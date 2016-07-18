@@ -60,7 +60,7 @@ infixl 9 power as .^
 divideUnits :: DerivedUnit → DerivedUnit → DerivedUnit
 divideUnits du1 du2 = du1 <> du2 .^ (-1.0)
 
-infixl 5 divideUnits as ./
+infixl 6 divideUnits as ./
 
 -- | A `String` representation of a`DerivedUnit`.
 toString :: DerivedUnit → String

@@ -7,6 +7,8 @@ module Data.Quantity
   , abs
   , toSI
   , approximatelyEqual
+  , qMultiply
+  , (⊗)
   ) where
 
 import Prelude
@@ -32,7 +34,7 @@ quantity = Quantity -- note that we define `quantity` because we do not want
                     -- the internal representation and the bare numerical
                     -- values.
 
-infix 3 quantity as .*
+infix 5 quantity as .*
 
 instance eqQuantity :: Eq Quantity where
   eq q1 q2 = value q1' == value q2' && derivedUnit q1' == derivedUnit q2'
@@ -102,6 +104,10 @@ approximatelyEqual tol q1' q2' =
 {--   case q2' of --}
 {--       (v2 ⋅ _) → pure $ (v1 + v2) ⋅ u1 --}
 
-{-- infixl 6 qAdd as .+. --}
+{-- infixl 6 qAdd as ⊕ --}
 
-{-- infixl 7 mul as * --}
+-- | Multiply two quantities.
+qMultiply :: Quantity → Quantity → Quantity
+qMultiply (v1 .*. u1) (v2 .*. u2) = (v1 * v2) .* (u1 <> u2)
+
+infixl 4 qMultiply as ⊗

@@ -7,7 +7,7 @@ import Data.Tuple (fst)
 import Data.DerivedUnit (meter, second, minute, hour, inch, unity, toString, (.^),
                          (./))
 import Data.DerivedUnit as D
-import Data.Quantity (Quantity, (.*))
+import Data.Quantity (Quantity, (.*), (⊗))
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
@@ -59,3 +59,6 @@ main = runTest do
       almostEqual (120.0 .* second) (2.0 .* minute)
       almostEqual (1.0 .* meter .^ 2.0) (1550.0031 .* inch .^ 2.0)
       almostEqual (50.0 .* meter ./ second) (180000.0 .* meter ./ hour)
+
+    test "Multiplication" do
+      equal (15.0 .* meter .^ 2.0) (3.0 .* meter ⊗ 5.0 .* meter)
