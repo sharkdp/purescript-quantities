@@ -1,0 +1,17 @@
+{
+  "name": "purescript-quantities",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-lists": "^1.0.0",
+    "purescript-monoid": "^1.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^1.0.0",
+    "purescript-test-unit": "^7.0.0"
+  }
+}
