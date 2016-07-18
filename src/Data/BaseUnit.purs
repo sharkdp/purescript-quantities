@@ -3,10 +3,10 @@ module Data.BaseUnit
   , BaseUnit()
   , shortName
   , longName
-  , isSI
-  , toSI
+  , isStandardUnit
+  , toStandardUnit
   , conversionFactor
-  -- SI units
+  -- Standard (SI) units
   , meter
   , gram
   , second
@@ -23,16 +23,16 @@ type ConversionFactor = Number
 -- | A base unit can either be a standardized SI unit or some non-standard
 -- | unit. In the latter case, a conversion to a SI unit must be provided.
 data UnitType
-  = SI
+  = Standard
   | NonStandard
-      { siUnit     :: BaseUnit
-      , conversion :: ConversionFactor
+      { standardUnit :: BaseUnit
+      , factor       :: ConversionFactor
       }
 
--- | The type for a base unit.
+-- | A (single) physical unit like *meter* or *second*.
 newtype BaseUnit = BaseUnit
-  { long :: String
-  , short :: String
+  { long     :: String
+  , short    :: String
   , unitType :: UnitType
   }
 
@@ -45,50 +45,55 @@ longName :: BaseUnit → String
 longName (BaseUnit u) = u.long
 
 instance eqBaseUnit :: Eq BaseUnit where
-  eq (BaseUnit u1) (BaseUnit u2) = u1.long == u2.long -- TODO
+  -- TODO: this is horrible!
+  eq (BaseUnit u1) (BaseUnit u2) = u1.long == u2.long
 
 instance showBaseUnit :: Show BaseUnit where
   show = longName
 
-makeSI :: String → String → BaseUnit
-makeSI long short = BaseUnit { short, long, unitType: SI }
-
-nonStandardUnit :: String → String → BaseUnit → ConversionFactor → BaseUnit
-nonStandardUnit long short siUnit conversion =
-  BaseUnit { short, long, unitType: NonStandard { siUnit, conversion } }
-
-meter :: BaseUnit
-meter = makeSI "meter" "m"
-
-second :: BaseUnit
-second = makeSI "second" "s"
-
-gram :: BaseUnit
-gram = makeSI "gram" "g"
-
-inch :: BaseUnit
-inch = nonStandardUnit "inch" "in" meter 0.0254
-
-minute :: BaseUnit
-minute = nonStandardUnit "minute" "min" second 60.0
-
-hour :: BaseUnit
-hour = nonStandardUnit "hour" "h" second 3600.0
-
-isSI :: BaseUnit → Boolean
-isSI (BaseUnit u) =
+-- | Test whether or not a given `BaseUnit` is a standard (SI) unit.
+isStandardUnit :: BaseUnit → Boolean
+isStandardUnit (BaseUnit u) =
   case u.unitType of
-    SI → true
-    _  → false
+    Standard → true
+    _        → false
 
-toSI :: BaseUnit → BaseUnit
-toSI (BaseUnit u) =
+-- | Convert a unit to a standard (SI) unit.
+toStandardUnit :: BaseUnit → BaseUnit
+toStandardUnit bu@(BaseUnit u) =
   case u.unitType of
-      SI → BaseUnit u
-      NonStandard { siUnit, conversion } → siUnit
+      Standard → bu
+      NonStandard { standardUnit, factor } → standardUnit
 
 conversionFactor :: BaseUnit → ConversionFactor
 conversionFactor (BaseUnit u) =
   case u.unitType of
-      SI → 1.0
-      NonStandard { siUnit, conversion } → conversion
+      Standard → 1.0
+      NonStandard { standardUnit, factor } → factor
+
+-- | Helper function to create a standard (SI) unit.
+makeStandard :: String → String → BaseUnit
+makeStandard long short = BaseUnit { short, long, unitType: Standard }
+
+-- | Helper function to create a non-SI unit.
+makeNonStandard :: String → String → BaseUnit → ConversionFactor → BaseUnit
+makeNonStandard long short standardUnit factor =
+  BaseUnit { short, long, unitType: NonStandard { standardUnit, factor } }
+
+meter :: BaseUnit
+meter = makeStandard "meter" "m"
+
+second :: BaseUnit
+second = makeStandard "second" "s"
+
+gram :: BaseUnit
+gram = makeStandard "gram" "g"
+
+inch :: BaseUnit
+inch = makeNonStandard "inch" "in" meter 0.0254
+
+minute :: BaseUnit
+minute = makeNonStandard "minute" "min" second 60.0
+
+hour :: BaseUnit
+hour = makeNonStandard "hour" "h" second 3600.0
