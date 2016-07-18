@@ -54,7 +54,7 @@ makeSI :: String → String → BaseUnit
 makeSI long short = BaseUnit { short, long, unitType: SI }
 
 nonStandardUnit :: String → String → BaseUnit → ConversionFactor → BaseUnit
-nonStandardUnit short long siUnit conversion =
+nonStandardUnit long short siUnit conversion =
   BaseUnit { short, long, unitType: NonStandard { siUnit, conversion } }
 
 meter :: BaseUnit

@@ -9,13 +9,13 @@ module Data.DerivedUnit
   -- One
   , unity
   -- SI units
-  , meter
-  , second
-  , gram
+  , meter, meters
+  , second, seconds
+  , gram, grams
   -- Non-standard units
-  , minute
-  , hour
-  , inch
+  , minute, minutes
+  , hour, hours
+  , inch, inches
   ) where
 
 import Prelude hiding (Unit)
@@ -48,15 +48,17 @@ runDerivedUnit :: DerivedUnit → List BaseUnitWithExponent
 runDerivedUnit (DerivedUnit u) = u
 
 -- | A `DerivedUnit` corresponding to `1`, i.e. the unit of scalar
--- | (dimensionless) values.
+-- | (or dimensionless) values.
 unity :: DerivedUnit
 unity = DerivedUnit Nil
 
+-- | Raise a unit to a given power.
 power :: DerivedUnit → Number → DerivedUnit
 power u n = DerivedUnit $ map (\(Tuple bu exp) → Tuple bu (exp * n)) (runDerivedUnit u)
 
 infixl 9 power as .^
 
+-- | Divide two given units.
 divideUnits :: DerivedUnit → DerivedUnit → DerivedUnit
 divideUnits du1 du2 = du1 <> du2 .^ (-1.0)
 
@@ -85,7 +87,7 @@ simplify = runDerivedUnit
              >>> sortBy (comparing (baseUnit >>> shortName))
              >>> groupBy (\u1 u2 → baseUnit u1 == baseUnit u2)
              >>> map merge
-             >>> filter (\x -> exponent x /= 0.0)
+             >>> filter (\x → exponent x /= 0.0)
              >>> DerivedUnit
   where
     merge units = Tuple (baseUnit (head units)) (sum $ exponent <$> units)
@@ -105,31 +107,50 @@ instance semigroupDerivedUnit :: Semigroup DerivedUnit where
 instance monoidDerivedUnit :: Monoid DerivedUnit where
   mempty = unity
 
--- | Convert all contained units to a SI unit and return a conversion function.
+-- | Convert all contained units to SI units and return the global conversion
+-- | factor.
 toSI :: DerivedUnit → Tuple DerivedUnit ConversionFactor
 toSI (DerivedUnit us) = Tuple us' conv
   where
     conv = product $ map (\(Tuple bu exp) → conversionFactor bu `pow` exp) us
-    us' = foldMap (du <<< B.toSI <<< baseUnit) us
+    us' = foldMap (\(Tuple bu exp) → du (B.toSI bu) .^ exp) us
 
--- | Every `BaseUnit` is also a (trivial) `DerivedUnit`.
+-- | Every `BaseUnit` is also a `DerivedUnit`.
 du :: BaseUnit → DerivedUnit
 du = DerivedUnit <<< singleton <<< (\bu → Tuple bu 1.0)
 
 meter :: DerivedUnit
 meter = du B.meter
 
+meters :: DerivedUnit
+meters = meter
+
 second :: DerivedUnit
 second = du B.second
+
+seconds :: DerivedUnit
+seconds = second
 
 gram :: DerivedUnit
 gram = du B.gram
 
+grams :: DerivedUnit
+grams = gram
+
 minute :: DerivedUnit
 minute = du B.minute
+
+minutes :: DerivedUnit
+minutes = minute
 
 hour :: DerivedUnit
 hour = du B.hour
 
+hours :: DerivedUnit
+hours = hour
+
 inch :: DerivedUnit
 inch = du B.inch
+
+inches :: DerivedUnit
+inches = inch
