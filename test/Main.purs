@@ -7,7 +7,7 @@ import Data.Tuple (fst, snd)
 
 import Data.BaseUnit as B
 import Data.DerivedUnit (meter, meters, second, seconds, minute, minutes, hour,
-                         hours, inch, inches, unity, (.^), (./))
+                         hours, inch, inches, miles, grams, unity, (.^), (./))
 import Data.DerivedUnit as D
 import Data.Quantity (Quantity, (.*), (⊕), (⊗), convertTo, asValueIn, pow)
 import Data.Quantity as Q
@@ -163,3 +163,15 @@ main = runTest do
     test "abs" do
       equal (2.4 .* seconds) (Q.abs (2.4 .* seconds))
       equal (2.4 .* seconds) (Q.abs ((-2.4) .* seconds))
+
+  suite "Integration" do
+    test "Example 1" do
+      equal (Right $ 2.5 .* minutes) (2.0 .* minutes ⊕ 30.0 .* seconds)
+
+    test "Example 2" do
+      equal (Right 37.9984) $
+            (85.0 .* miles ./ hour) `asValueIn` (meters ./ second)
+
+    test "Example 3" do
+      assert "should fail with error" $
+             isLeft ((10.0 .* miles) `asValueIn` (grams .^ 2.0))

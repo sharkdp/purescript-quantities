@@ -11,6 +11,7 @@ module Data.Quantity
   -- Create a dimensionless quantity
   , scalar
   -- Convert quantities
+  , convert
   , convertTo
   , asValueIn
   -- Calculate with quantities
@@ -118,7 +119,7 @@ convert to q@(val .*. from)
           in
             if from' == to'
               then Right $ q' ⊗ scalar (1.0 / factor)
-              else Left $ UnificationError to from
+              else Left $ UnificationError from to
 
 -- | Flipped version of `convert`.
 convertTo :: Quantity → DerivedUnit → Either UnificationError Quantity

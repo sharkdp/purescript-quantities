@@ -14,6 +14,8 @@ module Data.BaseUnit
   , minute
   , hour
   , inch
+  , foot
+  , mile
   ) where
 
 import Prelude
@@ -91,6 +93,12 @@ gram = makeStandard "gram" "g"
 
 inch :: BaseUnit
 inch = makeNonStandard "inch" "in" meter 0.0254
+
+foot :: BaseUnit
+foot = makeNonStandard "foot" "ft" meter 0.3048
+
+mile :: BaseUnit
+mile = makeNonStandard "mile" "mi" meter 1609.344
 
 minute :: BaseUnit
 minute = makeNonStandard "minute" "min" second 60.0

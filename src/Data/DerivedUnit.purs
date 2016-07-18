@@ -16,6 +16,8 @@ module Data.DerivedUnit
   , minute, minutes
   , hour, hours
   , inch, inches
+  , foot, feet
+  , mile, miles
   ) where
 
 import Prelude hiding (Unit)
@@ -165,3 +167,15 @@ inch = du B.inch
 
 inches :: DerivedUnit
 inches = inch
+
+foot :: DerivedUnit
+foot = du B.foot
+
+feet :: DerivedUnit
+feet = foot
+
+mile :: DerivedUnit
+mile = du B.mile
+
+miles :: DerivedUnit
+miles = mile
