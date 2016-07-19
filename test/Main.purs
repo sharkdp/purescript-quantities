@@ -7,9 +7,8 @@ import Data.Tuple (fst, snd)
 
 import Data.Units (unity, (.^), (./))
 import Data.Units as U
-import Data.Units.SI (meter, meters, second, seconds, grams)
-import Data.Units.NonStandard (hour, hours, minute, minutes, inch, inches,
-                               miles)
+import Data.Units.SI (meter, second, gram)
+import Data.Units.NonStandard (hour, minute, inch, mile)
 import Data.Quantity (Quantity, (.*), (⊕), (⊗), convertTo, asValueIn, pow)
 import Data.Quantity as Q
 
@@ -34,6 +33,14 @@ almostEqual expected actual = do
 
 main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT) Unit
 main = runTest do
+  let
+    meters = meter
+    seconds = second
+    miles = mile
+    minutes = minute
+    hours = hour
+    inches = inch
+    grams = gram
 
   suite "DerivedUnit" do
     test "Eq instance" do
