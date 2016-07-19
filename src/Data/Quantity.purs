@@ -28,8 +28,8 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
 
-import Data.DerivedUnit (DerivedUnit, toString, (.^))
-import Data.DerivedUnit as D
+import Data.Units (DerivedUnit, toString, (.^))
+import Data.Units as U
 
 import Math as Math
 
@@ -71,7 +71,7 @@ derivedUnit (_ .*. u) = u
 -- | Convert a quantity to its SI representation.
 toStandard :: Quantity → Quantity
 toStandard (num .*. du) =
-  case D.toStandardUnit du of
+  case U.toStandardUnit du of
     Tuple du' conversion → (conversion * num) .* du'
 
 -- | Check whether two quantities have matching units (or can be converted
@@ -104,7 +104,7 @@ errorMessage (UnificationError u1 u2) =
 
 -- | Create a scalar (i.e. dimensionless) quantity from a number.
 scalar :: Number → Quantity
-scalar factor = factor .* D.unity
+scalar factor = factor .* U.unity
 
 -- | Attempt to convert a physical quantity to a given target unit. Returns a
 -- | `UnificationError` if the conversion fails.
@@ -112,7 +112,7 @@ convert :: DerivedUnit → Quantity → Either UnificationError Quantity
 convert to q@(val .*. from)
   | to == from = Right q
   | otherwise =
-      case D.toStandardUnit to of
+      case U.toStandardUnit to of
         Tuple to' factor →
           let q' = toStandard q
               from' = derivedUnit q'

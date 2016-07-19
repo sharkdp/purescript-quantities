@@ -5,10 +5,11 @@ import Prelude
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
 
-import Data.BaseUnit as B
-import Data.DerivedUnit (meter, meters, second, seconds, minute, minutes, hour,
-                         hours, inch, inches, miles, grams, unity, (.^), (./))
-import Data.DerivedUnit as D
+import Data.Units (unity, (.^), (./))
+import Data.Units as U
+import Data.Units.SI (meter, meters, second, seconds, grams)
+import Data.Units.NonStandard (hour, hours, minute, minutes, inch, inches,
+                               miles)
 import Data.Quantity (Quantity, (.*), (⊕), (⊗), convertTo, asValueIn, pow)
 import Data.Quantity as Q
 
@@ -34,22 +35,6 @@ almostEqual expected actual = do
 main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT) Unit
 main = runTest do
 
-  suite "BaseUnit" do
-    test "isStandardUnit" do
-      assert "meter is a standard unit" $ B.isStandardUnit B.meter
-      assert "inch is a non-standard unit" $ not (B.isStandardUnit B.inch)
-
-    test "toStandardUnit" do
-      equal B.meter (B.toStandardUnit B.inch)
-      equal B.second (B.toStandardUnit B.hour)
-
-    test "conversionFactor" do
-      equal    1.0 (B.conversionFactor B.second)
-      equal   60.0 (B.conversionFactor B.minute)
-      equal 3600.0 (B.conversionFactor B.hour)
-
-
-
   suite "DerivedUnit" do
     test "Eq instance" do
       equal meter (meter .^ 1.0)
@@ -71,19 +56,19 @@ main = runTest do
       equal (meter <> meter <> second) (second <> meter <> meter)
 
     test "toStandardUnit" do
-      let rec = D.toStandardUnit minute
+      let rec = U.toStandardUnit minute
       equal second $ fst rec
       equal 60.0   $ snd rec
 
     test "toString" do
-      equal "m" $ D.toString meter
-      equal "m²" $ D.toString (meter <> meter)
-      equal "m²" $ D.toString (meter .^ 2.0)
-      equal "m³" $ D.toString (meter .^ 3.0)
-      equal "m^(4.0)" $ D.toString (meter .^ 4.0)
-      equal "m^(-1.0)" $ D.toString (meter .^ (-1.0))
-      equal "m²·s" $ D.toString (meter <> meter <> second)
-      equal "m·s²" $ D.toString (meter <> second <> second)
+      equal "m" $ U.toString meter
+      equal "m²" $ U.toString (meter <> meter)
+      equal "m²" $ U.toString (meter .^ 2.0)
+      equal "m³" $ U.toString (meter .^ 3.0)
+      equal "m^(4.0)" $ U.toString (meter .^ 4.0)
+      equal "m^(-1.0)" $ U.toString (meter .^ (-1.0))
+      equal "m²·s" $ U.toString (meter <> meter <> second)
+      equal "m·s²" $ U.toString (meter <> second <> second)
 
     test "power" do
       equal (meter <> meter) (meter .^ 2.0)

@@ -1,26 +1,20 @@
-module Data.DerivedUnit
+module Data.Units
   ( DerivedUnit()
+  , makeStandard
+  , makeNonStandard
+  -- Conversions
   , toStandardUnit
   , toString
+  -- Mathematical operations on units
   , power
   , (.^)
   , divideUnits
   , (./)
   -- One
   , unity
-  -- SI units
-  , meter, meters
-  , second, seconds
-  , gram, grams
-  -- Non-standard units
-  , minute, minutes
-  , hour, hours
-  , inch, inches
-  , foot, feet
-  , mile, miles
   ) where
 
-import Prelude hiding (Unit)
+import Prelude
 
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.List (List(Nil), singleton, (:), span, sortBy, filter)
@@ -30,8 +24,62 @@ import Data.Tuple (Tuple(..), fst, snd)
 
 import Math (pow)
 
-import Data.BaseUnit (shortName, BaseUnit, ConversionFactor, conversionFactor)
-import Data.BaseUnit as B
+
+type ConversionFactor = Number
+
+-- | A base unit can either be a standardized SI unit or some non-standard
+-- | unit. In the latter case, a conversion to a SI unit must be provided.
+data UnitType
+  = Standard
+  | NonStandard
+      { standardUnit :: DerivedUnit
+      , factor       :: ConversionFactor
+      }
+
+-- | A (single) physical unit like *meter* or *second*.
+newtype BaseUnit = BaseUnit
+  { long     :: String
+  , short    :: String
+  , unitType :: UnitType
+  }
+
+-- | The short name of a base unit (m, s, ..).
+shortName :: BaseUnit → String
+shortName (BaseUnit u) = u.short
+
+-- | The long name of a base unit (meter, second, ..).
+longName :: BaseUnit → String
+longName (BaseUnit u) = u.long
+
+instance eqBaseUnit :: Eq BaseUnit where
+  -- TODO: this is horrible!
+  eq (BaseUnit u1) (BaseUnit u2) = u1.long == u2.long
+
+instance showBaseUnit :: Show BaseUnit where
+  show = longName
+
+-- | Test whether or not a given `BaseUnit` is a standard (SI) unit.
+isStandardUnit :: BaseUnit → Boolean
+isStandardUnit (BaseUnit u) =
+  case u.unitType of
+    Standard → true
+    _        → false
+
+-- | Convert a base unit to a standard (SI) unit.
+baseToStandard :: BaseUnit → DerivedUnit
+baseToStandard bu@(BaseUnit u) =
+  case u.unitType of
+      Standard → fromBaseUnit bu
+      NonStandard { standardUnit, factor } → standardUnit
+
+conversionFactor :: BaseUnit → ConversionFactor
+conversionFactor (BaseUnit u) =
+  case u.unitType of
+      Standard → 1.0
+      NonStandard { standardUnit, factor } → factor
+
+
+
 
 -- | Type alias for something like m^3, s^(-1) or similar
 type BaseUnitWithExponent = { baseUnit :: BaseUnit
@@ -85,6 +133,17 @@ instance semigroupDerivedUnit :: Semigroup DerivedUnit where
 instance monoidDerivedUnit :: Monoid DerivedUnit where
   mempty = unity
 
+-- | Helper function to create a standard (SI) unit.
+makeStandard :: String → String → DerivedUnit
+makeStandard long short = fromBaseUnit $
+  BaseUnit { short, long, unitType: Standard }
+
+-- | Helper function to create a non-SI unit.
+makeNonStandard :: String → String → DerivedUnit → ConversionFactor
+                   → DerivedUnit
+makeNonStandard long short standardUnit factor = fromBaseUnit $
+  BaseUnit { short, long, unitType: NonStandard { standardUnit, factor } }
+
 -- | Convert all contained units to standard SI units and return the global
 -- | conversion factor.
 toStandardUnit :: DerivedUnit → Tuple DerivedUnit ConversionFactor
@@ -97,7 +156,7 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
 
     convert :: BaseUnitWithExponent → Tuple DerivedUnit Number
     convert { baseUnit, exponent } =
-      Tuple (du (B.toStandardUnit baseUnit) .^ exponent)
+      Tuple ((baseToStandard baseUnit) .^ exponent)
             (conversionFactor baseUnit `pow` exponent)
 
 -- | A `String` representation of a `DerivedUnit`.
@@ -128,54 +187,6 @@ infixl 6 divideUnits as ./
 unity :: DerivedUnit
 unity = DerivedUnit Nil
 
--- | Every `BaseUnit` is also a `DerivedUnit`.
-du :: BaseUnit → DerivedUnit
-du = DerivedUnit <<< singleton <<< (\bu → { baseUnit: bu, exponent: 1.0 })
-
-meter :: DerivedUnit
-meter = du B.meter
-
-meters :: DerivedUnit
-meters = meter
-
-second :: DerivedUnit
-second = du B.second
-
-seconds :: DerivedUnit
-seconds = second
-
-gram :: DerivedUnit
-gram = du B.gram
-
-grams :: DerivedUnit
-grams = gram
-
-minute :: DerivedUnit
-minute = du B.minute
-
-minutes :: DerivedUnit
-minutes = minute
-
-hour :: DerivedUnit
-hour = du B.hour
-
-hours :: DerivedUnit
-hours = hour
-
-inch :: DerivedUnit
-inch = du B.inch
-
-inches :: DerivedUnit
-inches = inch
-
-foot :: DerivedUnit
-foot = du B.foot
-
-feet :: DerivedUnit
-feet = foot
-
-mile :: DerivedUnit
-mile = du B.mile
-
-miles :: DerivedUnit
-miles = mile
+-- | Convert a `BaseUnit` to a `DerivedUnit`.
+fromBaseUnit :: BaseUnit → DerivedUnit
+fromBaseUnit = DerivedUnit <<< singleton <<< (\bu → { baseUnit: bu, exponent: 1.0 })
