@@ -6,7 +6,7 @@ A PureScript library to represent and work with physical quantities and units. N
 focuses on a representation at *run time* as opposed to other projects which use the type system to
 encode physical units at *compile time*.
 
-## Example
+## Examples
 
 ``` purs
 > 2.0 .* minutes ⊕ 30.0 .* seconds
@@ -20,4 +20,14 @@ encode physical units at *compile time*.
 
 > showError $ (10.0 .* miles) `asValueIn` (grams .^ 2.0)
 Cannot unify unit 'mi' with unit 'g²'
+```
+
+Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
+``` purs
+> let g = 9.81 .* meters ./ second .^ 2.0
+> let length = 20.0 .* centi meter
+> let period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+
+> period `asValueIn` milli seconds
+(Right 897.1402930932749)
 ```
