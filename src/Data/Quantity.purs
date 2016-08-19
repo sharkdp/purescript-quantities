@@ -94,8 +94,8 @@ data UnificationError = UnificationError DerivedUnit DerivedUnit
 derive instance eqUnificationError :: Eq UnificationError
 
 instance showUnificationError :: Show UnificationError where
-  show (UnificationError u1 u2) = "(UnificationError " <> show u1 <> " "
-                                                       <> show u2 <> ")"
+  show (UnificationError u1 u2) = "UnificationError (" <> show u1 <> ")"
+                                               <> " (" <> show u2 <> ")"
 
 -- | Textual representation of a unit conversion error.
 errorMessage :: UnificationError → String
