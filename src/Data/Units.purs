@@ -28,13 +28,19 @@ import Math (pow)
 type ConversionFactor = Number
 
 -- | A base unit can either be a standardized SI unit or some non-standard
--- | unit. In the latter case, a conversion to a SI unit must be provided.
+-- | unit. In the latter case, a conversion to an SI unit must be provided.
 data UnitType
   = Standard
   | NonStandard
       { standardUnit :: DerivedUnit
       , factor       :: ConversionFactor
       }
+
+instance eqUnitType :: Eq UnitType where
+  eq Standard Standard = true
+  eq (NonStandard rec1) (NonStandard rec2) = rec1.standardUnit == rec2.standardUnit
+                                          &&       rec1.factor == rec2.factor
+  eq _ _ = false
 
 -- | A (single) physical unit like *meter* or *second*.
 newtype BaseUnit = BaseUnit
@@ -52,8 +58,9 @@ longName :: BaseUnit → String
 longName (BaseUnit u) = u.long
 
 instance eqBaseUnit :: Eq BaseUnit where
-  -- TODO: this is horrible!
-  eq (BaseUnit u1) (BaseUnit u2) = u1.long == u2.long
+  eq (BaseUnit u1) (BaseUnit u2) =     u1.long == u2.long
+                                &&    u1.short == u2.short
+                                && u1.unitType == u2.unitType
 
 instance showBaseUnit :: Show BaseUnit where
   show = longName
@@ -98,7 +105,7 @@ runDerivedUnit (DerivedUnit u) = u
 groupBy :: ∀ a. (a → a → Boolean) → List a → List (NonEmpty List a)
 groupBy _ Nil = Nil
 groupBy eq (x : xs) = case span (eq x) xs of
-  { init: ys, rest: zs } → (x :| ys) : (groupBy eq zs)
+  { init: ys, rest: zs } → (x :| ys) : groupBy eq zs
 
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
