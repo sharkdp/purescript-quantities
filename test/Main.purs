@@ -228,7 +228,6 @@ main = runTest do
 
     test "Example 5" do
       let g = 9.81 .* meters ./ second .^ 2.0
-          length = 30.0 .* centi meter
-
-          osc_period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
-      almostEqual (1.0987679 .* seconds) osc_period
+          length = 20.0 .* centi meter
+          period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+      almostEqual (897.140293 .* milli second) period
