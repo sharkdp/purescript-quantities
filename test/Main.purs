@@ -216,5 +216,9 @@ main = runTest do
             (85.0 .* miles ./ hour) `asValueIn` (meters ./ second)
 
     test "Example 3" do
+      equal (Right 36.0) $
+            (10.0 .* meters ./ second) `asValueIn` (kilo meters ./ hour)
+
+    test "Example 4" do
       assert "should fail with error" $
              isLeft ((10.0 .* miles) `asValueIn` (grams .^ 2.0))

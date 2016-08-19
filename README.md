@@ -15,6 +15,9 @@ encode physical units at *compile time*.
 > (85.0 .* miles ./ hour) `asValueIn` (meters ./ second)
 (Right 37.9984)
 
+> (10.0 .* meters ./ second) `asValueIn` (kilo meters ./ hour)
+(Right 36.0)
+
 > showError $ (10.0 .* miles) `asValueIn` (grams .^ 2.0)
 Cannot unify unit 'mi' with unit 'g²'
 ```
