@@ -19,8 +19,11 @@ module Data.Quantity
   , (⊕)
   , qMultiply
   , (⊗)
+  , qDivide
+  , (⊘)
   , pow
   , abs
+  , sqrt
   ) where
 
 import Prelude
@@ -28,7 +31,7 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
 
-import Data.Units (DerivedUnit, toString, (.^))
+import Data.Units (DerivedUnit, toString, (.^), (./))
 import Data.Units as U
 
 import Math as Math
@@ -146,6 +149,12 @@ qMultiply (v1 .*. u1) (v2 .*. u2) = (v1 * v2) .* (u1 <> u2)
 
 infixl 4 qMultiply as ⊗
 
+-- | Divide two quantities.
+qDivide :: Quantity → Quantity → Quantity
+qDivide (v1 .*. u1) (v2 .*. u2) = (v1 / v2) .* (u1 ./ u2)
+
+infixl 4 qDivide as ⊘
+
 -- | Raise a quantity to a given power.
 pow :: Quantity → Number → Quantity
 pow (val .*. u) exp = (val `Math.pow` exp) .* (u .^ exp)
@@ -153,3 +162,7 @@ pow (val .*. u) exp = (val `Math.pow` exp) .* (u .^ exp)
 -- | The absolute value of a quantity.
 abs :: Quantity → Quantity
 abs (val .*. u) = Math.abs val .* u
+
+-- | The square root of a quantity.
+sqrt :: Quantity → Quantity
+sqrt q = q `pow` 0.5

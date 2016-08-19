@@ -10,11 +10,14 @@ import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
 import Data.Units.NonStandard (hour, minute, inch, mile)
-import Data.Quantity (Quantity, (.*), (⊕), (⊗), convertTo, asValueIn, pow)
+import Data.Quantity (Quantity, (.*), (⊕), (⊗), (⊘), convertTo, asValueIn, pow,
+                      scalar, sqrt)
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
+
+import Math (pi)
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
@@ -222,3 +225,10 @@ main = runTest do
     test "Example 4" do
       assert "should fail with error" $
              isLeft ((10.0 .* miles) `asValueIn` (grams .^ 2.0))
+
+    test "Example 5" do
+      let g = 9.81 .* meters ./ second .^ 2.0
+          length = 30.0 .* centi meter
+
+          osc_period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+      almostEqual (1.0987679 .* seconds) osc_period
