@@ -37,7 +37,7 @@ import Math as Math
 -- | and a physical unit.
 data Quantity = Quantity Number DerivedUnit
 
--- Used only internally for pattern matching
+-- | Helper operator, used internally for pattern matching.
 infix 3 Quantity as .*.
 
 -- | Construct a physical quantity from a numerical value and the physical

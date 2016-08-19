@@ -12,6 +12,22 @@ module Data.Units
   , (./)
   -- One
   , unity
+  -- Prefixes
+  , atto
+  , femto
+  , pico
+  , nano
+  , micro
+  , centi
+  , deci
+  , hecto
+  , milli
+  , kilo
+  , mega
+  , giga
+  , tera
+  , peta
+  , exa
   ) where
 
 import Prelude
@@ -92,13 +108,21 @@ conversionFactor (BaseUnit u) =
 type BaseUnitWithExponent = { baseUnit :: BaseUnit
                             , exponent :: Number }
 
+type Prefix = Number
+
 -- | A `DerivedUnit` is a product of `BaseUnits`, raised to arbitrary powers.
--- | The `Semigroup`/`Monoid` instance implements multiplication of units.
-data DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
+-- | The `Semigroup`/`Monoid` instance implements multiplication of units. A
+-- | `DerivedUnit` also has a `Prefix` value, which represents a numerical
+-- | prefix as a power of ten.
+data DerivedUnit = DerivedUnit Prefix (List BaseUnitWithExponent)
 
 -- | Expose the underlying list of base units.
 runDerivedUnit :: DerivedUnit → List BaseUnitWithExponent
-runDerivedUnit (DerivedUnit u) = u
+runDerivedUnit (DerivedUnit _ u) = u
+
+-- | Expose the underlying list of base units.
+prefix :: DerivedUnit → Prefix
+prefix (DerivedUnit p _) = p
 
 -- | Alternative implementation of `Data.List.groupBy` with a (more) useful
 -- | return type.
@@ -110,32 +134,40 @@ groupBy eq (x : xs) = case span (eq x) xs of
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
 simplify :: DerivedUnit → DerivedUnit
-simplify = runDerivedUnit
-             >>> sortBy (comparing (_.baseUnit >>> shortName))
-             >>> groupBy (\u1 u2 → u1.baseUnit == u2.baseUnit)
-             >>> map merge
-             >>> filter (\x → x.exponent /= 0.0)
-             >>> DerivedUnit
+simplify (DerivedUnit p list) = DerivedUnit p (go list)
   where
+    go = sortBy (comparing (_.baseUnit >>> shortName))
+           >>> groupBy (\u1 u2 → u1.baseUnit == u2.baseUnit)
+           >>> map merge
+           >>> filter (\x → x.exponent /= 0.0)
     merge units = { baseUnit: (head units).baseUnit
                   , exponent: sum $ _.exponent <$> units }
 
 instance eqDerivedUnit :: Eq DerivedUnit where
   eq u1 u2 = (_.baseUnit <$> list1 == _.baseUnit <$> list2)
           && (_.exponent <$> list1 == _.exponent <$> list2)
+          &&             prefix u1 == prefix u2
     where
       list1 = runDerivedUnit (simplify u1)
       list2 = runDerivedUnit (simplify u2)
 
 instance showDerivedUnit :: Show DerivedUnit where
-  show = intercalate " <> " <<< map showWithExp <<< runDerivedUnit
+  show du = showList (runDerivedUnit du)
     where
+      showList Nil | prefix' == 0.0 = "1.0"
+                   | otherwise      = prefixStr
+      showList xs  | prefix' == 0.0 = listString xs
+                   | otherwise      = prefixStr <> " .* " <> listString xs
+      listString xs = intercalate " <> " (showWithExp <$> xs)
       showWithExp { baseUnit, exponent: 1.0 } = show baseUnit
-      showWithExp { baseUnit, exponent } = show baseUnit <> " .^ "
-                                                         <> show exponent
+      showWithExp { baseUnit, exponent }      = show baseUnit
+                                                  <> " .^ " <> show exponent
+      prefix' = prefix du
+      prefixStr = if prefix' == 0.0 then "" else show (10.0 `pow` prefix')
 
 instance semigroupDerivedUnit :: Semigroup DerivedUnit where
-  append (DerivedUnit u1) (DerivedUnit u2) = simplify $ DerivedUnit (u1 <> u2)
+  append (DerivedUnit p1 u1) (DerivedUnit p2 u2) =
+    simplify $ DerivedUnit (p1 + p2) (u1 <> u2)
 
 instance monoidDerivedUnit :: Monoid DerivedUnit where
   mempty = unity
@@ -154,9 +186,9 @@ makeNonStandard long short standardUnit factor = fromBaseUnit $
 -- | Convert all contained units to standard SI units and return the global
 -- | conversion factor.
 toStandardUnit :: DerivedUnit → Tuple DerivedUnit ConversionFactor
-toStandardUnit (DerivedUnit units) = Tuple units' conv
+toStandardUnit (DerivedUnit prf units) = Tuple units' conv
   where
-    conv = product $ snd <$> converted
+    conv = 10.0 `pow` prf * product (snd <$> converted)
     units' = foldMap fst converted
 
     converted = convert <$> units
@@ -166,9 +198,29 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
       Tuple ((baseToStandard baseUnit) .^ exponent)
             (conversionFactor baseUnit `pow` exponent)
 
+-- | Convert a prefixed exponent to a `String`.
+prefixToString :: Prefix → String
+prefixToString -18.0 = "a"
+prefixToString -15.0 = "f"
+prefixToString -12.0 = "p"
+prefixToString  -9.0 = "n"
+prefixToString  -6.0 = "µ"
+prefixToString  -3.0 = "m"
+prefixToString  -2.0 = "c"
+prefixToString  -1.0 = "d"
+prefixToString   0.0 = ""
+prefixToString   2.0 = "h"
+prefixToString   3.0 = "k"
+prefixToString   6.0 = "M"
+prefixToString   9.0 = "G"
+prefixToString  12.0 = "T"
+prefixToString  15.0 = "P"
+prefixToString  18.0 = "E"
+prefixToString     p = "10^(" <> show p <> ")·"
+
 -- | A `String` representation of a `DerivedUnit`.
 toString :: DerivedUnit → String
-toString (DerivedUnit us) = intercalate "·" (withExp <$> us)
+toString (DerivedUnit prf us) = prefixToString prf <> intercalate "·" (withExp <$> us)
   where
     withExp { baseUnit, exponent: 1.0 } = shortName baseUnit
     withExp { baseUnit, exponent: 2.0 } = shortName baseUnit <> "²"
@@ -177,7 +229,7 @@ toString (DerivedUnit us) = intercalate "·" (withExp <$> us)
 
 -- | Raise a unit to the given power.
 power :: DerivedUnit → Number → DerivedUnit
-power u n = DerivedUnit $ map update (runDerivedUnit u)
+power u n = DerivedUnit (prefix u * n) $ map update (runDerivedUnit u)
   where
     update rec = rec { exponent = rec.exponent * n }
 
@@ -192,8 +244,56 @@ infixl 6 divideUnits as ./
 -- | A `DerivedUnit` corresponding to `1`, i.e. the unit of scalar
 -- | (or dimensionless) values.
 unity :: DerivedUnit
-unity = DerivedUnit Nil
+unity = DerivedUnit 0.0 Nil
 
 -- | Convert a `BaseUnit` to a `DerivedUnit`.
 fromBaseUnit :: BaseUnit → DerivedUnit
-fromBaseUnit = DerivedUnit <<< singleton <<< (\bu → { baseUnit: bu, exponent: 1.0 })
+fromBaseUnit = DerivedUnit 0.0 <<< singleton <<< (\bu → { baseUnit: bu, exponent: 1.0 })
+
+siPrefix :: Number → DerivedUnit → DerivedUnit
+siPrefix exp (DerivedUnit p us) = DerivedUnit (p + exp) us
+
+atto :: DerivedUnit → DerivedUnit
+atto = siPrefix (-18.0)
+
+femto :: DerivedUnit → DerivedUnit
+femto = siPrefix (-15.0)
+
+pico :: DerivedUnit → DerivedUnit
+pico = siPrefix (-12.0)
+
+nano :: DerivedUnit → DerivedUnit
+nano = siPrefix (-9.0)
+
+micro :: DerivedUnit → DerivedUnit
+micro = siPrefix (-6.0)
+
+milli :: DerivedUnit → DerivedUnit
+milli = siPrefix (-3.0)
+
+centi :: DerivedUnit → DerivedUnit
+centi = siPrefix (-2.0)
+
+deci :: DerivedUnit → DerivedUnit
+deci = siPrefix (-1.0)
+
+hecto :: DerivedUnit → DerivedUnit
+hecto = siPrefix 2.0
+
+kilo :: DerivedUnit → DerivedUnit
+kilo = siPrefix 3.0
+
+mega :: DerivedUnit → DerivedUnit
+mega = siPrefix 6.0
+
+giga :: DerivedUnit → DerivedUnit
+giga = siPrefix 9.0
+
+tera :: DerivedUnit → DerivedUnit
+tera = siPrefix 12.0
+
+peta :: DerivedUnit → DerivedUnit
+peta = siPrefix 15.0
+
+exa :: DerivedUnit → DerivedUnit
+exa = siPrefix 18.0

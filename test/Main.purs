@@ -5,7 +5,8 @@ import Prelude
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
 
-import Data.Units (unity, (.^), (./))
+import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
+                   deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
 import Data.Units.NonStandard (hour, minute, inch, mile)
@@ -47,20 +48,32 @@ main = runTest do
       equal meter (meter .^ 1.0)
       equal (meter .^ 2.0) (meter <> meter)
       equal (meter <> second) (second <> meter)
+      equal (kilo meter) (kilo meter)
+      assertFalse "should check the prefix" $ kilo meter == meter
+      assertFalse "should compare prefixes" $ kilo meter == nano meter
 
     test "Show instance" do
+      equal      "meter"
+            (show meter)
       equal      "meter"
             (show meter)
       equal      "meter .^ 2.0"
            (show (meter .^ 2.0))
       equal       "meter .^ 2.0 <> second .^ 3.0"
             (show (meter .^ 2.0 <> second .^ 3.0))
+      equal       "1000000.0 .* meter .^ 2.0"
+            (show (kilo meter .^ 2.0))
+      equal       "1.0"
+            (show unity)
+      equal       "1000.0"
+            (show (kilo meter ./ meter))
 
     test "Semigroup / Monoid instance" do
       equal meter (meter <> unity)
       equal meter (unity <> meter)
       equal (meter <> meter <> second) (meter <> second <> meter)
       equal (meter <> meter <> second) (second <> meter <> meter)
+      equal (kilo meter <> meter <> second) (second <> kilo meter <> meter)
 
     test "toStandardUnit" do
       let rec = U.toStandardUnit minute
@@ -76,17 +89,41 @@ main = runTest do
       equal "m^(-1.0)" $ U.toString (meter .^ (-1.0))
       equal "m²·s" $ U.toString (meter <> meter <> second)
       equal "m·s²" $ U.toString (meter <> second <> second)
+      equal "km·s²" $ U.toString (kilo meter <> second <> second)
+      equal "km·s²" $ U.toString (meter <> kilo second <> second)
+
+    test "toString (prefixes)" do
+      equal "am" $ U.toString (atto meter)
+      equal "fm" $ U.toString (femto meter)
+      equal "pm" $ U.toString (pico meter)
+      equal "nm" $ U.toString (nano meter)
+      equal "µm" $ U.toString (micro meter)
+      equal "mm" $ U.toString (milli meter)
+      equal "cm" $ U.toString (centi meter)
+      equal "dm" $ U.toString (deci meter)
+      equal "hm" $ U.toString (hecto meter)
+      equal "km" $ U.toString (kilo meter)
+      equal "Ms" $ U.toString (mega second)
+      equal "Gs" $ U.toString (giga second)
+      equal "Ts" $ U.toString (tera second)
+      equal "Ps" $ U.toString (peta second)
+      equal "Es" $ U.toString (exa second)
+      equal "10^(-24.0)·s²" $ U.toString (pico second .^ 2.0)
+      equal "10^(24.0)·s²"  $ U.toString (tera second .^ 2.0)
 
     test "power" do
       equal (meter <> meter) (meter .^ 2.0)
       equal unity (meter .^ (-1.0) <> meter)
       equal unity (meter <> meter .^ (-1.0))
       equal (meter ./ second) (meter <> second .^ (-1.0))
+      equal (micro (meter .^ 2.0)) (milli meter .^ 2.0)
 
     test "divideUnits" do
       equal unity (meter <> (unity ./ meter))
       equal unity ((unity ./ meter) <> meter)
       equal meter (meter <> meter ./ meter)
+      equal unity (kilo meter ./ kilo meter)
+      equal (milli meter) (meter .^ 2.0 ./ kilo meter)
 
 
 
@@ -99,6 +136,7 @@ main = runTest do
 
     test "Show instance" do
       equal "3.0m" $ show (3.0 .* meter)
+      equal "3.0km" $ show (3.0 .* kilo meter)
       equal "3.0m²·s" $ show (3.0 .* (meter <> second <> meter))
 
     test "derivedUnit" do
@@ -118,6 +156,12 @@ main = runTest do
              upToTenPercent (10.0 .* meters) (11.4 .* meters)
       assertFalse "should check units" $
              upToTenPercent (10.0 .* meters) (10.0 .* seconds)
+      assert "should do conversions" $
+             upToTenPercent (1000.0 .* meters) (1.0 .* kilo meter)
+      assert "should do conversions" $
+             upToTenPercent (1000000.0 .* meters) (1000.0 .* kilo meter)
+      assert "should do conversions" $
+             upToTenPercent (1.0 .* meter) (0.001 .* kilo meters)
 
     test "scalar" do
       equal (3.0 .* unity) (Q.scalar 3.0)
@@ -135,6 +179,8 @@ main = runTest do
       equal (Right $ 100.0) ((2.54 .* meters) `asValueIn` inches)
       equal (Right $ 120.0) ((2.0 .* hours) `asValueIn` minutes)
       equal (Right $ 2.0) ((120.0 .* minutes) `asValueIn` hours)
+      equal (Right $ 2000.0) ((2.0 .* kilo meters) `asValueIn` meters)
+      equal (Right $ 2.0) ((2000.0 .* meters) `asValueIn` kilo meters)
       assert "should not convert m to m^2" $
              isLeft ((2.0 .* meters) `asValueIn` (meter .^ 2.0))
       assert "should not convert meters to seconds" $
@@ -142,14 +188,19 @@ main = runTest do
 
     test "Addition" do
       equal (Right $ 8.0 .* meter) (3.0 .* meter ⊕ 5.0 .* meter)
+      equal (Right $ 8.05 .* meter) (8.0 .* meter ⊕ 50.0 .* milli meter)
       assert "should not add meters and seconds" $
              isLeft $ 3.0 .* meter ⊕ 5.0 .* second
 
     test "Multiplication" do
       equal (15.0 .* meter .^ 2.0) (3.0 .* meter ⊗ 5.0 .* meter)
+      equal (2000.0 .* meter .^ 2.0) (2.0 .* (meter <> kilo meter))
+      equal (2000.0 .* meter .^ 2.0) (2.0 .* (kilo meter <> meter))
 
     test "pow" do
       equal (100.0 .* meter .^ 2.0) ((10.0 .* meter) `pow` 2.0)
+      equal (4000000.0 .* meter .^ 2.0) (4.0 .* kilo meter .^ 2.0)
+      equal (4.0 .* kilo meter .^ 2.0) ((2.0 .* kilo meter) `pow` 2.0)
       equal (Q.scalar 100.0) ((Q.scalar 10.0) `pow` 2.0)
 
     test "abs" do
