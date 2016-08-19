@@ -8,5 +8,5 @@ import Prelude ((<>))
 radian :: DerivedUnit
 radian = unity
 
-herz :: DerivedUnit
-herz = unity ./ second
+hertz :: DerivedUnit
+hertz = unity ./ second
