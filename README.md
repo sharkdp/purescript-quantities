@@ -20,6 +20,14 @@ encode physical units at *compile time*.
 Cannot unify unit 'mi' with unit 'g²'
 ```
 
+Calculate the time it takes to download a *2.7Gb* file on a *6Mbit/s* connection:
+``` purs
+> let filesize = 2.7 .* giga byte
+> let speed = 6.0 .* mega bit ./ second
+> (filesize ⊘ speed) `asValueIn` hours
+(Right 1.0)
+```
+
 Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
 ``` purs
 > let g = 9.81 .* meters ./ second .^ 2.0

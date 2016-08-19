@@ -10,6 +10,7 @@ import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
 import Data.Units.NonStandard (hour, minute, inch, mile)
+import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), (⊕), (⊗), (⊘), convertTo, asValueIn, pow,
                       scalar, sqrt)
 import Data.Quantity as Q
@@ -227,6 +228,12 @@ main = runTest do
              isLeft ((10.0 .* miles) `asValueIn` (grams .^ 2.0))
 
     test "Example 5" do
+      let filesize = 2.7 .* giga byte
+          speed = 6.0 .* mega bit ./ second
+          time = filesize ⊘ speed
+      almostEqual (1.0 .* hour) time
+
+    test "Example 6" do
       let g = 9.81 .* meters ./ second .^ 2.0
           length = 20.0 .* centi meter
           period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
