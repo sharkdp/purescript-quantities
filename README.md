@@ -20,7 +20,7 @@ encode physical units at *compile time*.
 Cannot unify unit 'mi' with unit 'g²'
 ```
 
-Calculate the time it takes to download a *2.7Gb* file on a *6Mbit/s* connection:
+Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection:
 ``` purs
 > let filesize = 2.7 .* giga byte
 > let speed = 6.0 .* mega bit ./ second
