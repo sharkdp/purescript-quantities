@@ -1,7 +1,7 @@
 -- | A collection of units that are derived from SI units.
 module Data.Units.SI.Derived where
 
-import Data.Units (DerivedUnit, (./), (.^), unity, kilo)
+import Data.Units (DerivedUnit, (./), (.^), unity)
 import Data.Units.SI
 
 import Prelude ((<>))
@@ -20,7 +20,7 @@ steradian = unity
 
 -- | Unit for force, *1N = 1kg⋅m/s²*.
 newton :: DerivedUnit
-newton = kilo gram <> meter ./ second .^ 2.0
+newton = kilogram <> meter ./ second .^ 2.0
 
 -- | Unit for energy, *1J = 1N·m*.
 joule :: DerivedUnit
