@@ -17,6 +17,8 @@ module Data.Quantity
   -- Calculate with quantities
   , qAdd
   , (⊕)
+  , qSubtract
+  , (⊖)
   , qMultiply
   , (⊗)
   , qDivide
@@ -71,7 +73,7 @@ value (v .*. _) = v
 derivedUnit :: Quantity → DerivedUnit
 derivedUnit (_ .*. u) = u
 
--- | Convert a quantity to its SI representation.
+-- | Convert a quantity to its standard representation.
 toStandard :: Quantity → Quantity
 toStandard (num .*. du) =
   case U.toStandardUnit du of
@@ -142,6 +144,13 @@ qAdd (v1 .*. u1) q2 = do
     (v2 .*. _) → pure $ (v1 + v2) .* u1
 
 infixl 3 qAdd as ⊕
+
+-- | Attempt to subtract two quantities. If the units can not be unified, an
+-- | error is returned.
+qSubtract :: Quantity → Quantity → Either UnificationError Quantity
+qSubtract q1 (v2 .*. u2) = q1 ⊕ ((-v2) .*. u2)
+
+infixl 3 qSubtract as ⊖
 
 -- | Multiply two quantities.
 qMultiply :: Quantity → Quantity → Quantity

@@ -9,10 +9,12 @@ import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
-import Data.Units.NonStandard (hour, minute, inch, mile)
+import Data.Units.SI.Derived (hertz, newton, joule)
+import Data.Units.Time (hour, minute)
+import Data.Units.Imperial (inch, mile)
 import Data.Units.Bit (bit, byte)
-import Data.Quantity (Quantity, (.*), (⊕), (⊗), (⊘), convertTo, asValueIn, pow,
-                      scalar, sqrt)
+import Data.Quantity (Quantity, (.*), (⊕), (⊖), (⊗), (⊘), convertTo, asValueIn,
+                      pow, scalar, sqrt)
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
@@ -196,10 +198,21 @@ main = runTest do
       assert "should not add meters and seconds" $
              isLeft $ 3.0 .* meter ⊕ 5.0 .* second
 
+    test "Subtraction" do
+      equal (Right $ 3.0 .* meter) (5.0 .* meter ⊖ 2.0 .* meter)
+      equal (Right $ 994.0 .* meter) (1.0 .* kilo meter ⊖ 6.0 .* meter)
+      equal (Right $ 55.0 .* minutes) (1.0 .* hour ⊖ 5.0 .* minutes)
+      assert "should not subtract meters from seconds" $
+             isLeft $ 3.0 .* second ⊖ 5.0 .* meter
+
     test "Multiplication" do
       equal (15.0 .* meter .^ 2.0) (3.0 .* meter ⊗ 5.0 .* meter)
       equal (2000.0 .* meter .^ 2.0) (2.0 .* (meter <> kilo meter))
       equal (2000.0 .* meter .^ 2.0) (2.0 .* (kilo meter <> meter))
+      equal (4.0 .* joule) (8.0 .* newton ⊗ 0.5 .* meter)
+
+    test "Division" do
+      equal (0.5 .* giga hertz) (scalar 1.0 ⊘ 2.0 .* nano second)
 
     test "pow" do
       equal (100.0 .* meter .^ 2.0) ((10.0 .* meter) `pow` 2.0)
@@ -210,6 +223,7 @@ main = runTest do
     test "abs" do
       equal (2.4 .* seconds) (Q.abs (2.4 .* seconds))
       equal (2.4 .* seconds) (Q.abs ((-2.4) .* seconds))
+      equal (0.0 .* seconds) (Q.abs (0.0 .* seconds))
 
   suite "Integration" do
     test "Example 1" do

@@ -43,8 +43,8 @@ import Math (pow)
 
 type ConversionFactor = Number
 
--- | A base unit can either be a standardized SI unit or some non-standard
--- | unit. In the latter case, a conversion to an SI unit must be provided.
+-- | A base unit can either be a standardized unit or some non-standard unit.
+-- | In the latter case, a conversion to a standard unit must be provided.
 data UnitType
   = Standard
   | NonStandard
@@ -81,14 +81,14 @@ instance eqBaseUnit :: Eq BaseUnit where
 instance showBaseUnit :: Show BaseUnit where
   show = longName
 
--- | Test whether or not a given `BaseUnit` is a standard (SI) unit.
+-- | Test whether or not a given `BaseUnit` is a standard unit.
 isStandardUnit :: BaseUnit → Boolean
 isStandardUnit (BaseUnit u) =
   case u.unitType of
     Standard → true
     _        → false
 
--- | Convert a base unit to a standard (SI) unit.
+-- | Convert a base unit to a standard unit.
 baseToStandard :: BaseUnit → DerivedUnit
 baseToStandard bu@(BaseUnit u) =
   case u.unitType of
@@ -172,18 +172,18 @@ instance semigroupDerivedUnit :: Semigroup DerivedUnit where
 instance monoidDerivedUnit :: Monoid DerivedUnit where
   mempty = unity
 
--- | Helper function to create a standard (SI) unit.
+-- | Helper function to create a standard unit.
 makeStandard :: String → String → DerivedUnit
 makeStandard long short = fromBaseUnit $
   BaseUnit { short, long, unitType: Standard }
 
--- | Helper function to create a non-SI unit.
-makeNonStandard :: String → String → DerivedUnit → ConversionFactor
+-- | Helper function to create a non-standard unit.
+makeNonStandard :: String → String → ConversionFactor → DerivedUnit
                    → DerivedUnit
-makeNonStandard long short standardUnit factor = fromBaseUnit $
+makeNonStandard long short factor standardUnit = fromBaseUnit $
   BaseUnit { short, long, unitType: NonStandard { standardUnit, factor } }
 
--- | Convert all contained units to standard SI units and return the global
+-- | Convert all contained units to standard units and return the global
 -- | conversion factor.
 toStandardUnit :: DerivedUnit → Tuple DerivedUnit ConversionFactor
 toStandardUnit (DerivedUnit prf units) = Tuple units' conv
