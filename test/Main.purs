@@ -15,7 +15,7 @@ import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
-                      errorMessage)
+                      errorMessage, showResult)
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
@@ -272,29 +272,29 @@ main = runTest do
       equal (0.0 .* seconds) (Q.abs (0.0 .* seconds))
 
   suite "Integration" do
-    test "Example 1" do
-      equal (Right $ 2.5 .* minutes) (2.0 .* minutes ⊕ 30.0 .* seconds)
+    let testExample nr output input =
+          test ("Example " <> show nr) $
+            equal output (showResult input)
 
-    test "Example 2" do
-      equal (Right 37.9984) $
-            (85.0 .* miles ./ hour) `asValueIn` (meters ./ second)
+    testExample 1 "2.5min" $
+      2.0 .* minutes ⊕ 30.0 .* seconds
 
-    test "Example 3" do
-      equal (Right 36.0) $
-            (10.0 .* meters ./ second) `asValueIn` (kilo meters ./ hour)
+    testExample 2 "36.0km/h" $
+      (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
 
-    test "Example 4" do
-      assert "should fail with error" $
-             isLeft ((10.0 .* miles) `asValueIn` (grams .^ 2.0))
+    testExample 3 "37.9984m/s" $
+      (85.0 .* miles ./ hour) `convertTo` (meters ./ second)
 
-    test "Example 5" do
-      let filesize = 2.7 .* giga byte
-          speed = 6.0 .* mega bit ./ second
-          time = filesize ⊘ speed
-      almostEqual (1.0 .* hour) time
+    testExample 4 "Cannot unify unit 'mi' with unit 'g²'" $
+      (10.0 .* miles) `convertTo` (grams .^ 2.0)
 
-    test "Example 6" do
-      let g = 9.81 .* meters ./ second .^ 2.0
-          length = 20.0 .* centi meter
-          period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
-      almostEqual (897.140293 .* milli second) period
+    let filesize = 2.7 .* giga byte
+        speed = 6.0 .* mega bit ./ second
+        time = (filesize ⊘ speed) `convertTo` hour
+    testExample 5 "1.0h" time
+
+    let g = 9.81 .* meters ./ second .^ 2.0
+        length = 20.0 .* centi meter
+        period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+    testExample 6 "897.1402930932747ms"
+      (period `convertTo` milli second)

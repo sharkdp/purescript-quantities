@@ -7,16 +7,16 @@ encode physical units at *compile time*.
 ## Examples
 
 ``` purs
-> 2.0 .* minutes ⊕ 30.0 .* seconds
-(Right 2.5min)
+> printResult $ 2.0 .* minutes ⊕ 30.0 .* seconds
+2.5min
 
-> (85.0 .* miles ./ hour) `asValueIn` (meters ./ second)
-(Right 37.9984)
+> printResult $ (85.0 .* miles ./ hour) `convertTo` (meters ./ second)
+37.9984m/s
 
-> (10.0 .* meters ./ second) `asValueIn` (kilo meters ./ hour)
-(Right 36.0)
+> printResult $ (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
+36.0km/h
 
-> showError $ (10.0 .* miles) `asValueIn` (grams .^ 2.0)
+> printResult $ (10.0 .* miles) `convertTo` (grams .^ 2.0)
 Cannot unify unit 'mi' with unit 'g²'
 ```
 
@@ -24,8 +24,8 @@ Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection
 ``` purs
 > let filesize = 2.7 .* giga byte
 > let speed = 6.0 .* mega bit ./ second
-> (filesize ⊘ speed) `asValueIn` hours
-(Right 1.0)
+> printResult $ (filesize ⊘ speed) `convertTo` hours
+1.0h
 ```
 
 Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
@@ -34,8 +34,8 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 > let length = 20.0 .* centi meter
 > let period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
 
-> period `asValueIn` milli seconds
-(Right 897.1402930932749)
+> printResult $ period `convertTo` milli seconds
+897.1402930932747ms
 ```
 
 ## Documentation

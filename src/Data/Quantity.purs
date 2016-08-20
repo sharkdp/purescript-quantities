@@ -3,6 +3,7 @@ module Data.Quantity
   , quantity
   , (.*)
   , prettyPrint
+  , showResult
   , derivedUnit
   , toStandard
   , approximatelyEqual
@@ -71,6 +72,11 @@ prettyPrint (val .*. du)
   | du == unity = show val
   | otherwise   = let res = toStringWithPrefix du
                   in show val <> res.prefix <> res.value
+
+-- | Show the (possibly failed) result of a computation in human-readable form.
+showResult :: Either UnificationError Quantity → String
+showResult (Left error) = errorMessage error
+showResult (Right q)    = prettyPrint q
 
 -- | The numerical value stored inside a `Quantity`. For internal use only
 -- | (bare `Number`s without units should be handled with care).
