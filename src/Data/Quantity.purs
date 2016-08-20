@@ -127,11 +127,12 @@ convert to q@(val .*. from)
   | otherwise =
       case U.toStandardUnit to of
         Tuple to' factor →
-          let q' = toStandard q
+          let q'    = toStandard q
               from' = derivedUnit q'
           in
             if from' == to'
-              then Right $ q' ⊗ scalar (1.0 / factor)
+              then Right $ case q' of
+                             (val' .*. _) → (val' / factor) .*. to
               else Left $ UnificationError from to
 
 -- | Flipped version of `convert`.

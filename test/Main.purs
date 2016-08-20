@@ -11,21 +11,31 @@ import Data.Units as U
 import Data.Units.SI (meter, second, gram)
 import Data.Units.SI.Derived (hertz, newton, joule)
 import Data.Units.Time (hour, minute)
-import Data.Units.Imperial (inch, mile)
+import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
-                      convertTo, asValueIn, pow, scalar, sqrt)
+                      convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
+                      errorMessage)
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
 
-import Math (pi)
+import Math (pi, abs)
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
 import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.Assert (assert, assertFalse, equal)
+
+tolerance :: Number
+tolerance = 0.00001
+
+almostEqualNumbers :: ∀ e. Number → Number → Test e
+almostEqualNumbers x y = do
+  if abs (x - y) < tolerance * abs (x + y) / 2.0
+    then success
+    else failure $ "expected " <> show x <> ", got " <> show y
 
 -- | Test if two quantities are almost equal, i.e. if the units match and the
 -- | numerical value is approximately the same.
@@ -35,7 +45,7 @@ almostEqual expected actual = do
     then success
     else failure $ "expected " <> show expected <>
                    ", got " <> show actual
-  where approximatelyEqual = Q.approximatelyEqual 0.00001
+  where approximatelyEqual = Q.approximatelyEqual tolerance
 
 
 main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT) Unit
@@ -190,7 +200,26 @@ main = runTest do
       equal (3.0 .* unity) (Q.scalar 3.0)
 
     test "convert, convertTo" do
-      equal (Right $ 60.0 .* seconds) ((1.0 .* minute) `convertTo` seconds)
+      let checkConversion q targetValue targetUnit = do
+            let converted = q `convertTo` targetUnit
+            case converted of
+              Left err → failure $ "Conversion failed: " <> errorMessage err
+              Right q' →
+                if derivedUnit q' /= targetUnit
+                  then failure "Conversion failed: unit /= targetUnit"
+                  else
+                    case q' `asValueIn` targetUnit of
+                      Left err → failure "Conversion failed in this stage?"
+                      Right val → almostEqualNumbers targetValue val
+
+      checkConversion (1.0 .* minute)  60.0 seconds
+      checkConversion (2.0 .* hours ) 120.0 minutes
+      checkConversion (36.0 .* kilo meter ./ hour) 10.0 (meter ./ second)
+      checkConversion (12.0 .* inch) 1.0 foot
+      checkConversion (1.0 .* foot) 12.0 inch
+      checkConversion (3.0 .* foot) 1.0 yard
+      checkConversion (36.0 .* inch) 1.0 yard
+      checkConversion (2.0 .* foot .^ 2.0) 288.0 (inch .^ 2.0)
 
       -- the following checks implicitely use `convert`
       almostEqual (120.0 .* seconds) (2.0 .* minutes)
