@@ -37,3 +37,7 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 > period `asValueIn` milli seconds
 (Right 897.1402930932749)
 ```
+
+## Documentation
+
+- [Module documentation](https://pursuit.purescript.org/packages/purescript-quantities)
