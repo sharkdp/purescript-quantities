@@ -1,9 +1,14 @@
 module Data.Units
-  ( DerivedUnit()
+  ( Prefix
+  , DerivedUnit()
+  , prefix
+  , withPrefix
   , makeStandard
   , makeNonStandard
   -- Conversions
   , toStandardUnit
+  , prefixName
+  , toStringWithPrefix
   , toString
   -- Mathematical operations on units
   , power
@@ -34,13 +39,15 @@ import Prelude
 
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.List (List(Nil), singleton, (:), span, sortBy, filter)
+import Data.Maybe (Maybe(..), fromMaybe, isNothing)
 import Data.Monoid (class Monoid)
 import Data.NonEmpty (NonEmpty, (:|), head)
 import Data.Tuple (Tuple(..), fst, snd)
 
 import Math (pow)
 
-
+-- | A factor which is used to convert between two units. For the conversion
+-- | from `minute` to `second`, the conversion factor would be `60.0`.
 type ConversionFactor = Number
 
 -- | A base unit can either be a standardized unit or some non-standard unit.
@@ -58,18 +65,18 @@ instance eqUnitType :: Eq UnitType where
                                           &&       rec1.factor == rec2.factor
   eq _ _ = false
 
--- | A (single) physical unit like *meter* or *second*.
+-- | A (single) physical unit, for example *meter* or *second*.
 newtype BaseUnit = BaseUnit
   { long     :: String
   , short    :: String
   , unitType :: UnitType
   }
 
--- | The short name of a base unit (m, s, ..).
+-- | The short name of a base unit (*meter* -> *m*, *second* -> *s*, ..).
 shortName :: BaseUnit → String
 shortName (BaseUnit u) = u.short
 
--- | The long name of a base unit (meter, second, ..).
+-- | The long name of a base unit (*meter*, *second*, ..).
 longName :: BaseUnit → String
 longName (BaseUnit u) = u.long
 
@@ -120,9 +127,14 @@ data DerivedUnit = DerivedUnit Prefix (List BaseUnitWithExponent)
 runDerivedUnit :: DerivedUnit → List BaseUnitWithExponent
 runDerivedUnit (DerivedUnit _ u) = u
 
--- | Expose the underlying list of base units.
+-- | Get the prefix value of a `DerivedUnit`. A prefix value of `3.0`, for
+-- | example, represents an additional factor of `10^3` (*kilo*).
 prefix :: DerivedUnit → Prefix
 prefix (DerivedUnit p _) = p
+
+-- | Add a given prefix value to a unit. `withPrefix 3.0 meter = kilo meter`.
+withPrefix :: Prefix → DerivedUnit → DerivedUnit
+withPrefix p (DerivedUnit p' xs) = DerivedUnit (p + p') xs
 
 -- | Alternative implementation of `Data.List.groupBy` with a (more) useful
 -- | return type.
@@ -152,18 +164,18 @@ instance eqDerivedUnit :: Eq DerivedUnit where
       list2 = runDerivedUnit (simplify u2)
 
 instance showDerivedUnit :: Show DerivedUnit where
-  show du = showList (runDerivedUnit du)
+  show (DerivedUnit prf us) =
+    if prf == 0.0
+      then listString us
+      else "withPrefix (" <> show prf <> ") (" <> listString us <> ")"
+
     where
-      showList Nil | prefix' == 0.0 = "1.0"
-                   | otherwise      = prefixStr
-      showList xs  | prefix' == 0.0 = listString xs
-                   | otherwise      = prefixStr <> " .* " <> listString xs
-      listString xs = intercalate " <> " (showWithExp <$> xs)
+      listString Nil = "unity"
+      listString us' = intercalate " <> " (showWithExp <$> us')
+
       showWithExp { baseUnit, exponent: 1.0 } = show baseUnit
-      showWithExp { baseUnit, exponent }      = show baseUnit
-                                                  <> " .^ " <> show exponent
-      prefix' = prefix du
-      prefixStr = if prefix' == 0.0 then "" else show (10.0 `pow` prefix')
+      showWithExp { baseUnit, exponent }      =
+        show baseUnit <> " .^ (" <> show exponent <> ")"
 
 instance semigroupDerivedUnit :: Semigroup DerivedUnit where
   append (DerivedUnit p1 u1) (DerivedUnit p2 u2) =
@@ -198,34 +210,71 @@ toStandardUnit (DerivedUnit prf units) = Tuple units' conv
       Tuple ((baseToStandard baseUnit) .^ exponent)
             (conversionFactor baseUnit `pow` exponent)
 
--- | Convert a prefixed exponent to a `String`.
-prefixToString :: Prefix → String
-prefixToString -18.0 = "a"
-prefixToString -15.0 = "f"
-prefixToString -12.0 = "p"
-prefixToString  -9.0 = "n"
-prefixToString  -6.0 = "µ"
-prefixToString  -3.0 = "m"
-prefixToString  -2.0 = "c"
-prefixToString  -1.0 = "d"
-prefixToString   0.0 = ""
-prefixToString   2.0 = "h"
-prefixToString   3.0 = "k"
-prefixToString   6.0 = "M"
-prefixToString   9.0 = "G"
-prefixToString  12.0 = "T"
-prefixToString  15.0 = "P"
-prefixToString  18.0 = "E"
-prefixToString     p = "10^(" <> show p <> ")·"
+-- | Get the name of a SI-prefix.
+prefixName :: Prefix → Maybe String
+prefixName -18.0 = Just "a"
+prefixName -15.0 = Just "f"
+prefixName -12.0 = Just "p"
+prefixName  -9.0 = Just "n"
+prefixName  -6.0 = Just "µ"
+prefixName  -3.0 = Just "m"
+prefixName  -2.0 = Just "c"
+prefixName  -1.0 = Just "d"
+prefixName   0.0 = Just ""
+prefixName   2.0 = Just "h"
+prefixName   3.0 = Just "k"
+prefixName   6.0 = Just "M"
+prefixName   9.0 = Just "G"
+prefixName  12.0 = Just "T"
+prefixName  15.0 = Just "P"
+prefixName  18.0 = Just "E"
+prefixName     _ = Nothing
 
--- | A `String` representation of a `DerivedUnit`.
-toString :: DerivedUnit → String
-toString (DerivedUnit prf us) = prefixToString prf <> intercalate "·" (withExp <$> us)
+-- | A human-readable `String` representation of a `DerivedUnit`, including
+-- | a prefix string if the unit needs to be combined with a numerical value.
+toStringWithPrefix :: DerivedUnit → { prefix :: String, value :: String }
+toStringWithPrefix (DerivedUnit prf us) =
+  { value: prefixString <> unitString
+  , prefix: if isNothing prefixName' then "·" else ""
+  }
   where
-    withExp { baseUnit, exponent: 1.0 } = shortName baseUnit
-    withExp { baseUnit, exponent: 2.0 } = shortName baseUnit <> "²"
-    withExp { baseUnit, exponent: 3.0 } = shortName baseUnit <> "³"
+    prefixName' = prefixName prf
+    prefixString = fromMaybe ("10^" <> prfStr <> "·") prefixName'
+      where prfStr = if prf < 0.0 then "(" <> show prf <> ")" else show prf
+
+    withExp { baseUnit, exponent: -5.0 } = shortName baseUnit <> "⁻⁵"
+    withExp { baseUnit, exponent: -4.0 } = shortName baseUnit <> "⁻⁴"
+    withExp { baseUnit, exponent: -3.0 } = shortName baseUnit <> "⁻³"
+    withExp { baseUnit, exponent: -2.0 } = shortName baseUnit <> "⁻²"
+    withExp { baseUnit, exponent: -1.0 } = shortName baseUnit <> "⁻¹"
+    withExp { baseUnit, exponent:  1.0 } = shortName baseUnit
+    withExp { baseUnit, exponent:  2.0 } = shortName baseUnit <> "²"
+    withExp { baseUnit, exponent:  3.0 } = shortName baseUnit <> "³"
+    withExp { baseUnit, exponent:  4.0 } = shortName baseUnit <> "⁴"
+    withExp { baseUnit, exponent:  5.0 } = shortName baseUnit <> "⁵"
     withExp { baseUnit, exponent } = shortName baseUnit <> "^(" <> show exponent <> ")"
+
+    usSorted = sortBy (comparing (\rec → -rec.exponent)) us
+    splitted = span (\rec → rec.exponent >= 0.0) usSorted
+    positiveUs = splitted.init
+    negativeUs = sortBy (comparing _.exponent) splitted.rest
+    reverseExp rec = rec { exponent = -rec.exponent }
+
+    positiveUsStr = intercalate "·" (withExp <$> positiveUs)
+    negativeUsStr = intercalate "·" (withExp <$> negativeUs)
+    negativeUsStr' = intercalate "·" ((withExp <<< reverseExp) <$> negativeUs)
+
+    unitString =
+      case positiveUs of
+        Nil → negativeUsStr
+        _   → case negativeUs of
+                Nil → positiveUsStr
+                n : Nil → positiveUsStr <> "/" <> negativeUsStr'
+                ns → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
+
+-- | A human-readable `String` representation of a `DerivedUnit`.
+toString :: DerivedUnit → String
+toString = _.value <<< toStringWithPrefix
 
 -- | Raise a unit to the given power.
 power :: DerivedUnit → Number → DerivedUnit
@@ -250,50 +299,47 @@ unity = DerivedUnit 0.0 Nil
 fromBaseUnit :: BaseUnit → DerivedUnit
 fromBaseUnit = DerivedUnit 0.0 <<< singleton <<< (\bu → { baseUnit: bu, exponent: 1.0 })
 
-siPrefix :: Number → DerivedUnit → DerivedUnit
-siPrefix exp (DerivedUnit p us) = DerivedUnit (p + exp) us
-
 atto :: DerivedUnit → DerivedUnit
-atto = siPrefix (-18.0)
+atto = withPrefix (-18.0)
 
 femto :: DerivedUnit → DerivedUnit
-femto = siPrefix (-15.0)
+femto = withPrefix (-15.0)
 
 pico :: DerivedUnit → DerivedUnit
-pico = siPrefix (-12.0)
+pico = withPrefix (-12.0)
 
 nano :: DerivedUnit → DerivedUnit
-nano = siPrefix (-9.0)
+nano = withPrefix (-9.0)
 
 micro :: DerivedUnit → DerivedUnit
-micro = siPrefix (-6.0)
+micro = withPrefix (-6.0)
 
 milli :: DerivedUnit → DerivedUnit
-milli = siPrefix (-3.0)
+milli = withPrefix (-3.0)
 
 centi :: DerivedUnit → DerivedUnit
-centi = siPrefix (-2.0)
+centi = withPrefix (-2.0)
 
 deci :: DerivedUnit → DerivedUnit
-deci = siPrefix (-1.0)
+deci = withPrefix (-1.0)
 
 hecto :: DerivedUnit → DerivedUnit
-hecto = siPrefix 2.0
+hecto = withPrefix 2.0
 
 kilo :: DerivedUnit → DerivedUnit
-kilo = siPrefix 3.0
+kilo = withPrefix 3.0
 
 mega :: DerivedUnit → DerivedUnit
-mega = siPrefix 6.0
+mega = withPrefix 6.0
 
 giga :: DerivedUnit → DerivedUnit
-giga = siPrefix 9.0
+giga = withPrefix 9.0
 
 tera :: DerivedUnit → DerivedUnit
-tera = siPrefix 12.0
+tera = withPrefix 12.0
 
 peta :: DerivedUnit → DerivedUnit
-peta = siPrefix 15.0
+peta = withPrefix 15.0
 
 exa :: DerivedUnit → DerivedUnit
-exa = siPrefix 18.0
+exa = withPrefix 18.0

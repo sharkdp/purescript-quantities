@@ -13,8 +13,8 @@ import Data.Units.SI.Derived (hertz, newton, joule)
 import Data.Units.Time (hour, minute)
 import Data.Units.Imperial (inch, mile)
 import Data.Units.Bit (bit, byte)
-import Data.Quantity (Quantity, (.*), (⊕), (⊖), (⊗), (⊘), convertTo, asValueIn,
-                      pow, scalar, sqrt)
+import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
+                      convertTo, asValueIn, pow, scalar, sqrt)
 import Data.Quantity as Q
 
 import Control.Monad.Eff (Eff)
@@ -61,18 +61,22 @@ main = runTest do
     test "Show instance" do
       equal      "meter"
             (show meter)
-      equal      "meter"
-            (show meter)
-      equal      "meter .^ 2.0"
-           (show (meter .^ 2.0))
-      equal       "meter .^ 2.0 <> second .^ 3.0"
-            (show (meter .^ 2.0 <> second .^ 3.0))
-      equal       "1000000.0 .* meter .^ 2.0"
+      equal      "second"
+            (show second)
+      equal      "meter .^ (2.0)"
+           (show (meter .^ (2.0)))
+      equal      "meter .^ (-2.0)"
+           (show (meter .^ (-2.0)))
+      equal       "meter .^ (2.0) <> second .^ (3.0)"
+            (show (meter .^ (2.0) <> second .^ (3.0)))
+      equal       "withPrefix (6.0) (meter .^ (2.0))"
             (show (kilo meter .^ 2.0))
-      equal       "1.0"
+      equal       "unity"
             (show unity)
-      equal       "1000.0"
+      equal       "withPrefix (3.0) (unity)"
             (show (kilo meter ./ meter))
+      equal       "withPrefix (3.0) (gram <> meter <> second .^ (-2.0))"
+            (show newton)
 
     test "Semigroup / Monoid instance" do
       equal meter (meter <> unity)
@@ -91,12 +95,16 @@ main = runTest do
       equal "m²" $ U.toString (meter <> meter)
       equal "m²" $ U.toString (meter .^ 2.0)
       equal "m³" $ U.toString (meter .^ 3.0)
-      equal "m^(4.0)" $ U.toString (meter .^ 4.0)
-      equal "m^(-1.0)" $ U.toString (meter .^ (-1.0))
+      equal "m⁴" $ U.toString (meter .^ 4.0)
+      equal "m^(8.0)" $ U.toString (meter .^ 8.0)
+      equal "m^(-8.0)" $ U.toString (meter .^ -8.0)
+      equal "m⁻¹" $ U.toString (meter .^ (-1.0))
+      equal "m⁻⁴" $ U.toString (meter .^ (-4.0))
       equal "m²·s" $ U.toString (meter <> meter <> second)
-      equal "m·s²" $ U.toString (meter <> second <> second)
-      equal "km·s²" $ U.toString (kilo meter <> second <> second)
-      equal "km·s²" $ U.toString (meter <> kilo second <> second)
+      equal "s²·m" $ U.toString (meter <> second <> second)
+      equal "m/s" $ U.toString (meter ./ second)
+      equal "m/s²" $ U.toString (meter ./ second .^ 2.0)
+      equal "m³/(s²·g)" $ U.toString (meter .^ 3.0 ./ (second .^ 2.0 <> gram))
 
     test "toString (prefixes)" do
       equal "am" $ U.toString (atto meter)
@@ -115,7 +123,7 @@ main = runTest do
       equal "Ps" $ U.toString (peta second)
       equal "Es" $ U.toString (exa second)
       equal "10^(-24.0)·s²" $ U.toString (pico second .^ 2.0)
-      equal "10^(24.0)·s²"  $ U.toString (tera second .^ 2.0)
+      equal "10^24.0·s²"    $ U.toString (tera second .^ 2.0)
 
     test "power" do
       equal (meter <> meter) (meter .^ 2.0)
@@ -141,9 +149,18 @@ main = runTest do
       assert "should compare values" $ 3.0 .* meter /= 3.01 .* meter
 
     test "Show instance" do
-      equal "3.0m" $ show (3.0 .* meter)
-      equal "3.0km" $ show (3.0 .* kilo meter)
-      equal "3.0m²·s" $ show (3.0 .* (meter <> second <> meter))
+      equal "(-3.0) .* (meter)" $ show (-3.0 .* meter)
+      equal "(3.0) .* (withPrefix (3.0) (meter))" $ show (3.0 .* kilo meter)
+      equal "(3.0) .* (meter .^ (2.0) <> second)" $ show (3.0 .* (meter <> second <> meter))
+      equal "(2.0) .* (withPrefix (24.0) (second .^ (2.0)))" $ show (2.0 .* (tera second .^ 2.0))
+
+    test "prettyPrint" do
+      equal "3.0" $ prettyPrint (scalar 3.0)
+      equal "3.0km" $ prettyPrint (3.0 .* kilo meter)
+      equal "3.0m" $ prettyPrint (3.0 .* meter)
+      equal "3.0m²·s" $ prettyPrint (3.0 .* (meter <> second <> meter))
+      equal "3.0m/s" $ prettyPrint (3.0 .* meter ./ second)
+      equal "3.0·10^30.0·s²" $ prettyPrint (3.0 .* peta second .^ 2.0)
 
     test "derivedUnit" do
       equal meter (Q.derivedUnit (3.0 .* meter))

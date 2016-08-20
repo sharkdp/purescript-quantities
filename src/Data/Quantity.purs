@@ -2,6 +2,7 @@ module Data.Quantity
   ( Quantity
   , quantity
   , (.*)
+  , prettyPrint
   , derivedUnit
   , toStandard
   , approximatelyEqual
@@ -33,7 +34,7 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
 
-import Data.Units (DerivedUnit, toString, (.^), (./))
+import Data.Units (DerivedUnit, toString, toStringWithPrefix, (.^), (./), unity)
 import Data.Units as U
 
 import Math as Math
@@ -62,7 +63,14 @@ instance eqQuantity :: Eq Quantity where
       q2' = toStandard q2
 
 instance showQuantity :: Show Quantity where
-  show (Quantity num unit) = show num <> toString unit
+  show (Quantity num unit) = "(" <> show num <> ") .* (" <> show unit <> ")"
+
+-- | Show a physical quantity in a human-readable form.
+prettyPrint :: Quantity → String
+prettyPrint (val .*. du)
+  | du == unity = show val
+  | otherwise   = let res = toStringWithPrefix du
+                  in show val <> res.prefix <> res.value
 
 -- | The numerical value stored inside a `Quantity`. For internal use only
 -- | (bare `Number`s without units should be handled with care).
