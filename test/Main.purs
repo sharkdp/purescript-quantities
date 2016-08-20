@@ -1,6 +1,6 @@
 module Test.Main where
 
-import Prelude
+import Prelude hiding (degree)
 
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
@@ -9,7 +9,8 @@ import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (hertz, newton, joule)
+import Data.Units.SI.Derived (hertz, newton, joule, radian)
+import Data.Units.SI.Accepted (degree)
 import Data.Units.Time (hour, minute)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
@@ -17,6 +18,7 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
                       errorMessage, showResult)
 import Data.Quantity as Q
+import Data.Quantity.Math (sin, asin)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
@@ -47,6 +49,11 @@ almostEqual expected actual = do
                    ", got " <> show actual
   where approximatelyEqual = Q.approximatelyEqual tolerance
 
+almostEqual' :: ∀ e err. Quantity → Either err Quantity → Test e
+almostEqual' expected actual =
+  case actual of
+    Left _ → failure "Conversion error"
+    Right actual' → almostEqual expected actual'
 
 main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT) Unit
 main = runTest do
@@ -59,7 +66,7 @@ main = runTest do
     inches = inch
     grams = gram
 
-  suite "DerivedUnit" do
+  suite "Data.Units" do
     test "Eq instance" do
       equal meter (meter .^ 1.0)
       equal (meter .^ 2.0) (meter <> meter)
@@ -151,7 +158,7 @@ main = runTest do
 
 
 
-  suite "Quantity" do
+  suite "Data.Quantity" do
     test "Eq instance" do
       equal (3.0 .* meter) ((1.0 + 2.0) .* (meter .^ 1.0))
       assert "should compare units" $ 3.0 .* meter /= 3.0 .* second
@@ -271,6 +278,13 @@ main = runTest do
       equal (2.4 .* seconds) (Q.abs ((-2.4) .* seconds))
       equal (0.0 .* seconds) (Q.abs (0.0 .* seconds))
 
+  suite "Data.Quantity.Math" do
+    test "Functions" do
+      almostEqual' (scalar 1.0) (sin (90.0 .* degree))
+      almostEqual' (scalar 0.5) (sin (30.0 .* degree))
+      almostEqual' (30.0 .* degree) (asin (scalar 0.5))
+      almostEqual' (scalar 1.0) (sin ((0.5 * pi) .* radian))
+
   suite "Integration" do
     let testExample nr output input =
           test ("Example " <> show nr) $
@@ -288,13 +302,16 @@ main = runTest do
     testExample 4 "Cannot unify unit 'mi' with unit 'g²'" $
       (10.0 .* miles) `convertTo` (grams .^ 2.0)
 
+    testExample 5 "1.0" $
+      sin (90.0 .* degree)
+
     let filesize = 2.7 .* giga byte
         speed = 6.0 .* mega bit ./ second
         time = (filesize ⊘ speed) `convertTo` hour
-    testExample 5 "1.0h" time
+    testExample 6 "1.0h" time
 
     let g = 9.81 .* meters ./ second .^ 2.0
         length = 20.0 .* centi meter
         period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
-    testExample 6 "897.1402930932747ms"
+    testExample 7 "897.1402930932747ms"
       (period `convertTo` milli second)

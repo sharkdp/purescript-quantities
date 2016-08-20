@@ -4,8 +4,6 @@ module Data.Units.Imperial where
 import Data.Units (DerivedUnit, makeNonStandard)
 import Data.Units.SI
 
-import Prelude ((*))
-
 -- | Unit of length, *1in = 0.0254m*.
 inch :: DerivedUnit
 inch = makeNonStandard "inch" "in" 0.0254 meter

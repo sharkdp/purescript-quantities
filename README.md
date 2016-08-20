@@ -18,6 +18,9 @@ encode physical units at *compile time*.
 
 > printResult $ (10.0 .* miles) `convertTo` (grams .^ 2.0)
 Cannot unify unit 'mi' with unit 'g²'
+
+> printResult $ sin (90.0 .* degree)
+1.0
 ```
 
 Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection:
