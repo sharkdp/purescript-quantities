@@ -4,7 +4,7 @@ import Prelude hiding (degree)
 
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
-
+import Data.Number ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
@@ -23,19 +23,16 @@ import Data.Quantity.Math (sin, asin)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
 
-import Math (pi, abs)
+import Math (pi)
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
 import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.Assert (assert, assertFalse, equal)
 
-tolerance :: Number
-tolerance = 0.00001
-
 almostEqualNumbers :: ∀ e. Number → Number → Test e
 almostEqualNumbers x y = do
-  if abs (x - y) < tolerance * abs (x + y) / 2.0
+  if x ≅ y
     then success
     else failure $ "expected " <> show x <> ", got " <> show y
 
@@ -47,7 +44,9 @@ almostEqual expected actual = do
     then success
     else failure $ "expected " <> show expected <>
                    ", got " <> show actual
-  where approximatelyEqual = Q.approximatelyEqual tolerance
+  where
+    approximatelyEqual = Q.approximatelyEqual tolerance
+    tolerance = 1.0e-6
 
 almostEqual' :: ∀ e err. Quantity → Either err Quantity → Test e
 almostEqual' expected actual =

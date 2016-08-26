@@ -34,6 +34,7 @@ import Prelude
 
 import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
+import Data.Number (eqRelative)
 
 import Data.Units (DerivedUnit, toString, toStringWithPrefix, (.^), (./), unity)
 import Data.Units as U
@@ -99,7 +100,7 @@ toStandard (num .*. du) =
 approximatelyEqual :: Number → Quantity → Quantity → Boolean
 approximatelyEqual tol q1' q2' =
   derivedUnit q1 == derivedUnit q2 &&
-  Math.abs (v1 - v2) < tol * Math.abs (v1 + v2) / 2.0
+  eqRelative tol v1 v2
     where
       q1 = toStandard q1'
       q2 = toStandard q2'

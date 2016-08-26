@@ -19,7 +19,8 @@
   "dependencies": {
     "purescript-lists": "^1.0.0",
     "purescript-monoid": "^1.0.0",
-    "purescript-nonempty": "^1.0.0"
+    "purescript-nonempty": "^1.0.0",
+    "purescript-numbers": "^2.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^1.0.0",
