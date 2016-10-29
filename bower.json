@@ -17,13 +17,13 @@
     "output"
   ],
   "dependencies": {
-    "purescript-lists": "^1.0.0",
-    "purescript-monoid": "^1.0.0",
-    "purescript-nonempty": "^1.0.0",
-    "purescript-numbers": "^2.0.0"
+    "purescript-lists": "^3.0.0",
+    "purescript-monoid": "^2.0.0",
+    "purescript-nonempty": "^3.0.0",
+    "purescript-numbers": "^3.0.0"
   },
   "devDependencies": {
-    "purescript-psci-support": "^1.0.0",
-    "purescript-test-unit": "^7.0.0"
+    "purescript-psci-support": "^2.0.0",
+    "purescript-test-unit": "^10.0.0"
   }
 }
