@@ -22,6 +22,7 @@ import Data.Quantity.Math (sin, asin)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Aff.AVar (AVAR)
 
 import Math (pi)
 
@@ -54,7 +55,7 @@ almostEqual' expected actual =
     Left _ → failure "Conversion error"
     Right actual' → almostEqual expected actual'
 
-main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT) Unit
+main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT, avar :: AVAR) Unit
 main = runTest do
   let
     meters = meter
