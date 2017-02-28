@@ -1,4 +1,14 @@
-module Data.Quantity.Math where
+module Data.Quantity.Math
+  ( acos
+  , asin
+  , atan
+  , atan2
+  , cos
+  , exp
+  , log
+  , sin
+  , tan
+  ) where
 
 import Prelude
 import Math as M
