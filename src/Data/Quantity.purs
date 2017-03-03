@@ -120,7 +120,12 @@ instance showUnificationError :: Show UnificationError where
 -- | Textual representation of a unit conversion error.
 errorMessage :: UnificationError → String
 errorMessage (UnificationError u1 u2) =
-  "Cannot unify unit '" <> toString u1 <> "' with unit '" <> toString u2 <> "'"
+  if u1 == unity
+    then "Cannot convert quantity of unit '" <> toString u2 <> "' to a scalar"
+    else
+      if u2 == unity
+        then "Cannot convert quantity of unit '" <> toString u1 <> "' to a scalar"
+        else "Cannot unify unit '" <> toString u1 <> "' with unit '" <> toString u2 <> "'"
 
 -- | Create a scalar (i.e. dimensionless) quantity from a number.
 scalar :: Number → Quantity
