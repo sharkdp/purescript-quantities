@@ -8,6 +8,8 @@ module Data.Quantity.Math
   , log
   , sin
   , tan
+  , pi
+  , e
   ) where
 
 import Prelude
@@ -51,3 +53,9 @@ sin = lift M.sin
 
 tan :: Quantity → Result
 tan = lift M.tan
+
+pi ∷ Quantity
+pi = scalar M.pi
+
+e ∷ Quantity
+e = scalar M.e

@@ -15,6 +15,7 @@ module Quantities
 import Prelude hiding (degree) as P
 import Data.Quantity as DQ
 import Data.Quantity.Math as DQM
+import Data.Quantity.Physics as DQM
 import Data.Units as DU
 import Data.Units.SI as DUS
 import Data.Units.SI.Derived as DUSD
