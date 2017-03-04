@@ -17,6 +17,7 @@ module Data.Quantity
   , convertTo
   , asValueIn
   -- Calculate with quantities
+  , qNegate
   , qAdd
   , (⊕)
   , qSubtract
@@ -155,6 +156,10 @@ convertTo = flip convert
 -- | `UnificationError` if the conversion fails.
 asValueIn :: Quantity → DerivedUnit → Either UnificationError Number
 asValueIn u = convertTo u >=> value >>> pure
+
+-- | Negate the numerical value of a quantity.
+qNegate :: Quantity → Quantity
+qNegate (v .*. u) = (-v) .*. u
 
 -- | Attempt to add two quantities. If the units can not be unified, an error
 -- | is returned.

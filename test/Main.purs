@@ -16,7 +16,7 @@ import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
-                      errorMessage, showResult)
+                      errorMessage, showResult, qNegate)
 import Data.Quantity as Q
 import Data.Quantity.Math (sin, asin)
 
@@ -249,6 +249,10 @@ main = runTest do
              isLeft ((2.0 .* meters) `asValueIn` (meter .^ 2.0))
       assert "should not convert meters to seconds" $
              isLeft ((2.0 .* meters) `asValueIn` seconds)
+
+    test "Negation" do
+      equal ((-8.0) .* meter) (qNegate $ 8.0 .* meter)
+      equal (0.0 .* meter) (qNegate $ 0.0 .* meter)
 
     test "Addition" do
       equal (Right $ 8.0 .* meter) (3.0 .* meter ⊕ 5.0 .* meter)
