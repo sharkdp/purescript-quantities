@@ -1,8 +1,8 @@
 -- | A helper module which re-exports all sub-modules.
 module Quantities
-  ( module P
-  , module DQ
+  ( module DQ
   , module DQM
+  , module DQP
   , module DU
   , module DUS
   , module DUSD
@@ -12,10 +12,9 @@ module Quantities
   , module DUB
   ) where
 
-import Prelude hiding (degree) as P
 import Data.Quantity as DQ
 import Data.Quantity.Math as DQM
-import Data.Quantity.Physics as DQM
+import Data.Quantity.Physics as DQP
 import Data.Units as DU
 import Data.Units.SI as DUS
 import Data.Units.SI.Derived as DUSD
