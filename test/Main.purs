@@ -9,7 +9,7 @@ import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
 import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (hertz, newton, joule, radian)
+import Data.Units.SI.Derived (hertz, newton, joule, radian, watt)
 import Data.Units.SI.Accepted (degree)
 import Data.Units.Time (hour, minute)
 import Data.Units.Imperial (inch, mile, foot, yard)
@@ -243,6 +243,10 @@ main = runTest do
       checkConversion (3.0 .* foot) 1.0 yard
       checkConversion (36.0 .* inch) 1.0 yard
       checkConversion (2.0 .* foot .^ 2.0) 288.0 (inch .^ 2.0)
+      checkConversion (1.0 .* (kilo gram <> meter <> second .^ (-2.0))) 1.0 newton
+      checkConversion (1.0 .* newton) 1.0 (kilo gram <> meter <> second .^ (-2.0))
+      checkConversion (1.0 .* joule) 1.0 (watt <> second)
+      checkConversion (1.0 .* joule) 1.0 (newton <> meter)
 
       -- the following checks implicitely use `convert`
       almostEqual (120.0 .* seconds) (2.0 .* minutes)

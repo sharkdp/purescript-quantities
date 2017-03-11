@@ -40,7 +40,7 @@ import Prelude
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.List (List(Nil), singleton, (:), span, sortBy, filter, findIndex,
                   modifyAt)
-import Data.Maybe (Maybe(..), fromMaybe, isNothing)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid (class Monoid)
 import Data.NonEmpty (NonEmpty, (:|), head)
 import Data.Tuple (Tuple(..), fst, snd)

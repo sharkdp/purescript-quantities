@@ -20,12 +20,12 @@ steradian = unity
 
 -- | Unit for force, *1N = 1kg⋅m/s²*.
 newton :: DerivedUnit
-newton = makeNonStandard "newton" "N" 1.0 (kilogram <> meter ./ second .^ 2.0)
+newton = makeNonStandard "newton" "N" 1000.0 (gram <> meter ./ second .^ 2.0)
 
 -- | Unit for energy, *1J = 1N·m*.
 joule :: DerivedUnit
-joule = makeNonStandard "joule" "J" 1.0 (kilogram <> meter .^ 2.0 ./ second .^ 2.0)
+joule = makeNonStandard "joule" "J" 1000.0 (gram <> meter .^ 2.0 ./ second .^ 2.0)
 
 -- | Unit for power, *1W = 1J/s*.
 watt :: DerivedUnit
-watt = makeNonStandard "watt" "W" 1.0 (kilogram <> meter .^ 2.0 ./ second .^ 3.0)
+watt = makeNonStandard "watt" "W" 1000.0 (gram <> meter .^ 2.0 ./ second .^ 3.0)
