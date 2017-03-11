@@ -191,6 +191,13 @@ main = runTest do
       almostEqual (1.0 .* meter ./ second) $
                   Q.toStandard (2362.2047 .* inch ./ minute)
 
+    test "fullSimplify" do
+      almostEqual (200.0 .* unity) $
+        Q.fullSimplify (2.0 .* meter ./ centi meter)
+
+      almostEqual (2.0 .* unity) $
+        Q.fullSimplify (2000000.0 .* milli meter ./ kilo meter)
+
     test "approximatelyEqual" do
       let upToTenPercent = Q.approximatelyEqual 0.1
       assert "should tolerate small differences" $

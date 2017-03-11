@@ -7,10 +7,9 @@ module Data.Quantity.Physics
 
 import Prelude
 
-import Data.Quantity ((⊗), (⊘), (.*), Quantity, UnificationError, asValueIn,
-                      scalar)
+import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar)
 import Data.Quantity.Math (pi)
-import Data.Units ((.^), (./), unity, kilo)
+import Data.Units ((.^), (./), kilo)
 import Data.Units.SI (meter, second, gram)
 import Data.Units.SI.Derived (joule)
 

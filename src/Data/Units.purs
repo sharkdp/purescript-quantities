@@ -2,6 +2,7 @@ module Data.Units
   ( Prefix
   , DerivedUnit()
   , withPrefix
+  , simplify
   , makeStandard
   , makeNonStandard
   -- Conversions

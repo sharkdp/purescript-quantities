@@ -6,6 +6,7 @@ module Data.Quantity
   , showResult
   , derivedUnit
   , toStandard
+  , fullSimplify
   , approximatelyEqual
   -- Conversion errors
   , UnificationError
@@ -16,6 +17,7 @@ module Data.Quantity
   , convert
   , convertTo
   , asValueIn
+  , toScalar
   -- Calculate with quantities
   , qNegate
   , qAdd
@@ -95,6 +97,13 @@ toStandard (num .*. du) =
   case U.toStandardUnit du of
     Tuple du' conversion → (conversion * num) .* du'
 
+-- | Simplify the unit of a quantity.
+fullSimplify :: Quantity → Quantity
+fullSimplify q@(num .*. du) =
+  case toScalar q of
+    Left _ → num .*. U.simplify du
+    Right n → n .*. unity
+
 -- | Check whether two quantities have matching units (or can be converted
 -- | to the same representation) and test if the numerical are approximately
 -- | equal.
@@ -156,6 +165,10 @@ convertTo = flip convert
 -- | `UnificationError` if the conversion fails.
 asValueIn :: Quantity → DerivedUnit → Either UnificationError Number
 asValueIn u = convertTo u >=> value >>> pure
+
+-- | Try to convert a quantity to a scalar value
+toScalar :: Quantity → Either UnificationError Number
+toScalar q = q `asValueIn` unity
 
 -- | Negate the numerical value of a quantity.
 qNegate :: Quantity → Quantity
