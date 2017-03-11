@@ -177,29 +177,30 @@ instance eqDerivedUnit :: Eq DerivedUnit where
 instance showDerivedUnit :: Show DerivedUnit where
   show (DerivedUnit us) = listString us
     where
-      listString Nil = "unity"
-      listString us' = intercalate " <> " (show' <$> us')
+      listString Nil       = "unity"
+      listString (u : Nil) = show' u
+      listString us'       = "(" <> intercalate " <> " (show' <$> us') <> ")"
 
-      addPrf  -18.0 str = "atto "  <> str
-      addPrf  -15.0 str = "femto " <> str
-      addPrf  -12.0 str = "pico "  <> str
-      addPrf   -9.0 str = "nano "  <> str
-      addPrf   -6.0 str = "micro " <> str
-      addPrf   -3.0 str = "milli " <> str
+      addPrf  -18.0 str = "(atto "  <> str <> ")"
+      addPrf  -15.0 str = "(femto " <> str <> ")"
+      addPrf  -12.0 str = "(pico "  <> str <> ")"
+      addPrf   -9.0 str = "(nano "  <> str <> ")"
+      addPrf   -6.0 str = "(micro " <> str <> ")"
+      addPrf   -3.0 str = "(milli " <> str <> ")"
       addPrf    0.0 str = str
-      addPrf    3.0 str = "kilo "  <> str
-      addPrf    6.0 str = "mega "  <> str
-      addPrf    9.0 str = "giga "  <> str
-      addPrf   12.0 str = "tera "  <> str
-      addPrf   15.0 str = "peta "  <> str
-      addPrf   18.0 str = "exa "   <> str
-      addPrf prefix str = "withPrefix (" <> show prefix <> ") (" <> str <> ")"
+      addPrf    3.0 str = "(kilo "  <> str <> ")"
+      addPrf    6.0 str = "(mega "  <> str <> ")"
+      addPrf    9.0 str = "(giga "  <> str <> ")"
+      addPrf   12.0 str = "(tera "  <> str <> ")"
+      addPrf   15.0 str = "(peta "  <> str <> ")"
+      addPrf   18.0 str = "(exa "   <> str <> ")"
+      addPrf prefix str = "(withPrefix (" <> show prefix <> ") (" <> str <> "))"
 
       show' { prefix, baseUnit, exponent: 1.0 } = addPrf prefix (show baseUnit)
       show' { prefix: 0.0, baseUnit, exponent }      =
         show baseUnit <> " .^ (" <> show exponent <> ")"
       show' { prefix, baseUnit, exponent }      =
-        "(" <> addPrf prefix (show baseUnit) <> ")" <> " .^ (" <> show exponent <> ")"
+        addPrf prefix (show baseUnit) <> " .^ (" <> show exponent <> ")"
 
 instance semigroupDerivedUnit :: Semigroup DerivedUnit where
   append (DerivedUnit u1) (DerivedUnit u2) =

@@ -84,15 +84,15 @@ main = runTest do
            (show (meter .^ (2.0)))
       equal      "meter .^ (-2.0)"
            (show (meter .^ (-2.0)))
-      equal       "meter .^ (2.0) <> second .^ (3.0)"
+      equal      "(meter .^ (2.0) <> second .^ (3.0))"
             (show (meter .^ (2.0) <> second .^ (3.0)))
       equal       "(kilo meter) .^ (2.0)"
             (show ((kilo meter) .^ (2.0)))
       equal       "unity"
             (show unity)
-      equal       "kilo meter <> meter .^ (-1.0)"
+      equal      "((kilo meter) <> meter .^ (-1.0))"
             (show (kilo meter ./ meter))
-      equal       "kilo gram <> meter <> second .^ (-2.0)"
+      equal      "newton"
             (show newton)
 
     test "Semigroup / Monoid instance" do
@@ -122,7 +122,8 @@ main = runTest do
       equal "m/s" $ U.toString (meter ./ second)
       equal "m/s²" $ U.toString (meter ./ second .^ 2.0)
       equal "m³/(s²·g)" $ U.toString (meter .^ 3.0 ./ (second .^ 2.0 <> gram))
-      equal "m²·kg/s²" $ U.toString joule
+      equal "J" $ U.toString joule
+      equal "°" $ U.toString degree
       equal "s²·km" $ U.toString (kilo meter <> second <> second)
       equal "m·ks·s" $ U.toString (meter <> kilo second <> second)
 
@@ -170,10 +171,10 @@ main = runTest do
       assert "should compare values" $ 3.0 .* meter /= 3.01 .* meter
 
     test "Show instance" do
-      equal "(-3.0) .* (meter)" $ show (-3.0 .* meter)
+      equal "(-3.0) .* meter" $ show (-3.0 .* meter)
       equal "(3.0) .* (kilo meter)" $ show (3.0 .* kilo meter)
       equal "(3.0) .* (meter .^ (2.0) <> second)" $ show (3.0 .* (meter <> second <> meter))
-      equal "(2.0) .* ((tera second) .^ (2.0))" $ show (2.0 .* (tera second .^ 2.0))
+      equal "(2.0) .* (tera second) .^ (2.0)" $ show (2.0 .* (tera second .^ 2.0))
 
     test "prettyPrint" do
       equal "3.0" $ prettyPrint (scalar 3.0)

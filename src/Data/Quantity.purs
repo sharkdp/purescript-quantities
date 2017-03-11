@@ -69,7 +69,7 @@ instance eqQuantity :: Eq Quantity where
       q2' = toStandard q2
 
 instance showQuantity :: Show Quantity where
-  show (Quantity num unit) = "(" <> show num <> ") .* (" <> show unit <> ")"
+  show (Quantity num unit) = "(" <> show num <> ") .* " <> show unit
 
 -- | Show a physical quantity in a human-readable form.
 prettyPrint :: Quantity → String
