@@ -198,6 +198,9 @@ main = runTest do
       almostEqual (2.0 .* unity) $
         Q.fullSimplify (2000000.0 .* milli meter ./ kilo meter)
 
+      equal "180.0°" $
+        prettyPrint $ Q.fullSimplify (180.0 .* degree)
+
     test "approximatelyEqual" do
       let upToTenPercent = Q.approximatelyEqual 0.1
       assert "should tolerate small differences" $

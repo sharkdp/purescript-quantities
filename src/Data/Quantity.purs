@@ -40,6 +40,7 @@ import Data.Tuple (Tuple(..))
 import Data.Number (eqRelative)
 
 import Data.Units (DerivedUnit, toString, toStringWithPrefix, (.^), (./), unity)
+import Data.Units.SI.Accepted as USIA
 import Data.Units as U
 
 import Math as Math
@@ -102,7 +103,9 @@ fullSimplify :: Quantity → Quantity
 fullSimplify q@(num .*. du) =
   case toScalar q of
     Left _ → num .*. U.simplify du
-    Right n → n .*. unity
+    Right n → if du /= USIA.degree
+                then n .*. unity
+                else num .* du
 
 -- | Check whether two quantities have matching units (or can be converted
 -- | to the same representation) and test if the numerical are approximately
