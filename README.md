@@ -14,21 +14,21 @@ encode physical units at *compile time*.
 "37.9984m/s"
 
 > showResult $ (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
-"36.0km/h"
+"36km/h"
 
 > showResult $ (10.0 .* miles) `convertTo` (grams .^ 2.0)
 "Cannot unify unit 'mi' with unit 'g²'"
 
 > showResult $ sin (90.0 .* degree)
-"1.0"
+"1"
 ```
 
 Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection:
 ``` purs
 > let filesize = 2.7 .* giga byte
 > let speed = 6.0 .* mega bit ./ second
-> showResult $ (filesize ⊘ speed) `convertTo` hours
-"1.0h"
+> showResult $ (filesize ⊘ speed) `convertTo` minute
+"60min"
 ```
 
 Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
@@ -38,7 +38,13 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 > let period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
 
 > showResult $ period `convertTo` milli seconds
-"897.1402930932747ms"
+"897.14ms"
+```
+
+## Installation
+```
+bower install purescript-quantities
+npm install decimal.js
 ```
 
 ## Documentation

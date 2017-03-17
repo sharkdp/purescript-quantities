@@ -2,6 +2,7 @@ module Test.Main where
 
 import Prelude hiding (degree)
 
+import Data.Decimal (fromNumber)
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
 import Data.Number ((≅))
@@ -171,19 +172,19 @@ main = runTest do
       assert "should compare values" $ 3.0 .* meter /= 3.01 .* meter
 
     test "Show instance" do
-      equal "(-3.0) .* meter" $ show (-3.0 .* meter)
-      equal "(3.0) .* (kilo meter)" $ show (3.0 .* kilo meter)
-      equal "(3.0) .* (meter .^ (2.0) <> second)" $ show (3.0 .* (meter <> second <> meter))
-      equal "(2.0) .* (tera second) .^ (2.0)" $ show (2.0 .* (tera second .^ 2.0))
+      equal "(fromString \"-3\") .* meter" $ show (-3.0 .* meter)
+      equal "(fromString \"3\") .* (kilo meter)" $ show (3.0 .* kilo meter)
+      equal "(fromString \"3.7\") .* (meter .^ (2.0) <> second)" $ show (3.7 .* (meter <> second <> meter))
+      equal "(fromString \"2\") .* (tera second) .^ (2.0)" $ show (2.0 .* (tera second .^ 2.0))
 
     test "prettyPrint" do
-      equal "3.0" $ prettyPrint (scalar 3.0)
-      equal "3.0km" $ prettyPrint (3.0 .* kilo meter)
-      equal "3.0m" $ prettyPrint (3.0 .* meter)
-      equal "3.0m²·s" $ prettyPrint (3.0 .* (meter <> second <> meter))
-      equal "3.0m/s" $ prettyPrint (3.0 .* meter ./ second)
-      equal "3.0Ps²" $ prettyPrint (3.0 .* peta second .^ 2.0)
-      equal "3.0km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
+      equal "3" $ prettyPrint (scalar 3.0)
+      equal "3km" $ prettyPrint (3.0 .* kilo meter)
+      equal "3.2m" $ prettyPrint (3.2 .* meter)
+      equal "3.71m²·s" $ prettyPrint (3.71 .* (meter <> second <> meter))
+      equal "3m/s" $ prettyPrint (3.0 .* meter ./ second)
+      equal "-3.12332Ps²" $ prettyPrint ((-3.123321) .* peta second .^ 2.0)
+      equal "3km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
 
     test "derivedUnit" do
       equal meter (Q.derivedUnit (3.0 .* meter))
@@ -199,7 +200,7 @@ main = runTest do
       almostEqual (2.0 .* unity) $
         Q.fullSimplify (2000000.0 .* milli meter ./ kilo meter)
 
-      equal "180.0°" $
+      equal "180°" $
         prettyPrint $ Q.fullSimplify (180.0 .* degree)
 
     test "approximatelyEqual" do
@@ -296,10 +297,11 @@ main = runTest do
       almostEqual (0.5 .* giga hertz) (scalar 1.0 ⊘ 2.0 .* nano second)
 
     test "pow" do
-      equal (100.0 .* meter .^ 2.0) ((10.0 .* meter) `pow` 2.0)
+      let two = fromNumber 2.0
+      equal (100.0 .* meter .^ 2.0) ((10.0 .* meter) `pow` two)
       equal (4000000.0 .* meter .^ 2.0) (4.0 .* kilo meter .^ 2.0)
-      equal (4.0 .* kilo meter .^ 2.0) ((2.0 .* kilo meter) `pow` 2.0)
-      equal (Q.scalar 100.0) ((Q.scalar 10.0) `pow` 2.0)
+      equal (4.0 .* kilo meter .^ 2.0) ((2.0 .* kilo meter) `pow` two)
+      equal (Q.scalar 100.0) ((Q.scalar 10.0) `pow` two)
 
     test "abs" do
       equal (2.4 .* seconds) (Q.abs (2.4 .* seconds))
@@ -321,7 +323,7 @@ main = runTest do
     testExample 1 "2.5min" $
       2.0 .* minutes ⊕ 30.0 .* seconds
 
-    testExample 2 "36.0km/h" $
+    testExample 2 "36km/h" $
       (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
 
     testExample 3 "37.9984m/s" $
@@ -330,16 +332,16 @@ main = runTest do
     testExample 4 "Cannot unify unit 'mi' with unit 'g²'" $
       (10.0 .* miles) `convertTo` (grams .^ 2.0)
 
-    testExample 5 "1.0" $
+    testExample 5 "1" $
       sin (90.0 .* degree)
 
     let filesize = 2.7 .* giga byte
         speed = 6.0 .* mega bit ./ second
-        time = (filesize ⊘ speed) `convertTo` hour
-    testExample 6 "1.0h" time
+        time = (filesize ⊘ speed) `convertTo` minute
+    testExample 6 "60min" time
 
     let g = 9.81 .* meters ./ second .^ 2.0
         length = 20.0 .* centi meter
         period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
-    testExample 7 "897.1402930932747ms"
+    testExample 7 "897.14ms"
       (period `convertTo` milli second)

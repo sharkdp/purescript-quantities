@@ -106,7 +106,7 @@ baseToStandard bu@(BaseUnit u) =
 conversionFactor :: BaseUnit → ConversionFactor
 conversionFactor (BaseUnit u) =
   case u.unitType of
-      Standard → 1.0
+      Standard → one
       NonStandard { standardUnit, factor } → factor
 
 
