@@ -84,7 +84,10 @@ instance showQuantity :: Show Quantity where
   show (Quantity num unit) = show num <> " .* " <> show unit
 
 prettyDecimal :: Decimal → String
-prettyDecimal = Decimal.toString <<< Decimal.toSignificantDigits 6
+prettyDecimal d =
+  if Decimal.isInteger d && d < (Decimal.fromNumber 1.0e18)
+    then Decimal.toString d
+    else Decimal.toString (Decimal.toSignificantDigits 6 d)
 
 -- | Show a physical quantity in a human-readable form.
 prettyPrint :: Quantity → String
