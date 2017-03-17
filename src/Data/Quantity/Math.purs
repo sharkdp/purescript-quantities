@@ -8,6 +8,18 @@ module Data.Quantity.Math
   , ln
   , sin
   , tan
+  , sinh
+  , cosh
+  , tanh
+  , asinh
+  , acosh
+  , atanh
+  , ceil
+  , floor
+  , log10
+  , max
+  , min
+  , round
   , pi
   , e
   ) where
@@ -54,6 +66,42 @@ sin = lift Decimal.sin
 
 tan :: Quantity → Result
 tan = lift Decimal.tan
+
+sinh :: Quantity → Result
+sinh = lift Decimal.sinh
+
+cosh :: Quantity → Result
+cosh = lift Decimal.cosh
+
+tanh :: Quantity → Result
+tanh = lift Decimal.tanh
+
+asinh :: Quantity → Result
+asinh = lift Decimal.asinh
+
+acosh :: Quantity → Result
+acosh = lift Decimal.acosh
+
+atanh :: Quantity → Result
+atanh = lift Decimal.atanh
+
+ceil :: Quantity → Result
+ceil = lift Decimal.ceil
+
+floor :: Quantity → Result
+floor = lift Decimal.floor
+
+log10 :: Quantity → Result
+log10 = lift Decimal.log10
+
+max :: Quantity → Quantity → Result
+max = lift2 Decimal.max
+
+min :: Quantity → Quantity → Result
+min = lift2 Decimal.min
+
+round :: Quantity → Result
+round = lift Decimal.round
 
 pi ∷ Quantity
 pi = scalar' Decimal.pi
