@@ -8,4 +8,4 @@ bit = makeStandard "bit" "bit"
 
 -- | Unit of digital information, *1byte = 8bit*.
 byte :: DerivedUnit
-byte = makeNonStandard "byte" "b" 8.0 bit
+byte = makeNonStandard "byte" "B" 8.0 bit
