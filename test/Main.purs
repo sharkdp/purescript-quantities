@@ -14,7 +14,7 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
                               watt, coulomb, volt, farad, ohm, siemens, weber,
                               tesla, henry, lumen, lux, becquerel, gray,
                               sievert, katal)
-import Data.Units.SI.Accepted (degree)
+import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt)
 import Data.Units.Time (hour, minute)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
@@ -188,6 +188,7 @@ main = runTest do
       equal "3m/s" $ prettyPrint (3.0 .* meter ./ second)
       equal "-3.12332Ps²" $ prettyPrint ((-3.123321) .* peta second .^ 2.0)
       equal "3km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
+      equal "3K" $ prettyPrint (3.0 .* kelvin)
 
     test "derivedUnit" do
       equal meter (Q.derivedUnit (3.0 .* meter))
@@ -318,8 +319,8 @@ main = runTest do
       almostEqual' (30.0 .* degree) (asin (scalar 0.5))
       almostEqual' (scalar 1.0) (sin ((0.5 * pi) .* radian))
 
-  suite "Data.Units.SI.Derived" do
-    test "Consistency checks" do
+  suite "Consistency checks" do
+    test "Data.Units.SI.Derived" do
       -- See: https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units
       equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* radian)
       equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* steradian)
@@ -342,6 +343,14 @@ main = runTest do
       equal (1.0 .* (joule ./ kilo gram)) (1.0 .* gray)
       equal (1.0 .* (joule ./ kilo gram)) (1.0 .* sievert)
       equal (1.0 .* (mole ./ second)) (1.0 .* katal)
+
+    test "Data.Units.SI.Accepted" do
+      -- See: https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI
+      equal ((pi / 180.0) .* radian) (1.0 .* degree)
+      equal (1.0 .* (hecto meter) .^ 2.0) (1.0 .* hectare)
+      almostEqual (1.0 .* (deci meter) .^ 3.0) (1.0 .* liter)
+      equal (1000.0 .* kilo gram) (1.0 .* tonne)
+      almostEqual (1.602176e-19 .* joule) (1.0 .* electronvolt)
 
   suite "Integration" do
     let testExample nr output input =
