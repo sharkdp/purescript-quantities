@@ -9,8 +9,11 @@ import Data.Number ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
 import Data.Units as U
-import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (hertz, newton, joule, radian, watt)
+import Data.Units.SI (meter, gram, second, ampere, kelvin, mole, candela)
+import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
+                              watt, coulomb, volt, farad, ohm, siemens, weber,
+                              tesla, henry, lumen, lux, becquerel, gray,
+                              sievert, katal)
 import Data.Units.SI.Accepted (degree)
 import Data.Units.Time (hour, minute)
 import Data.Units.Imperial (inch, mile, foot, yard)
@@ -314,6 +317,31 @@ main = runTest do
       almostEqual' (scalar 0.5) (sin (30.0 .* degree))
       almostEqual' (30.0 .* degree) (asin (scalar 0.5))
       almostEqual' (scalar 1.0) (sin ((0.5 * pi) .* radian))
+
+  suite "Data.Units.SI.Derived" do
+    test "Consistency checks" do
+      -- See: https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units
+      equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* radian)
+      equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* steradian)
+      equal (1.0 .* second .^ (-1.0)) (1.0 .* hertz)
+      equal (1.0 .* (kilo gram <> meter ./ second .^ 2.0)) (1.0 .* newton)
+      equal (1.0 .* (newton ./ meter .^ 2.0)) (1.0 .* pascal)
+      equal (1.0 .* (newton <> meter)) (1.0 .* joule)
+      equal (1.0 .* (joule ./ second)) (1.0 .* watt)
+      equal (1.0 .* (ampere <> second)) (1.0 .* coulomb)
+      equal (1.0 .* (watt ./ ampere)) (1.0 .* volt)
+      equal (1.0 .* (coulomb ./ volt)) (1.0 .* farad)
+      equal (1.0 .* (volt ./ ampere)) (1.0 .* ohm)
+      equal (1.0 .* (ampere ./ volt)) (1.0 .* siemens)
+      equal (1.0 .* (volt <> second)) (1.0 .* weber)
+      equal (1.0 .* (weber ./ meter .^ 2.0)) (1.0 .* tesla)
+      equal (1.0 .* (weber ./ ampere)) (1.0 .* henry)
+      equal (1.0 .* (candela <> steradian)) (1.0 .* lumen)
+      equal (1.0 .* (lumen ./ meter .^ 2.0)) (1.0 .* lux)
+      equal (1.0 .* (second .^ (-1.0))) (1.0 .* becquerel)
+      equal (1.0 .* (joule ./ kilo gram)) (1.0 .* gray)
+      equal (1.0 .* (joule ./ kilo gram)) (1.0 .* sievert)
+      equal (1.0 .* (mole ./ second)) (1.0 .* katal)
 
   suite "Integration" do
     let testExample nr output input =
