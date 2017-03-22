@@ -3,6 +3,8 @@ module Data.Quantity.Physics
   , gravitationalConstant
   , planckConstant
   , hbar
+  , electronMass
+  , electronCharge
   ) where
 
 import Prelude
@@ -11,7 +13,7 @@ import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar)
 import Data.Quantity.Math (pi)
 import Data.Units ((.^), (./), kilo)
 import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (joule)
+import Data.Units.SI.Derived (joule, coulomb)
 
 -- | The speed of light in vacuum.
 speedOfLight ∷ Quantity
@@ -28,3 +30,11 @@ planckConstant = 6.626070040e-34 .* (joule <> second)
 -- | The reduced Planck constant.
 hbar ∷ Quantity
 hbar = planckConstant ⊘ (scalar 2.0 ⊗ pi)
+
+-- | The mass of the electron.
+electronMass ∷ Quantity
+electronMass = 9.1093826e-31 .* kilo gram
+
+-- | The charge of the electron.
+electronCharge ∷ Quantity
+electronCharge = 1.60217653e-19 .* coulomb
