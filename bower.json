@@ -17,9 +17,8 @@
     "output"
   ],
   "dependencies": {
-    "purescript-lists": "^3.0.0",
+    "purescript-lists": "^3.4.0",
     "purescript-monoid": "^2.0.0",
-    "purescript-nonempty": "^3.0.0",
     "purescript-numbers": "^3.0.0",
     "purescript-decimals": "^1.3.0"
   },

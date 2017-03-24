@@ -39,10 +39,10 @@ import Prelude
 
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.List (List(Nil), singleton, (:), span, sortBy, filter, findIndex,
-                  modifyAt)
+                  modifyAt, groupBy)
+import Data.List.NonEmpty (head)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid (class Monoid)
-import Data.NonEmpty (NonEmpty, (:|), head)
 import Data.Tuple (Tuple(..), fst, snd)
 
 import Math (pow)
@@ -138,13 +138,6 @@ withPrefix p (DerivedUnit us) = DerivedUnit $
     Just ind →
       fromMaybe us (modifyAt ind (\u → u { prefix = u.prefix + p }) us)
     Nothing → { prefix: p, baseUnit: unity', exponent: 1.0 } : us
-
--- | Alternative implementation of `Data.List.groupBy` with a (more) useful
--- | return type.
-groupBy ∷ ∀ a. (a → a → Boolean) → List a → List (NonEmpty List a)
-groupBy _ Nil = Nil
-groupBy eq (x : xs) = case span (eq x) xs of
-  { init: ys, rest: zs } → (x :| ys) : groupBy eq zs
 
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
@@ -318,8 +311,7 @@ divideUnits du1 du2 = du1 <> du2 .^ (-1.0)
 
 infixl 6 divideUnits as ./
 
--- | A helper (dimensionless) unit, used internally.
--- | (or dimensionless) values.
+-- | A helper (dimensionless) unit for scalars, used internally.
 unity' ∷ BaseUnit
 unity' = BaseUnit { short: "unity", long: "unity", unitType: Standard }
 
@@ -330,7 +322,8 @@ unity = DerivedUnit Nil
 
 -- | Convert a `BaseUnit` to a `DerivedUnit`.
 fromBaseUnit ∷ BaseUnit → DerivedUnit
-fromBaseUnit = DerivedUnit <<< singleton <<< (\bu → { prefix: 0.0, baseUnit: bu, exponent: 1.0 })
+fromBaseUnit = DerivedUnit <<< singleton
+                           <<< { prefix: 0.0, baseUnit: _, exponent: 1.0 }
 
 atto ∷ DerivedUnit → DerivedUnit
 atto = withPrefix (-18.0)
