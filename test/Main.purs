@@ -35,7 +35,7 @@ import Test.Unit.Main (runTest)
 import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.Assert (assert, assertFalse, equal)
 
-almostEqualNumbers :: ∀ e. Number → Number → Test e
+almostEqualNumbers ∷ ∀ e. Number → Number → Test e
 almostEqualNumbers x y = do
   if x ≅ y
     then success
@@ -43,7 +43,7 @@ almostEqualNumbers x y = do
 
 -- | Test if two quantities are almost equal, i.e. if the units match and the
 -- | numerical value is approximately the same.
-almostEqual :: ∀ e. Quantity → Quantity → Test e
+almostEqual ∷ ∀ e. Quantity → Quantity → Test e
 almostEqual expected actual = do
   if expected `approximatelyEqual` actual
     then success
@@ -53,13 +53,13 @@ almostEqual expected actual = do
     approximatelyEqual = Q.approximatelyEqual tolerance
     tolerance = 1.0e-6
 
-almostEqual' :: ∀ e err. Quantity → Either err Quantity → Test e
+almostEqual' ∷ ∀ e err. Quantity → Either err Quantity → Test e
 almostEqual' expected actual =
   case actual of
     Left _ → failure "Conversion error"
     Right actual' → almostEqual expected actual'
 
-main :: Eff (console :: CONSOLE, testOutput :: TESTOUTPUT, avar :: AVAR) Unit
+main ∷ Eff (console ∷ CONSOLE, testOutput ∷ TESTOUTPUT, avar ∷ AVAR) Unit
 main = runTest do
   let
     meters = meter
