@@ -198,11 +198,11 @@ main = runTest do
                   Q.toStandard (2362.2047 .* inch ./ minute)
 
     test "fullSimplify" do
-      almostEqual (200.0 .* unity) $
-        Q.fullSimplify (2.0 .* meter ./ centi meter)
+      equal "200" $
+        prettyPrint $ Q.fullSimplify (2.0 .* meter ./ centi meter)
 
-      almostEqual (2.0 .* unity) $
-        Q.fullSimplify (2000000.0 .* milli meter ./ kilo meter)
+      equal "2" $
+        prettyPrint $ Q.fullSimplify (2000000.0 .* milli meter ./ kilo meter)
 
       equal "180°" $
         prettyPrint $ Q.fullSimplify (180.0 .* degree)
