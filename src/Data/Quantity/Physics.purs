@@ -2,18 +2,25 @@ module Data.Quantity.Physics
   ( speedOfLight
   , gravitationalConstant
   , planckConstant
-  , hbar
+  , ℏ
   , electronMass
   , electronCharge
+  , µ₀
+  , ε₀
+  , μ_B
+  , α
+  , protonMass
+  , avogadroConstant
   ) where
 
 import Prelude
 
-import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar)
+import Data.Decimal (fromNumber)
+import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar, pow)
 import Data.Quantity.Math (pi)
 import Data.Units ((.^), (./), kilo)
-import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (joule, coulomb)
+import Data.Units.SI (meter, second, gram, ampere, kilogram, mole, kelvin)
+import Data.Units.SI.Derived (joule, coulomb, newton, tesla)
 
 -- | The speed of light in vacuum.
 speedOfLight ∷ Quantity
@@ -28,13 +35,46 @@ planckConstant ∷ Quantity
 planckConstant = 6.626070040e-34 .* (joule <> second)
 
 -- | The reduced Planck constant.
-hbar ∷ Quantity
-hbar = planckConstant ⊘ (scalar 2.0 ⊗ pi)
+ℏ ∷ Quantity
+ℏ = planckConstant ⊘ (scalar 2.0 ⊗ pi)
 
 -- | The mass of the electron.
 electronMass ∷ Quantity
 electronMass = 9.1093826e-31 .* kilo gram
 
--- | The charge of the electron.
+-- | Elementary charge (charge of the electron).
 electronCharge ∷ Quantity
 electronCharge = 1.60217653e-19 .* coulomb
+
+-- | Magnetic constant (vacuum permeability).
+µ₀ ∷ Quantity
+µ₀ = pi ⊗ (4.0e-7 .* newton ./ ampere .^ 2.0)
+
+-- | Electric constant (vacuum permittivity).
+ε₀ ∷ Quantity
+ε₀ = scalar 1.0 ⊘ (µ₀ ⊗ (speedOfLight `pow` (fromNumber 2.0)))
+
+-- | Bohr magneton.
+μ_B ∷ Quantity
+μ_B = 9.274009994e-24 .* (joule ./ tesla)
+
+-- | Fine structure constant.
+α ∷ Quantity
+α = electronCharge `pow` (fromNumber 2.0) ⊘
+      (scalar 4.0 ⊗ pi ⊗ ε₀ ⊗ ℏ ⊗ speedOfLight)
+
+-- | Mass of the proton.
+protonMass ∷ Quantity
+protonMass = 1.672621898e-27 .* kilogram
+
+-- | Avogadro's number.
+avogadroConstant ∷ Quantity
+avogadroConstant = 6.022140857e-23 .* mole .^ (-1.0)
+
+-- | Boltzmann constant.
+kB ∷ Quantity
+kB = 1.38064852e-23 .* (joule ./ kelvin)
+
+-- | Standard gravitational acceleration on earth.
+g0 ∷ Quantity
+g0 = 9.80665 .* meter ./ second .^ (2.0)
