@@ -43,7 +43,7 @@ import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
 import Data.Number (eqRelative)
 
-import Data.Units (DerivedUnit, toString, toStringWithPrefix, (.^), (./), unity)
+import Data.Units (DerivedUnit, toString, (.^), (./), unity)
 import Data.Units.SI.Accepted as USIA
 import Data.Units as U
 import Data.Decimal (Decimal, fromNumber, toNumber)
@@ -93,8 +93,7 @@ prettyDecimal d =
 prettyPrint ∷ Quantity → String
 prettyPrint (val .*. du)
   | du == unity = prettyDecimal val
-  | otherwise   = let res = toStringWithPrefix du
-                  in prettyDecimal val <> res.prefix <> res.value
+  | otherwise   = prettyDecimal val <> toString du
 
 -- | Show the (possibly failed) result of a computation in human-readable form.
 showResult ∷ Either UnificationError Quantity → String

@@ -8,7 +8,6 @@ module Data.Units
   -- Conversions
   , toStandardUnit
   , prefixName
-  , toStringWithPrefix
   , toString
   -- Mathematical operations on units
   , power
@@ -100,17 +99,19 @@ isStandardUnit (BaseUnit u) =
 baseToStandard ∷ BaseUnit → DerivedUnit
 baseToStandard bu@(BaseUnit u) =
   case u.unitType of
-      Standard → fromBaseUnit bu
-      NonStandard { standardUnit, factor } → standardUnit
+    Standard → fromBaseUnit bu
+    NonStandard { standardUnit, factor } → standardUnit
 
 conversionFactor ∷ BaseUnit → ConversionFactor
 conversionFactor (BaseUnit u) =
   case u.unitType of
-      Standard → one
-      NonStandard { standardUnit, factor } → factor
+    Standard → one
+    NonStandard { standardUnit, factor } → factor
 
-
+-- | A number that represents a power of ten as a prefix for a unit.
 type Prefix = Number
+
+-- | A number that represents the exponent of a unit, like *2* in *m²*.
 type Exponent = Number
 
 -- | Type alias for something like *m³*, *s⁻¹*, *km²* or similar A prefix.
@@ -119,9 +120,12 @@ type BaseUnitWithExponent = { prefix   ∷ Prefix
                             , baseUnit ∷ BaseUnit
                             , exponent ∷ Exponent }
 
+-- | A generic physical unit. The `Semigroup`/`Monoid` instance implements
+-- | multiplication of units.
+-- |
+-- | Implementation detail:
 -- | A `DerivedUnit` is a product of `BaseUnits`, raised to arbitrary powers.
--- | The `Semigroup`/`Monoid` instance implements multiplication of units. A
--- | `DerivedUnit` also has a `Prefix` value, which represents a numerical
+-- | Each factor also has a `Prefix` value which represents a numerical
 -- | prefix as a power of ten.
 data DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
 
@@ -129,7 +133,7 @@ data DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
 runDerivedUnit ∷ DerivedUnit → List BaseUnitWithExponent
 runDerivedUnit (DerivedUnit u) = u
 
--- | Add a given prefix value to a unit. `withPrefix 3.0 meter = kilo meter`.
+-- | Add a given prefix value to a unit: `withPrefix 3.0 meter = kilo meter`.
 withPrefix ∷ Prefix → DerivedUnit → DerivedUnit
 withPrefix p (DerivedUnit Nil) =
   DerivedUnit $ singleton { prefix: p, baseUnit: unity', exponent: 1.0 }
@@ -262,13 +266,9 @@ prettyExponent  4.0 = "⁴"
 prettyExponent  5.0 = "⁵"
 prettyExponent exp = "^(" <> show exp <> ")"
 
--- | A human-readable `String` representation of a `DerivedUnit`, including
--- | a prefix string if the unit needs to be combined with a numerical value.
-toStringWithPrefix ∷ DerivedUnit → { prefix ∷ String, value ∷ String }
-toStringWithPrefix (DerivedUnit us) =
-  { value: unitString
-  , prefix: "" -- TODO
-  }
+-- | A human-readable `String` representation of a `DerivedUnit`.
+toString ∷ DerivedUnit → String
+toString (DerivedUnit us) = unitString
   where
     prefixName' exp = fromMaybe ("10^" <> show exp <> "·") (prefixName exp)
 
@@ -292,10 +292,6 @@ toStringWithPrefix (DerivedUnit us) =
                 Nil → positiveUsStr
                 n : Nil → positiveUsStr <> "/" <> negativeUsStr'
                 ns → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
-
--- | A human-readable `String` representation of a `DerivedUnit`.
-toString ∷ DerivedUnit → String
-toString = _.value <<< toStringWithPrefix
 
 -- | Raise a unit to the given power.
 power ∷ DerivedUnit → Number → DerivedUnit
