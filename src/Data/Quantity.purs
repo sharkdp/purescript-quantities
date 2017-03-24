@@ -40,7 +40,7 @@ module Data.Quantity
 import Prelude
 
 import Data.Either (Either(..))
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(..), fst)
 import Data.Number (eqRelative)
 
 import Data.Units (DerivedUnit, toString, (.^), (./), unity)
@@ -155,7 +155,17 @@ errorMessage (UnificationError u1 u2) =
     else
       if u2 == unity
         then "Cannot convert quantity of unit '" <> toString u1 <> "' to a scalar"
-        else "Cannot unify unit '" <> toString u1 <> "' with unit '" <> toString u2 <> "'"
+        else
+          "Cannot unify unit '" <> toString u1 <> "'" <> baseRep u1 <> "\n" <>
+          "        with unit '" <> toString u2 <> "'" <> baseRep u2 <> ""
+  where
+    baseRep u =
+      let u' = fst (U.toStandardUnit u)
+      in
+        if u' == unity
+          then ""
+          else " (SI: '" <> toString u' <> "')"
+
 
 -- | Create a scalar (i.e. dimensionless) quantity from a number.
 scalar ∷ Number → Quantity
