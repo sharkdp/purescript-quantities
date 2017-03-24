@@ -22,6 +22,8 @@ module Data.Quantity
   , asValueIn'
   , toScalar
   , toScalar'
+  -- Numerical properties
+  , isFinite
   -- Calculate with quantities
   , qNegate
   , qAdd
@@ -212,6 +214,10 @@ toScalar' q = q `asValueIn'` unity
 -- | Try to convert a quantity to a scalar value
 toScalar ∷ Quantity → Either UnificationError Number
 toScalar q = q `asValueIn` unity
+
+-- | Check if the numerical value of a quantity is finite.
+isFinite ∷ Quantity → Boolean
+isFinite (n .*. _) = Decimal.isFinite n
 
 -- | Negate the numerical value of a quantity.
 qNegate ∷ Quantity → Quantity

@@ -20,7 +20,7 @@ import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
-                      errorMessage, showResult, qNegate)
+                      errorMessage, showResult, qNegate, isFinite)
 import Data.Quantity as Q
 import Data.Quantity.Math (sin, asin)
 
@@ -269,6 +269,15 @@ main = runTest do
              isLeft ((2.0 .* meters) `asValueIn` (meter .^ 2.0))
       assert "should not convert meters to seconds" $
              isLeft ((2.0 .* meters) `asValueIn` seconds)
+
+    test "isFinite" do
+      assert "should be finite" $
+        isFinite (4.0 .* meter)
+      assertFalse "should be infinite" $
+        isFinite ((1.0 .* meter) ⊘ (0.0 .* second))
+      assertFalse "should be NaN" $
+        isFinite (sqrt (scalar (-1.0)))
+      equal (Right false) (isFinite <$> (asin (scalar 2.0)))
 
     test "Negation" do
       equal ((-8.0) .* meter) (qNegate $ 8.0 .* meter)
