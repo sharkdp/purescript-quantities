@@ -23,7 +23,7 @@ liter = makeNonStandard "liter" "L" 0.001 (meter .^ 3.0)
 
 -- | Unit of mass, *1t = 10³ km*.
 tonne :: DerivedUnit
-tonne = makeNonStandard "tonne" "t" 1000000.0 gram
+tonne = makeNonStandard "tonne" "ton" 1000000.0 gram
 
 -- | Unit of energy, *1eV = 1.60217653·10^(−19) J*.
 electronvolt :: DerivedUnit
