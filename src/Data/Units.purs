@@ -115,7 +115,8 @@ type Prefix = Number
 type Exponent = Number
 
 -- | Type alias for something like *m³*, *s⁻¹*, *km²* or similar A prefix.
--- | value of `p` represents an additional factor of `10^p`.
+-- | value of `p` represents an additional factor of `10^p`. The mathematical
+-- | representation of this record would be *(10^prefix * baseUnit)^exponent*.
 type BaseUnitWithExponent = { prefix   ∷ Prefix
                             , baseUnit ∷ BaseUnit
                             , exponent ∷ Exponent }
