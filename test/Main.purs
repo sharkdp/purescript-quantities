@@ -15,7 +15,7 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
                               tesla, henry, lumen, lux, becquerel, gray,
                               sievert, katal)
 import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt)
-import Data.Units.Time (hour, minute)
+import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
@@ -351,6 +351,15 @@ main = runTest do
       almostEqual (1.0 .* (deci meter) .^ 3.0) (1.0 .* liter)
       equal (1000.0 .* kilo gram) (1.0 .* tonne)
       almostEqual (1.602176e-19 .* joule) (1.0 .* electronvolt)
+
+    test "Data.Units.Time" do
+      equal (60.0 .* second)  (1.0 .* minute)
+      equal (60.0 .* minute)  (1.0 .* hour)
+      equal (7.0 .* day)      (1.0 .* week)
+      equal (24.0 .* hour)    (1.0 .* day)
+      equal (730.0 .* hour)   (1.0 .* month)
+      equal (365.0 .* day)    (1.0 .* year)
+      equal (12.0 .* month)   (1.0 .* year)
 
   suite "Integration" do
     let testExample nr output input =
