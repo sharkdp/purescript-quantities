@@ -3,6 +3,7 @@ module Data.Quantity
   , quantity
   , (.*)
   , quantity'
+  , prettyPrint'
   , prettyPrint
   , showResult
   , derivedUnit
@@ -10,7 +11,7 @@ module Data.Quantity
   , fullSimplify
   , approximatelyEqual
   -- Conversion errors
-  , UnificationError
+  , UnificationError(..)
   , errorMessage
   -- Create a dimensionless quantity
   , scalar
@@ -91,11 +92,18 @@ prettyDecimal d =
     then Decimal.toString d
     else Decimal.toString (Decimal.toSignificantDigits 6 d)
 
+-- | Show a physical quantity in a human-readable form, value and unit
+-- | separately.
+prettyPrint' ∷ Quantity → Tuple String String
+prettyPrint' (val .*. du)
+  | du == unity = Tuple (prettyDecimal val) ""
+  | otherwise   = Tuple (prettyDecimal val) (toString du)
+
 -- | Show a physical quantity in a human-readable form.
 prettyPrint ∷ Quantity → String
-prettyPrint (val .*. du)
-  | du == unity = prettyDecimal val
-  | otherwise   = prettyDecimal val <> toString du
+prettyPrint q =
+  case prettyPrint' q of
+    Tuple v u → v <> u
 
 -- | Show the (possibly failed) result of a computation in human-readable form.
 showResult ∷ Either UnificationError Quantity → String
