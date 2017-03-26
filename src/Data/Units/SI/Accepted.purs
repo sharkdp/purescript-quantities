@@ -5,13 +5,12 @@ import Prelude
 
 import Math (pi)
 
-import Data.Units (DerivedUnit, makeNonStandard, (.^), (./))
+import Data.Units (DerivedUnit, makeNonStandard, (.^), (./), unity)
 import Data.Units.SI (meter, second, gram)
-import Data.Units.SI.Derived (radian)
 
 -- | 'Dimensionless' unit for angles *360 degree = 2 pi rad*.
 degree ∷ DerivedUnit
-degree = makeNonStandard "degree" "°" (pi / 180.0) radian
+degree = makeNonStandard "degree" "°" (pi / 180.0) unity
 
 -- | Unit of area, *1ha = 10000m²*.
 hectare ∷ DerivedUnit

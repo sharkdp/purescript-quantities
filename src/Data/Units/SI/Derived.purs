@@ -8,11 +8,11 @@ import Data.Units.SI (ampere, candela, gram, meter, mole, second)
 
 -- | 'Dimensionless' unit for angles *1 rad = 1m / 1m*.
 radian ∷ DerivedUnit
-radian = unity
+radian = makeNonStandard "radian" "rad" 1.0 unity
 
 -- | 'Dimensionless' unit for solid angles *1 sr = 1m² / 1m²*.
 steradian ∷ DerivedUnit
-steradian = unity
+steradian = makeNonStandard "steradian" "sr" 1.0 unity
 
 -- | Unit of frequency, *1 Hz = 1 / s*.
 hertz ∷ DerivedUnit
