@@ -211,6 +211,9 @@ main = runTest do
       equal "180°" $
         prettyPrint $ Q.fullSimplify (180.0 .* degree)
 
+      equal "10mrad" $
+        prettyPrint $ Q.fullSimplify (10.0 .* milli radian)
+
     test "approximatelyEqual" do
       let upToTenPercent = Q.approximatelyEqual 0.1
       assert "should tolerate small differences" $
@@ -310,6 +313,7 @@ main = runTest do
       equal (0.5 .* hertz) (scalar 1.0 ⊘ 2.0 .* second)
       equal (0.5 .* kilo hertz) (scalar 1.0 ⊘ 2.0 .* milli second)
       equal (0.5 .* mega hertz) (scalar 1.0 ⊘ 2.0 .* micro second)
+      equal (0.5 .* tera hertz) (scalar 1.0 ⊘ 2.0 .* pico second)
 
     test "pow" do
       let two = fromNumber 2.0

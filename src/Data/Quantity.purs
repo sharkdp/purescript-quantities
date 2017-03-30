@@ -46,8 +46,9 @@ import Data.Either (Either(..))
 import Data.Tuple (Tuple(..), fst)
 import Data.Number (eqRelative)
 
-import Data.Units (DerivedUnit, toString, (.^), (./), unity)
-import Data.Units.SI.Accepted as USIA
+import Data.Units (DerivedUnit, toString, (.^), (./), unity, removePrefix)
+import Data.Units.SI.Derived (radian) as SI
+import Data.Units.SI.Accepted (degree) as SI
 import Data.Units as U
 import Data.Decimal (Decimal, fromNumber, toNumber)
 import Data.Decimal as Decimal
@@ -130,7 +131,7 @@ fullSimplify ∷ Quantity → Quantity
 fullSimplify q@(num .*. du) =
   case toScalar' q of
     Left _ → num .*. U.simplify du
-    Right n → if du /= USIA.degree
+    Right n → if removePrefix du /= SI.degree && removePrefix du /= SI.radian
                 then n .*. unity
                 else num ..* du
 
