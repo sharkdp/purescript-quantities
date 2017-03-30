@@ -1,7 +1,7 @@
 -- | A collection units of the imperial system.
 module Data.Units.Imperial where
 
-import Data.Units (DerivedUnit, makeNonStandard)
+import Data.Units (DerivedUnit, makeNonStandard, (.^))
 import Data.Units.SI
 
 -- | Unit of length, *1in = 0.0254m*.
@@ -27,3 +27,7 @@ ounce = makeNonStandard "ounce" "oz" 28.35 gram
 -- | Unit of mass, *1lb = 453.6g*.
 pound ∷ DerivedUnit
 pound = makeNonStandard "pound" "lb" 453.6 gram
+
+-- | Unit of Volume, the US liquid gallon *1gal = 0.003785411784m^3*
+gallon ∷ DerivedUnit
+gallon = makeNonStandard "gallon" "gal" 0.003785411784 (meter .^ 3.0)
