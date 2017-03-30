@@ -4,6 +4,7 @@ module Data.Units
   , withPrefix
   , removePrefix
   , simplify
+  , splitByDimension
   , makeStandard
   , makeNonStandard
   -- Conversions
@@ -38,11 +39,13 @@ module Data.Units
 import Prelude
 
 import Data.Foldable (intercalate, sum, foldMap, product)
-import Data.List (List(Nil), singleton, (:), span, sortBy, filter, findIndex,
-                  modifyAt, groupBy)
-import Data.List.NonEmpty (head)
+import Data.Function (on)
+import Data.List (List(Nil), filter, findIndex, modifyAt,
+                  singleton, sortBy, span, (:), concat)
+import Data.List.NonEmpty (NonEmptyList(..), head, toList)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid (class Monoid)
+import Data.NonEmpty ((:|))
 import Data.Tuple (Tuple(..), fst, snd)
 
 import Math (pow)
@@ -152,30 +155,73 @@ withPrefix p (DerivedUnit us) = DerivedUnit $
 removePrefix ∷ DerivedUnit → DerivedUnit
 removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = 0.0 }) <$> list
 
+-- | Like filter, but also return the non-matching elements.
+split ∷ ∀ a . (a → Boolean) → List a → { yes ∷ List a, no ∷ List a }
+split _ Nil = { yes: Nil, no: Nil }
+split f (x : xs) =
+  if f x
+    then res { yes = x : res.yes }
+    else res { no  = x : res.no  }
+  where
+    res = split f xs
+
+-- | A variant of `Data.List.groupBy` which groups non-consecutive elements,
+-- | too. Notice the worse complexity.
+-- |
+-- | Running time: `O(n²)`
+groupBy' ∷ ∀ a. (a → a → Boolean) → List a → List (NonEmptyList a)
+groupBy' _ Nil = Nil
+groupBy' eq (x : xs) = case split (eq x) xs of
+  { yes, no } → NonEmptyList (x :| yes) : groupBy' eq no
+
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
 simplify ∷ DerivedUnit → DerivedUnit
 simplify (DerivedUnit list) = DerivedUnit (go list)
   where
-    go = sortBy (comparing (_.baseUnit >>> shortName))
-           >>> groupBy (\u1 u2 → u1.baseUnit == u2.baseUnit
-                                && u1.prefix == u2.prefix)
+    go = groupBy' (\u1 u2 → u1.baseUnit == u2.baseUnit)
+           >>> map toList >>> concat
+           >>> groupBy' (\u1 u2 → u1.baseUnit == u2.baseUnit
+                                 && u1.prefix == u2.prefix)
            >>> map merge
            >>> filter (\x → not (x.exponent == 0.0))
     merge units = { prefix: (head units).prefix
                   , baseUnit: (head units).baseUnit
                   , exponent: sum $ _.exponent <$> units }
 
+-- | Split up a physical units into several parts that belong to the same
+-- | physical dimension (length, time, ...). In the first component, the
+-- | returned tuples contain a 'target' unit, to which this group can be
+-- | converted. In the second component, the original group is returned.
+splitByDimension ∷ DerivedUnit → List (Tuple DerivedUnit DerivedUnit)
+splitByDimension (DerivedUnit list) = transform list
+  where
+    transform = groupBy' (eq `on` standardUnit) >>> map reduce
+
+    standardUnit = _.baseUnit >>> baseToStandard
+
+    reduce ∷ NonEmptyList BaseUnitWithExponent → Tuple DerivedUnit DerivedUnit
+    reduce us = Tuple first (DerivedUnit $ toList us)
+      where
+        first = DerivedUnit $ singleton $ (head us) { exponent = exp }
+        exp = sum $ (_.exponent) <$> us
+
 instance eqDerivedUnit ∷ Eq DerivedUnit where
   eq u1 u2 = (_.baseUnit <$> list1' == _.baseUnit <$> list2')
           && (_.exponent <$> list1' == _.exponent <$> list2')
           && globalPrefix list1 == globalPrefix list2
     where
-      -- TODO: get rid of `unity'` and re-write the Eq instance
-      list1' = filter (\u → longName u.baseUnit /= "unity") list1
-      list2' = filter (\u → longName u.baseUnit /= "unity") list2
-      list1 = runDerivedUnit (simplify u1)
-      list2 = runDerivedUnit (simplify u2)
+      prepare = simplify
+                >>> runDerivedUnit
+                >>> sortBy (comparing (_.baseUnit >>> shortName))
+
+      removeUnity = filter (\u → longName u.baseUnit /= "unity")
+
+      list1 = prepare u1
+      list2 = prepare u2
+
+      list1' = removeUnity list1
+      list2' = removeUnity list2
 
       globalPrefix ∷ List BaseUnitWithExponent → Prefix
       globalPrefix us = sum $ map (\{prefix, baseUnit, exponent} → prefix * exponent) us

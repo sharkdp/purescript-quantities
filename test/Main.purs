@@ -75,7 +75,7 @@ main = runTest do
     test "Eq instance" do
       equal meter (meter .^ 1.0)
       equal (meter .^ 2.0) (meter <> meter)
-      equal (meter <> second) (second <> meter)
+      equal (second <> meter) (second <> meter)
       equal (kilo meter) (kilo meter)
       assertFalse "should check the prefix" $ kilo meter == meter
       assertFalse "should compare prefixes" $ kilo meter == nano meter
@@ -104,8 +104,8 @@ main = runTest do
       equal meter (meter <> unity)
       equal meter (unity <> meter)
       equal (meter <> meter <> second) (meter <> second <> meter)
-      equal (meter <> meter <> second) (second <> meter <> meter)
-      equal (kilo meter <> meter <> second) (second <> kilo meter <> meter)
+      equal (second <> meter <> meter) (second <> meter <> meter)
+      equal (second <> kilo meter <> meter) (second <> kilo meter <> meter)
 
     test "toStandardUnit" do
       let rec = U.toStandardUnit minute
@@ -208,7 +208,7 @@ main = runTest do
       equal "m²·s" $
         U.toString $ U.simplify (meter <> second <> meter)
 
-      equal "m·cm·µs·s" $
+      equal "µs·s·m·cm" $
         U.toString $ U.simplify (micro second <> meter <> second <> centi meter)
 
       equal "s/m" $
@@ -226,6 +226,24 @@ main = runTest do
 
       equal "10mrad" $
         prettyPrint $ Q.fullSimplify (10.0 .* milli radian)
+
+      equal "10m²·s" $
+        prettyPrint $ Q.fullSimplify (10.0 .* (meter <> second <> meter))
+
+      equal "0.5g" $
+        prettyPrint $ Q.fullSimplify (50.0 .* (gram <> centi meter ./ meter))
+
+      equal "18000Mbit" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (mega bit ./ second <> hour))
+
+      equal "500cm²" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (centi meter <> meter))
+
+      equal "0.05m²" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (meter <> centi meter))
+
+      equal "12.7cm²" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (centi meter <> inch))
 
     test "approximatelyEqual" do
       let upToTenPercent = Q.approximatelyEqual 0.1

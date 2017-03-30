@@ -43,7 +43,8 @@ module Data.Quantity
 import Prelude
 
 import Data.Either (Either(..))
-import Data.Tuple (Tuple(..), fst)
+import Data.Foldable (product, foldMap)
+import Data.Tuple (Tuple(..), fst, snd)
 import Data.Number (eqRelative)
 
 import Data.Units (DerivedUnit, toString, (.^), (./), unity, removePrefix)
@@ -126,14 +127,28 @@ toStandard (num .*. du) =
   case U.toStandardUnit du of
     Tuple du' conversion → (fromNumber conversion * num) ..* du'
 
--- | Simplify the unit of a quantity.
+-- | Attempt to simplify the unit of a quantity.
 fullSimplify ∷ Quantity → Quantity
 fullSimplify q@(num .*. du) =
   case toScalar' q of
-    Left _ → num .*. U.simplify du
-    Right n → if removePrefix du /= SI.degree && removePrefix du /= SI.radian
-                then n .*. unity
-                else num ..* du
+    Right n →
+     if removePrefix du /= SI.degree && removePrefix du /= SI.radian
+       then n .*. unity
+       else num ..* du
+    Left _ →
+      let list = U.splitByDimension du
+
+          toTuple (Tuple target us) =
+            case convertTo (one .* us) target of
+              Right (f .*. target') → Tuple f target'
+              Left _                → Tuple one target
+
+          list' = toTuple <$> list
+
+          factor = product (fst <$> list')
+          du' = foldMap snd list'
+
+      in (num * factor) .*. du'
 
 -- | Check whether two quantities have matching units (or can be converted
 -- | to the same representation) and test if the numerical values are
