@@ -201,6 +201,19 @@ main = runTest do
     test "removePrefix" do
       equal (meter <> second) (removePrefix (kilo meter <> nano second))
 
+    test "simplify" do
+      equal "m" $
+        U.toString $ U.simplify meter
+
+      equal "m²·s" $
+        U.toString $ U.simplify (meter <> second <> meter)
+
+      equal "m·cm·µs·s" $
+        U.toString $ U.simplify (micro second <> meter <> second <> centi meter)
+
+      equal "s/m" $
+        U.toString $ U.simplify (meter <> second <> meter .^ (-2.0))
+
     test "fullSimplify" do
       equal "200" $
         prettyPrint $ Q.fullSimplify (2.0 .* meter ./ centi meter)
