@@ -7,7 +7,8 @@ import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
 import Data.Number ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
-                   deci, hecto, milli, kilo, mega, giga, tera, peta, exa)
+                   deci, hecto, milli, kilo, mega, giga, tera, peta, exa,
+                   removePrefix)
 import Data.Units as U
 import Data.Units.SI (meter, gram, second, ampere, kelvin, mole, candela)
 import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
@@ -197,6 +198,9 @@ main = runTest do
       almostEqual (1.0 .* meter ./ second) $
                   Q.toStandard (2362.2047 .* inch ./ minute)
 
+    test "removePrefix" do
+      equal (meter <> second) (removePrefix (kilo meter <> nano second))
+
     test "fullSimplify" do
       equal "200" $
         prettyPrint $ Q.fullSimplify (2.0 .* meter ./ centi meter)
@@ -305,9 +309,7 @@ main = runTest do
     test "Division" do
       equal (0.5 .* hertz) (scalar 1.0 ⊘ 2.0 .* second)
       equal (0.5 .* kilo hertz) (scalar 1.0 ⊘ 2.0 .* milli second)
-      -- TODO: this should also work with `equal` instead of `almostEqual`,
-      -- see GitHub issue #12.
-      almostEqual (0.5 .* giga hertz) (scalar 1.0 ⊘ 2.0 .* nano second)
+      equal (0.5 .* mega hertz) (scalar 1.0 ⊘ 2.0 .* micro second)
 
     test "pow" do
       let two = fromNumber 2.0

@@ -2,6 +2,7 @@ module Data.Units
   ( Prefix
   , DerivedUnit()
   , withPrefix
+  , removePrefix
   , simplify
   , makeStandard
   , makeNonStandard
@@ -143,6 +144,13 @@ withPrefix p (DerivedUnit us) = DerivedUnit $
     Just ind →
       fromMaybe us (modifyAt ind (\u → u { prefix = u.prefix + p }) us)
     Nothing → { prefix: p, baseUnit: unity', exponent: 1.0 } : us
+
+-- | Remove all prefix values from the unit:
+-- | ```
+-- | removePrefix (kilo meter <> milli second) = meter <> second
+-- | ```
+removePrefix ∷ DerivedUnit → DerivedUnit
+removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = 0.0 }) <$> list
 
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
