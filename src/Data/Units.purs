@@ -287,8 +287,12 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
 
     convert ∷ BaseUnitWithExponent → Tuple DerivedUnit Decimal
     convert { prefix, baseUnit, exponent } =
-      Tuple ((baseToStandard baseUnit) .^ exponent)
-            ((fromNumber 10.0 `pow` prefix * conversionFactor baseUnit) `pow` fromNumber exponent)
+      Tuple (standardUnit .^ exponent)
+            ((fromNumber 10.0 `pow` prefix * factor) `pow` exponent')
+        where
+          standardUnit = baseToStandard baseUnit
+          factor = conversionFactor baseUnit
+          exponent' = fromNumber exponent
 
 -- | Get the name of a SI-prefix.
 prefixName ∷ Prefix → Maybe String
