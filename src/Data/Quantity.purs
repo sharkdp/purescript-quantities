@@ -54,7 +54,7 @@ import Data.Units.SI.Derived (radian) as SI
 import Data.Units.SI.Accepted (degree) as SI
 import Data.Units as U
 import Data.Decimal (Decimal, fromNumber, toNumber)
-import Data.Decimal as Decimal
+import Data.Decimal as D
 
 -- | Representation of a physical quantity as a (product of a) numerical value
 -- | and a physical unit.
@@ -92,9 +92,9 @@ instance showQuantity ∷ Show Quantity where
 
 prettyDecimal ∷ Decimal → String
 prettyDecimal d =
-  if Decimal.isInteger d && d < (Decimal.fromNumber 1.0e18)
-    then Decimal.toString d
-    else Decimal.toString (Decimal.toSignificantDigits 6 d)
+  if D.isInteger d && d < (D.fromNumber 1.0e18)
+    then D.toString d
+    else D.toString (D.toSignificantDigits 6 d)
 
 -- | Show a physical quantity in a human-readable form, value and unit
 -- | separately.
@@ -243,7 +243,7 @@ toScalar q = q `asValueIn` unity
 
 -- | Check if the numerical value of a quantity is finite.
 isFinite ∷ Quantity → Boolean
-isFinite (n .*. _) = Decimal.isFinite n
+isFinite (n .*. _) = D.isFinite n
 
 -- | Negate the numerical value of a quantity.
 qNegate ∷ Quantity → Quantity
@@ -280,11 +280,11 @@ infixl 4 qDivide as ⊘
 
 -- | Raise a quantity to a given power.
 pow ∷ Quantity → Decimal → Quantity
-pow (val .*. u) exp = (val `Decimal.pow` exp) ..* (u .^ toNumber exp)
+pow (val .*. u) exp = (val `D.pow` exp) ..* (u .^ toNumber exp)
 
 -- | The absolute value of a quantity.
 abs ∷ Quantity → Quantity
-abs (val .*. u) = Decimal.abs val ..* u
+abs (val .*. u) = D.abs val ..* u
 
 -- | The square root of a quantity.
 sqrt ∷ Quantity → Quantity
