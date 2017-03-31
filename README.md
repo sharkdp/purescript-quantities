@@ -7,17 +7,18 @@ encode physical units at *compile time*.
 ## Examples
 
 ``` purs
-> showResult $ 2.0 .* minutes ⊕ 30.0 .* seconds
+> showResult $ 2.0 .* minute ⊕ 30.0 .* second
 "2.5min"
 
-> showResult $ (85.0 .* miles ./ hour) `convertTo` (meters ./ second)
+> showResult $ (85.0 .* mile ./ hour) `convertTo` (meter ./ second)
 "37.9984m/s"
 
-> showResult $ (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
+> showResult $ (10.0 .* meter ./ second) `convertTo` (kilo meter ./ hour)
 "36km/h"
 
-> showResult $ (10.0 .* miles) `convertTo` (grams .^ 2.0)
-"Cannot unify unit 'mi' with unit 'g²'"
+> log $ showResult $ (10.0 .* joule) `convertTo` watt
+Cannot unify unit 'J' (SI: 'm²·g/s²')
+        with unit 'W' (SI: 'm²·g/s³')
 
 > showResult $ sin (90.0 .* degree)
 "1"
@@ -33,12 +34,12 @@ Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection
 
 Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
 ``` purs
-> let g = 9.81 .* meters ./ second .^ 2.0
+> let g = 9.81 .* meter ./ second .^ 2.0
 > let length = 20.0 .* centi meter
-> let period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+> let period = scalar 2.0 ⊗ pi ⊗ sqrt (length ⊘ g)
 
-> showResult $ period `convertTo` milli seconds
-"897.14ms"
+> prettyPrint (fullSimplify period)
+"0.89714s"
 ```
 
 ## Installation
