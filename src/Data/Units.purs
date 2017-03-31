@@ -6,6 +6,7 @@ module Data.Units
   , removePrefix
   , simplify
   , splitByDimension
+  , baseRepresentation
   , makeStandard
   , makeNonStandard
   -- Conversions
@@ -205,6 +206,30 @@ splitByDimension (DerivedUnit list) = transform list
       where
         first = DerivedUnit $ singleton $ (head us) { exponent = exp }
         exp = sum $ (_.exponent) <$> us
+
+-- | Return a representation of the `DerivedUnit` in terms of base units, split
+-- | by physical dimension.
+baseRepresentation ∷ DerivedUnit → List DerivedUnit
+baseRepresentation du
+  | du == unity = singleton du
+  | otherwise = us
+  where
+    du' = fst $ toStandardUnit du
+    us = (replace <<< snd) <$> splitByDimension du'
+
+    -- Replace "gram" by "kilo gram"
+    replace u =
+      case runDerivedUnit u of
+        (b : Nil) →
+          let b' =
+                case b.baseUnit of
+                  BaseUnit rec →
+                    if rec.long == "gram"
+                      then b { baseUnit = BaseUnit (rec { long = "kilogram"
+                                                        , short = "kg" }) }
+                      else b
+          in DerivedUnit (singleton b')
+        _ → u
 
 instance eqDerivedUnit ∷ Eq DerivedUnit where
   eq u1 u2 = (_.baseUnit <$> list1' == _.baseUnit <$> list2')
