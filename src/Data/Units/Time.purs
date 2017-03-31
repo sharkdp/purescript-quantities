@@ -1,4 +1,4 @@
--- | A collection of units for time durations.
+-- | A collection of units for durations of time.
 module Data.Units.Time where
 
 import Data.Units (DerivedUnit, makeNonStandard)

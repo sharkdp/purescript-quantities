@@ -1,3 +1,4 @@
+-- | This module defines a base unit `bit`, and a derived unit `byte`.
 module Data.Units.Bit where
 
 import Data.Units (DerivedUnit, makeStandard, makeNonStandard)

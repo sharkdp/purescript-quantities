@@ -1,4 +1,5 @@
--- | A collection of units that are derived from SI units.
+-- | A collection of units that are directly derived from SI units and accepted
+-- | by the standard.
 module Data.Units.SI.Derived where
 
 import Prelude

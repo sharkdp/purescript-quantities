@@ -1,3 +1,5 @@
+-- | This module defines data types and functions to handle physical
+-- | quantities.
 module Data.Quantity
   ( Quantity
   , quantity

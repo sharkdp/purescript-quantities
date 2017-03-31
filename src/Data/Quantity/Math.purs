@@ -1,3 +1,7 @@
+-- | This module defines mathematical operations on physical quantities. Most
+-- | of these functions return `Either UnificationError Quantity` since they
+-- | can only be applied to scalar (dimensionless) values. If the conversion
+-- | to a scalar fails, they will return a `UnificationError`.
 module Data.Quantity.Math
   ( acos
   , asin

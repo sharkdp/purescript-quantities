@@ -1,3 +1,4 @@
+-- | This module defines data types and functions to handle physical units.
 module Data.Units
   ( Prefix
   , DerivedUnit()

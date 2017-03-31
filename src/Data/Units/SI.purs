@@ -1,4 +1,4 @@
--- | A collection of standardized SI units.
+-- | This module defines the seven SI base units.
 module Data.Units.SI
   ( meter
   , kilogram

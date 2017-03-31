@@ -1,4 +1,4 @@
--- | A collection units of the imperial system.
+-- | A collection of units from the imperial system.
 module Data.Units.Imperial where
 
 import Data.Units (DerivedUnit, makeNonStandard, (.^))

@@ -1,3 +1,4 @@
+-- | This module defines certain constants of nature.
 module Data.Quantity.Physics
   ( speedOfLight
   , gravitationalConstant
