@@ -127,7 +127,7 @@ derivedUnit (_ .*. u) = u
 toStandard ∷ Quantity → Quantity
 toStandard (num .*. du) =
   case U.toStandardUnit du of
-    Tuple du' conversion → (fromNumber conversion * num) ..* du'
+    Tuple du' conversion → (conversion * num) ..* du'
 
 -- | Attempt to simplify the unit of a quantity.
 fullSimplify ∷ Quantity → Quantity
@@ -216,7 +216,7 @@ convert to q@(val .*. from)
           in
             if from' == to'
               then Right $ case q' of
-                             (val' .*. _) → (val' / fromNumber factor) .*. to
+                             (val' .*. _) → (val' / factor) .*. to
               else Left $ UnificationError from to
 
 -- | Flipped version of `convert`.

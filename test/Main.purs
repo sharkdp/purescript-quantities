@@ -109,8 +109,8 @@ main = runTest do
 
     test "toStandardUnit" do
       let rec = U.toStandardUnit minute
-      equal second $ fst rec
-      equal 60.0   $ snd rec
+      equal second            $ fst rec
+      equal (fromNumber 60.0) $ snd rec
 
     test "toString" do
       equal "m" $ U.toString meter
@@ -344,7 +344,10 @@ main = runTest do
       equal (0.5 .* hertz) (scalar 1.0 ⊘ 2.0 .* second)
       equal (0.5 .* kilo hertz) (scalar 1.0 ⊘ 2.0 .* milli second)
       equal (0.5 .* mega hertz) (scalar 1.0 ⊘ 2.0 .* micro second)
+      equal (0.5 .* giga hertz) (scalar 1.0 ⊘ 2.0 .* nano second)
       equal (0.5 .* tera hertz) (scalar 1.0 ⊘ 2.0 .* pico second)
+      equal (0.5 .* peta hertz) (scalar 1.0 ⊘ 2.0 .* femto second)
+      equal (0.5 .* exa  hertz) (scalar 1.0 ⊘ 2.0 .* atto second)
 
     test "pow" do
       let two = fromNumber 2.0

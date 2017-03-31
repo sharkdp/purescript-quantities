@@ -39,6 +39,7 @@ module Data.Units
 
 import Prelude
 
+import Data.Decimal (Decimal, pow, fromNumber, toNumber)
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.Function (on)
 import Data.List (List(Nil), filter, findIndex, modifyAt,
@@ -49,11 +50,9 @@ import Data.Monoid (class Monoid)
 import Data.NonEmpty ((:|))
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Math (pow)
-
 -- | A factor which is used to convert between two units. For the conversion
 -- | from `minute` to `second`, the conversion factor would be `60.0`.
-type ConversionFactor = Number
+type ConversionFactor = Decimal
 
 -- | A base unit can either be a standardized unit or some non-standard unit.
 -- | In the latter case, a conversion to a standard unit must be provided.
@@ -114,7 +113,7 @@ conversionFactor (BaseUnit u) =
     NonStandard { standardUnit, factor } → factor
 
 -- | A number that represents a power of ten as a prefix for a unit.
-type Prefix = Number
+type Prefix = Decimal
 
 -- | A number that represents the exponent of a unit, like *2* in *m²*.
 type Exponent = Number
@@ -140,21 +139,21 @@ runDerivedUnit ∷ DerivedUnit → List BaseUnitWithExponent
 runDerivedUnit (DerivedUnit u) = u
 
 -- | Add a given prefix value to a unit: `withPrefix 3.0 meter = kilo meter`.
-withPrefix ∷ Prefix → DerivedUnit → DerivedUnit
+withPrefix ∷ Number → DerivedUnit → DerivedUnit
 withPrefix p (DerivedUnit Nil) =
-  DerivedUnit $ singleton { prefix: p, baseUnit: unity', exponent: 1.0 }
+  DerivedUnit $ singleton { prefix: fromNumber p, baseUnit: unity', exponent: 1.0 }
 withPrefix p (DerivedUnit us) = DerivedUnit $
   case findIndex (\u → u.exponent == 1.0) us of
     Just ind →
-      fromMaybe us (modifyAt ind (\u → u { prefix = u.prefix + p }) us)
-    Nothing → { prefix: p, baseUnit: unity', exponent: 1.0 } : us
+      fromMaybe us (modifyAt ind (\u → u { prefix = u.prefix + fromNumber p }) us)
+    Nothing → { prefix: fromNumber p, baseUnit: unity', exponent: 1.0 } : us
 
 -- | Remove all prefix values from the unit:
 -- | ```
 -- | removePrefix (kilo meter <> milli second) = meter <> second
 -- | ```
 removePrefix ∷ DerivedUnit → DerivedUnit
-removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = 0.0 }) <$> list
+removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = fromNumber 0.0 }) <$> list
 
 -- | Like filter, but also return the non-matching elements.
 split ∷ ∀ a . (a → Boolean) → List a → { yes ∷ List a, no ∷ List a }
@@ -225,7 +224,7 @@ instance eqDerivedUnit ∷ Eq DerivedUnit where
       list2' = removeUnity list2
 
       globalPrefix ∷ List BaseUnitWithExponent → Prefix
-      globalPrefix us = sum $ map (\{prefix, baseUnit, exponent} → prefix * exponent) us
+      globalPrefix us = sum $ map (\{prefix, baseUnit, exponent} → prefix * fromNumber exponent) us
 
 instance showDerivedUnit ∷ Show DerivedUnit where
   show (DerivedUnit us) = listString us
@@ -249,11 +248,12 @@ instance showDerivedUnit ∷ Show DerivedUnit where
       addPrf   18.0 str = "(exa "   <> str <> ")"
       addPrf prefix str = "(withPrefix (" <> show prefix <> ") (" <> str <> "))"
 
-      show' { prefix, baseUnit, exponent: 1.0 } = addPrf prefix (show baseUnit)
-      show' { prefix: 0.0, baseUnit, exponent }      =
-        show baseUnit <> " .^ (" <> show exponent <> ")"
-      show' { prefix, baseUnit, exponent }      =
-        addPrf prefix (show baseUnit) <> " .^ (" <> show exponent <> ")"
+      show' { prefix, baseUnit, exponent: 1.0 } = addPrf (toNumber prefix) (show baseUnit)
+      show' { prefix, baseUnit, exponent }
+        | prefix == zero =
+            show baseUnit <> " .^ (" <> show exponent <> ")"
+        | otherwise      =
+            addPrf (toNumber prefix) (show baseUnit) <> " .^ (" <> show exponent <> ")"
 
 instance semigroupDerivedUnit ∷ Semigroup DerivedUnit where
   append (DerivedUnit u1) (DerivedUnit u2) =
@@ -268,10 +268,12 @@ makeStandard long short = fromBaseUnit $
   BaseUnit { short, long, unitType: Standard }
 
 -- | Helper function to create a non-standard unit.
-makeNonStandard ∷ String → String → ConversionFactor → DerivedUnit
+makeNonStandard ∷ String → String → Number → DerivedUnit
                    → DerivedUnit
 makeNonStandard long short factor standardUnit = fromBaseUnit $
-  BaseUnit { short, long, unitType: NonStandard { standardUnit, factor } }
+  BaseUnit { short, long, unitType: NonStandard { standardUnit: standardUnit
+                                                , factor: fromNumber factor
+                                                } }
 
 -- | Convert all contained units to standard units and return the global
 -- | conversion factor.
@@ -283,30 +285,32 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
 
     converted = convert <$> units
 
-    convert ∷ BaseUnitWithExponent → Tuple DerivedUnit Number
+    convert ∷ BaseUnitWithExponent → Tuple DerivedUnit Decimal
     convert { prefix, baseUnit, exponent } =
       Tuple ((baseToStandard baseUnit) .^ exponent)
-            ((10.0 `pow` prefix * conversionFactor baseUnit) `pow` exponent)
+            ((fromNumber 10.0 `pow` prefix * conversionFactor baseUnit) `pow` fromNumber exponent)
 
 -- | Get the name of a SI-prefix.
 prefixName ∷ Prefix → Maybe String
-prefixName -18.0 = Just "a"
-prefixName -15.0 = Just "f"
-prefixName -12.0 = Just "p"
-prefixName  -9.0 = Just "n"
-prefixName  -6.0 = Just "µ"
-prefixName  -3.0 = Just "m"
-prefixName  -2.0 = Just "c"
-prefixName  -1.0 = Just "d"
-prefixName   0.0 = Just ""
-prefixName   2.0 = Just "h"
-prefixName   3.0 = Just "k"
-prefixName   6.0 = Just "M"
-prefixName   9.0 = Just "G"
-prefixName  12.0 = Just "T"
-prefixName  15.0 = Just "P"
-prefixName  18.0 = Just "E"
-prefixName     _ = Nothing
+prefixName = pn <<< toNumber
+  where
+    pn -18.0 = Just "a"
+    pn -15.0 = Just "f"
+    pn -12.0 = Just "p"
+    pn  -9.0 = Just "n"
+    pn  -6.0 = Just "µ"
+    pn  -3.0 = Just "m"
+    pn  -2.0 = Just "c"
+    pn  -1.0 = Just "d"
+    pn   0.0 = Just ""
+    pn   2.0 = Just "h"
+    pn   3.0 = Just "k"
+    pn   6.0 = Just "M"
+    pn   9.0 = Just "G"
+    pn  12.0 = Just "T"
+    pn  15.0 = Just "P"
+    pn  18.0 = Just "E"
+    pn     _ = Nothing
 
 -- | Helper to show exponents in superscript notation.
 prettyExponent ∷ Number → String
@@ -375,7 +379,9 @@ unity = DerivedUnit Nil
 -- | Convert a `BaseUnit` to a `DerivedUnit`.
 fromBaseUnit ∷ BaseUnit → DerivedUnit
 fromBaseUnit = DerivedUnit <<< singleton
-                           <<< { prefix: 0.0, baseUnit: _, exponent: 1.0 }
+                           <<< { prefix: fromNumber 0.0
+                               , baseUnit: _
+                               , exponent: 1.0 }
 
 atto ∷ DerivedUnit → DerivedUnit
 atto = withPrefix (-18.0)
