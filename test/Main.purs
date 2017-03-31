@@ -23,13 +23,13 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
                       errorMessage, showResult, qNegate, isFinite)
 import Data.Quantity as Q
-import Data.Quantity.Math (sin, asin)
+import Data.Quantity.Math (sin, asin, pi)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Aff.AVar (AVAR)
 
-import Math (pi)
+import Math as Math
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
@@ -366,7 +366,7 @@ main = runTest do
       almostEqual' (scalar 1.0) (sin (90.0 .* degree))
       almostEqual' (scalar 0.5) (sin (30.0 .* degree))
       almostEqual' (30.0 .* degree) (asin (scalar 0.5))
-      almostEqual' (scalar 1.0) (sin ((0.5 * pi) .* radian))
+      almostEqual' (scalar 1.0) (sin ((0.5 * Math.pi) .* radian))
 
   suite "Consistency checks" do
     test "Data.Units.SI.Derived" do
@@ -395,7 +395,7 @@ main = runTest do
 
     test "Data.Units.SI.Accepted" do
       -- See: https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI
-      equal ((pi / 180.0) .* radian) (1.0 .* degree)
+      equal ((Math.pi / 180.0) .* radian) (1.0 .* degree)
       equal (1.0 .* (hecto meter) .^ 2.0) (1.0 .* hectare)
       almostEqual (1.0 .* (deci meter) .^ 3.0) (1.0 .* liter)
       equal (1000.0 .* kilo gram) (1.0 .* tonne)
@@ -435,8 +435,8 @@ main = runTest do
         time = (filesize ⊘ speed) `convertTo` minute
     testExample 6 "60min" time
 
-    let g = 9.81 .* meters ./ second .^ 2.0
+    let g = 9.81 .* meter ./ second .^ 2.0
         length = 20.0 .* centi meter
-        period = scalar (2.0 * pi) ⊗ sqrt (length ⊘ g)
+        period = scalar 2.0 ⊗ pi ⊗ sqrt (length ⊘ g)
     testExample 7 "897.14ms"
       (period `convertTo` milli second)
