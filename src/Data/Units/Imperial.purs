@@ -27,7 +27,3 @@ ounce = makeNonStandard "ounce" "oz" 28.35 gram
 -- | Unit of mass, *1lb = 453.6g*.
 pound ∷ DerivedUnit
 pound = makeNonStandard "pound" "lb" 453.6 gram
-
--- | Unit of Volume, the US liquid gallon *1gal = 0.003785411784m^3*
-gallon ∷ DerivedUnit
-gallon = makeNonStandard "gallon" "gal" 0.003785411784 (meter .^ 3.0)

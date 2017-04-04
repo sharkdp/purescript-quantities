@@ -18,6 +18,7 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
 import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt)
 import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard)
+import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -409,6 +410,13 @@ main = runTest do
       equal (730.0 .* hour)   (1.0 .* month)
       equal (365.0 .* day)    (1.0 .* year)
       equal (12.0 .* month)   (1.0 .* year)
+
+    test "Data.Units.USCustomary" do
+      equal (231.0 .* inch .^ 3.0) ( 1.0 .* gallon)
+      equal (1.0 .* gallon)        ( 8.0 .* pint)
+      equal (1.0 .* pint)          ( 2.0 .* cup)
+      equal (1.0 .* cup)           (16.0 .* tablespoon)
+      equal (1.0 .* tablespoon)    ( 3.0 .* teaspoon)
 
   suite "Integration" do
     let testExample nr output input =
