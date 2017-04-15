@@ -258,20 +258,20 @@ instance showDerivedUnit ∷ Show DerivedUnit where
       listString (u : Nil) = show' u
       listString us'       = "(" <> intercalate " <> " (show' <$> us') <> ")"
 
-      addPrf  -18.0 str = "(atto "  <> str <> ")"
-      addPrf  -15.0 str = "(femto " <> str <> ")"
-      addPrf  -12.0 str = "(pico "  <> str <> ")"
-      addPrf   -9.0 str = "(nano "  <> str <> ")"
-      addPrf   -6.0 str = "(micro " <> str <> ")"
-      addPrf   -3.0 str = "(milli " <> str <> ")"
-      addPrf    0.0 str = str
-      addPrf    3.0 str = "(kilo "  <> str <> ")"
-      addPrf    6.0 str = "(mega "  <> str <> ")"
-      addPrf    9.0 str = "(giga "  <> str <> ")"
-      addPrf   12.0 str = "(tera "  <> str <> ")"
-      addPrf   15.0 str = "(peta "  <> str <> ")"
-      addPrf   18.0 str = "(exa "   <> str <> ")"
-      addPrf prefix str = "(withPrefix (" <> show prefix <> ") (" <> str <> "))"
+      addPrf  (-18.0) str = "(atto "  <> str <> ")"
+      addPrf  (-15.0) str = "(femto " <> str <> ")"
+      addPrf  (-12.0) str = "(pico "  <> str <> ")"
+      addPrf  ( -9.0) str = "(nano "  <> str <> ")"
+      addPrf  ( -6.0) str = "(micro " <> str <> ")"
+      addPrf  ( -3.0) str = "(milli " <> str <> ")"
+      addPrf     0.0  str = str
+      addPrf     3.0  str = "(kilo "  <> str <> ")"
+      addPrf     6.0  str = "(mega "  <> str <> ")"
+      addPrf     9.0  str = "(giga "  <> str <> ")"
+      addPrf    12.0  str = "(tera "  <> str <> ")"
+      addPrf    15.0  str = "(peta "  <> str <> ")"
+      addPrf    18.0  str = "(exa "   <> str <> ")"
+      addPrf  prefix  str = "(withPrefix (" <> show prefix <> ") (" <> str <> "))"
 
       show' { prefix, baseUnit, exponent: 1.0 } = addPrf (toNumber prefix) (show baseUnit)
       show' { prefix, baseUnit, exponent }
@@ -323,23 +323,23 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
 prefixName ∷ Prefix → Maybe String
 prefixName = pn <<< toNumber
   where
-    pn -18.0 = Just "a"
-    pn -15.0 = Just "f"
-    pn -12.0 = Just "p"
-    pn  -9.0 = Just "n"
-    pn  -6.0 = Just "µ"
-    pn  -3.0 = Just "m"
-    pn  -2.0 = Just "c"
-    pn  -1.0 = Just "d"
-    pn   0.0 = Just ""
-    pn   2.0 = Just "h"
-    pn   3.0 = Just "k"
-    pn   6.0 = Just "M"
-    pn   9.0 = Just "G"
-    pn  12.0 = Just "T"
-    pn  15.0 = Just "P"
-    pn  18.0 = Just "E"
-    pn     _ = Nothing
+    pn (-18.0) = Just "a"
+    pn (-12.0) = Just "p"
+    pn (-15.0) = Just "f"
+    pn ( -9.0) = Just "n"
+    pn ( -6.0) = Just "µ"
+    pn ( -3.0) = Just "m"
+    pn ( -2.0) = Just "c"
+    pn ( -1.0) = Just "d"
+    pn    0.0  = Just ""
+    pn    2.0  = Just "h"
+    pn    3.0  = Just "k"
+    pn    6.0  = Just "M"
+    pn    9.0  = Just "G"
+    pn   12.0  = Just "T"
+    pn   15.0  = Just "P"
+    pn   18.0  = Just "E"
+    pn      _  = Nothing
 
 -- | Helper to show exponents in superscript notation.
 prettyExponent ∷ Number → String
