@@ -1,7 +1,7 @@
 -- | A collection of units from the imperial system.
 module Data.Units.Imperial where
 
-import Data.Units (DerivedUnit, makeNonStandard, (.^))
+import Data.Units (DerivedUnit, makeNonStandard)
 import Data.Units.SI
 
 -- | Unit of length, *1in = 0.0254m*.
