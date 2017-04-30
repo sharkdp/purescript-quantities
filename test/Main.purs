@@ -5,7 +5,7 @@ import Prelude hiding (degree)
 import Data.Decimal (fromNumber)
 import Data.Either (Either(..), isLeft)
 import Data.Tuple (fst, snd)
-import Data.Number ((≅))
+import Data.Number.Approximate ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa,
                    removePrefix)

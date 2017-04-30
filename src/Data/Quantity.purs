@@ -47,7 +47,7 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Foldable (product, foldMap)
 import Data.Tuple (Tuple(..), fst, snd)
-import Data.Number (eqRelative)
+import Data.Number.Approximate (Fraction(..), eqRelative)
 
 import Data.Units (DerivedUnit, toString, (.^), (./), unity, removePrefix)
 import Data.Units.SI.Derived (radian) as SI
@@ -158,7 +158,7 @@ fullSimplify q@(num .*. du) =
 approximatelyEqual ∷ Number → Quantity → Quantity → Boolean
 approximatelyEqual tol q1' q2' =
   derivedUnit q1 == derivedUnit q2 &&
-  eqRelative tol v1 v2
+  eqRelative (Fraction tol) v1 v2
     where
       q1 = toStandard q1'
       q2 = toStandard q2'
