@@ -20,7 +20,7 @@
     "purescript-lists": "^4.0.1",
     "purescript-monoid": "^3.0.0",
     "purescript-numbers": "^5.0.0",
-    "purescript-decimals": "^2.1.0"
+    "purescript-decimals": "^3.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0",

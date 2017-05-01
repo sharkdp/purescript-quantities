@@ -24,6 +24,8 @@ module Data.Quantity.Math
   , max
   , min
   , round
+  , gamma
+  , factorial
   , pi
   , e
   ) where
@@ -106,6 +108,12 @@ min = lift2 Decimal.min
 
 round ∷ Quantity → Result
 round = lift Decimal.round
+
+gamma ∷ Quantity → Result
+gamma = lift Decimal.gamma
+
+factorial ∷ Quantity → Result
+factorial = lift Decimal.factorial
 
 pi ∷ Quantity
 pi = scalar' Decimal.pi
