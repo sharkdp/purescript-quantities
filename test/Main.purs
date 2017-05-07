@@ -20,6 +20,7 @@ import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
 import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon)
+import Data.Units.CGS (gauss)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -456,6 +457,9 @@ main = runTest do
       equal (1.0 .* pint)          ( 2.0 .* cup)
       equal (1.0 .* cup)           (16.0 .* tablespoon)
       equal (1.0 .* tablespoon)    ( 3.0 .* teaspoon)
+
+    test "Data.Units.CGS" do
+      equal (100.0 .* micro tesla) (1.0 .* gauss)
 
   suite "Integration" do
     let testExample nr output input =

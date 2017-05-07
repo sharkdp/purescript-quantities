@@ -10,6 +10,7 @@ module Quantities
   , module DUT
   , module DUI
   , module DUUSC
+  , module DUCGS
   , module DUB
   ) where
 
@@ -23,4 +24,5 @@ import Data.Units.SI.Accepted as DUSA
 import Data.Units.Time as DUT
 import Data.Units.Imperial as DUI
 import Data.Units.USCustomary as DUUSC
+import Data.Units.CGS as DUCGS
 import Data.Units.Bit as DUB
