@@ -7,6 +7,6 @@ import Data.Units (DerivedUnit, makeStandard, makeNonStandard)
 bit ∷ DerivedUnit
 bit = makeStandard "bit" "bit"
 
--- | Unit of digital information, *1byte = 8bit*.
+-- | Unit of digital information, *1 byte = 8 bit*.
 byte ∷ DerivedUnit
 byte = makeNonStandard "byte" "B" 8.0 bit

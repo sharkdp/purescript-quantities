@@ -6,26 +6,26 @@ import Data.Units.SI
 
 import Prelude ((*), (+))
 
--- | Unit of time, *1min = 60sec*.
+-- | Unit of time, *1 min = 60 sec*.
 minute ∷ DerivedUnit
 minute = makeNonStandard "minute" "min" 60.0 second
 
--- | Unit of time, *1hour = 60min*.
+-- | Unit of time, *1 hour = 60 min*.
 hour ∷ DerivedUnit
 hour = makeNonStandard "hour" "h" 3600.0 second
 
--- | Unit of time, *1day = 24hour*.
+-- | Unit of time, *1 day = 24 hour*.
 day ∷ DerivedUnit
 day = makeNonStandard "day" "d" (24.0 * 3600.0) second
 
--- | Unit of time, *1week = 7days*.
+-- | Unit of time, *1 week = 7 days*.
 week ∷ DerivedUnit
 week = makeNonStandard "week" "week" (7.0 * 24.0 * 3600.0) second
 
--- | Unit of time, *1month = 30days + 10hours*.
+-- | Unit of time, *1 month = 30 days + 10 hours*.
 month ∷ DerivedUnit
 month = makeNonStandard "month" "month" ((30.0 * 24.0 + 10.0) * 3600.0) second
 
--- | Unit of time, *1year = 365days*.
+-- | Unit of time, *1 year = 365 days*.
 year ∷ DerivedUnit
 year = makeNonStandard "year" "year" (365.0 * 24.0 * 3600.0) second
