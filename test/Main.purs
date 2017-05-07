@@ -15,7 +15,8 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
                               watt, coulomb, volt, farad, ohm, siemens, weber,
                               tesla, henry, lumen, lux, becquerel, gray,
                               sievert, katal)
-import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt)
+import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
+                               bel, astronomicalUnit, bar, angstrom, barn)
 import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon)
@@ -434,6 +435,11 @@ main = runTest do
       almostEqual (1.0 .* (deci meter) .^ 3.0) (1.0 .* liter)
       equal (1000.0 .* kilo gram) (1.0 .* tonne)
       almostEqual (1.602176e-19 .* joule) (1.0 .* electronvolt)
+      equal (0.1 .* bel) (1.0 .* deci bel)
+      equal (149597870700.0 .* meter) (1.0 .* astronomicalUnit)
+      equal (1.0e5 .* pascal) (1.0 .* bar)
+      equal (100.0 .* pico meter) (1.0 .* angstrom)
+      equal (100.0 .* (femto meter) .^ 2.0) (1.0 .* barn)
 
     test "Data.Units.Time" do
       equal (60.0 .* second)  (1.0 .* minute)
