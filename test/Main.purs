@@ -184,13 +184,46 @@ main = runTest do
 
     test "prettyPrint" do
       equal "3" $ prettyPrint (scalar 3.0)
-      equal "3km" $ prettyPrint (3.0 .* kilo meter)
-      equal "3.2m" $ prettyPrint (3.2 .* meter)
-      equal "3.71m²·s" $ prettyPrint (3.71 .* (meter <> second <> meter))
-      equal "3m/s" $ prettyPrint (3.0 .* meter ./ second)
-      equal "-3.12332Ps²" $ prettyPrint ((-3.123321) .* peta second .^ 2.0)
-      equal "3km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
-      equal "3K" $ prettyPrint (3.0 .* kelvin)
+      equal "3 km" $ prettyPrint (3.0 .* kilo meter)
+      equal "3.2 m" $ prettyPrint (3.2 .* meter)
+      equal "3.71 m²·s" $ prettyPrint (3.71 .* (meter <> second <> meter))
+      equal "3 m/s" $ prettyPrint (3.0 .* meter ./ second)
+      equal "-3.12332 Ps²" $ prettyPrint ((-3.123321) .* peta second .^ 2.0)
+      equal "3 km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
+      equal "3 K" $ prettyPrint (3.0 .* kelvin)
+
+    test "SI-compliant pretty printing" do
+      --  See: https://en.wikipedia.org/wiki/International_System_of_Units
+      --        -> Unit symbols and the value of quantities
+
+      -- The value of a quantity is written as a number followed by a space
+      -- (representing a multiplication sign) and a unit symbol; e.g., 2.21 kg,
+      -- 7.3×10² m², 22 K.
+      equal "2.21 kg" $ prettyPrint (2.21 .* kilo gram)
+      equal "22 K" $ prettyPrint (22.0 .* kelvin)
+
+      -- Exceptions are the symbols for plane angular degrees, minutes, and
+      -- seconds (°, ′, and ″), which are placed immediately after the
+      -- number with no intervening space.
+      equal "90°" $ prettyPrint (90.0 .* degree)
+
+      -- A prefix is part of the unit, and its symbol is prepended to the
+      -- unit symbol without a separator (e.g., k in km, M in MPa, G in GHz).
+      -- Compound prefixes are not allowed.
+      equal "1 MPa" $ prettyPrint (1.0 .* mega pascal)
+
+      -- Symbols for derived units formed by multiplication are joined with a
+      -- centre dot (·) or a non-breaking space; e.g., N·m or N m.
+      equal "1 N·m" $ prettyPrint (1.0 .* (newton <> meter))
+
+      -- Symbols for derived units formed by division are joined with a solidus
+      -- (/), or given as a negative exponent. E.g., the "metre per second" can
+      -- be written m/s, m s^(−1), m·s^(−1), or m/s. Only one solidus should
+      -- be used; e.g., kg/(m·s2) and kg·m^(−1)·s^(−2) are acceptable, but
+      -- kg/m/s² is ambiguous and unacceptable.
+      equal "1 m/s" $ prettyPrint (1.0 .* (meter ./ second))
+      equal "1 kg/(s²·m)" $
+          prettyPrint (1.0 .* (kilo gram ./ (meter <> second .^ 2.0)))
 
     test "derivedUnit" do
       equal meter (Q.derivedUnit (3.0 .* meter))
@@ -225,25 +258,25 @@ main = runTest do
       equal "180°" $
         prettyPrint $ Q.fullSimplify (180.0 .* degree)
 
-      equal "10mrad" $
+      equal "10 mrad" $
         prettyPrint $ Q.fullSimplify (10.0 .* milli radian)
 
-      equal "10m²·s" $
+      equal "10 m²·s" $
         prettyPrint $ Q.fullSimplify (10.0 .* (meter <> second <> meter))
 
-      equal "0.5g" $
+      equal "0.5 g" $
         prettyPrint $ Q.fullSimplify (50.0 .* (gram <> centi meter ./ meter))
 
-      equal "18000Mbit" $
+      equal "18000 Mbit" $
         prettyPrint $ Q.fullSimplify (5.0 .* (mega bit ./ second <> hour))
 
-      equal "500cm²" $
+      equal "500 cm²" $
         prettyPrint $ Q.fullSimplify (5.0 .* (centi meter <> meter))
 
-      equal "0.05m²" $
+      equal "0.05 m²" $
         prettyPrint $ Q.fullSimplify (5.0 .* (meter <> centi meter))
 
-      equal "12.7cm²" $
+      equal "12.7 cm²" $
         prettyPrint $ Q.fullSimplify (5.0 .* (centi meter <> inch))
 
     test "approximatelyEqual" do
@@ -423,13 +456,13 @@ main = runTest do
           test ("Example " <> show nr) $
             equal output (showResult input)
 
-    testExample 1 "2.5min" $
+    testExample 1 "2.5 min" $
       2.0 .* minutes ⊕ 30.0 .* seconds
 
-    testExample 2 "36km/h" $
+    testExample 2 "36 km/h" $
       (10.0 .* meters ./ second) `convertTo` (kilo meters ./ hour)
 
-    testExample 3 "37.9984m/s" $
+    testExample 3 "37.9984 m/s" $
       (85.0 .* miles ./ hour) `convertTo` (meters ./ second)
 
     testExample 4 "Cannot unify unit 'mi' (SI: 'm')\n        with unit 'g²' (SI: 'g²')" $
@@ -441,10 +474,10 @@ main = runTest do
     let filesize = 2.7 .* giga byte
         speed = 6.0 .* mega bit ./ second
         time = (filesize ⊘ speed) `convertTo` minute
-    testExample 6 "60min" time
+    testExample 6 "60 min" time
 
     let g = 9.81 .* meter ./ second .^ 2.0
         length = 20.0 .* centi meter
         period = scalar 2.0 ⊗ pi ⊗ sqrt (length ⊘ g)
-    testExample 7 "897.14ms"
+    testExample 7 "897.14 ms"
       (period `convertTo` milli second)

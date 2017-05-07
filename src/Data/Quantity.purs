@@ -98,16 +98,19 @@ prettyDecimal d =
 
 -- | Show a physical quantity in a human-readable form, value and unit
 -- | separately.
-prettyPrint' ∷ Quantity → Tuple String String
+prettyPrint' ∷ Quantity → { number ∷ String, space ∷ Boolean, unit ∷ String }
 prettyPrint' (val .*. du)
-  | du == unity = Tuple (prettyDecimal val) ""
-  | otherwise   = Tuple (prettyDecimal val) (toString du)
+  | du == unity = { number: prettyDecimal val, space: false, unit: "" }
+  | otherwise   = { number: prettyDecimal val, space: space, unit: toString du }
+    where space = du /= SI.degree
 
 -- | Show a physical quantity in a human-readable form.
 prettyPrint ∷ Quantity → String
 prettyPrint q =
   case prettyPrint' q of
-    Tuple v u → v <> u
+    rec →
+      let space = if rec.space then " " else ""
+      in rec.number <> space <> rec.unit
 
 -- | Show the (possibly failed) result of a computation in human-readable form.
 showResult ∷ Either UnificationError Quantity → String

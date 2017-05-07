@@ -8,13 +8,13 @@ encode physical units at *compile time*.
 
 ``` purs
 > showResult $ 2.0 .* minute ⊕ 30.0 .* second
-"2.5min"
+"2.5 min"
 
 > showResult $ (85.0 .* mile ./ hour) `convertTo` (meter ./ second)
-"37.9984m/s"
+"37.9984 m/s"
 
 > showResult $ (10.0 .* meter ./ second) `convertTo` (kilo meter ./ hour)
-"36km/h"
+"36 km/h"
 
 > log $ showResult $ (10.0 .* joule) `convertTo` watt
 Cannot unify unit 'J' (SI: 'm²·g/s²')
@@ -29,7 +29,7 @@ Calculate the time it takes to download a *2.7GB* file on a *6Mbit/s* connection
 > let filesize = 2.7 .* giga byte
 > let speed = 6.0 .* mega bit ./ second
 > showResult $ (filesize ⊘ speed) `convertTo` minute
-"60min"
+"60 min"
 ```
 
 Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *L = 20cm*:
@@ -39,7 +39,7 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 > let period = scalar 2.0 ⊗ pi ⊗ sqrt (length ⊘ g)
 
 > prettyPrint (fullSimplify period)
-"0.89714s"
+"0.89714 s"
 ```
 
 ## Installation
