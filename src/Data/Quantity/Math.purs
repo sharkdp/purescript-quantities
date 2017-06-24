@@ -28,6 +28,7 @@ module Data.Quantity.Math
   , factorial
   , pi
   , e
+  , tau
   ) where
 
 import Prelude
@@ -120,3 +121,6 @@ pi = scalar' Decimal.pi
 
 e ∷ Quantity
 e = scalar' Decimal.e
+
+tau ∷ Quantity
+tau = scalar' $ Decimal.fromNumber 2.0 * Decimal.pi
