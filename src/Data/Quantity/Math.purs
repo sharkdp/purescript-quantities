@@ -1,7 +1,7 @@
 -- | This module defines mathematical operations on physical quantities. Most
--- | of these functions return `Either UnificationError Quantity` since they
+-- | of these functions return `Either ConversionError Quantity` since they
 -- | can only be applied to scalar (dimensionless) values. If the conversion
--- | to a scalar fails, they will return a `UnificationError`.
+-- | to a scalar fails, they will return a `ConversionError`.
 module Data.Quantity.Math
   ( acos
   , asin
@@ -32,12 +32,12 @@ module Data.Quantity.Math
 
 import Prelude
 import Data.Either (Either)
-import Data.Quantity (Quantity, UnificationError, asValueIn', scalar')
+import Data.Quantity (Quantity, ConversionError, asValueIn', scalar')
 import Data.Units (unity)
 import Data.Decimal (Decimal)
 import Data.Decimal as Decimal
 
-type Result = Either UnificationError Quantity
+type Result = Either ConversionError Quantity
 
 lift ∷ (Decimal → Decimal) → Quantity → Result
 lift fn q = (scalar' <<< fn) <$> (q `asValueIn'` unity)

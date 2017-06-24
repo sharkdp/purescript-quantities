@@ -13,7 +13,7 @@ module Data.Quantity
   , fullSimplify
   , approximatelyEqual
   -- Conversion errors
-  , UnificationError(..)
+  , ConversionError(..)
   , errorMessage
   -- Create a dimensionless quantity
   , scalar
@@ -113,7 +113,7 @@ prettyPrint q =
       in rec.number <> space <> rec.unit
 
 -- | Show the (possibly failed) result of a computation in human-readable form.
-showResult ∷ Either UnificationError Quantity → String
+showResult ∷ Either ConversionError Quantity → String
 showResult (Left error) = errorMessage error
 showResult (Right q)    = prettyPrint q
 
@@ -170,25 +170,25 @@ approximatelyEqual tol q1' q2' =
 
 -- | A unit conversion error that appears if two given units cannot be
 -- | converted into each other.
-data UnificationError = UnificationError DerivedUnit DerivedUnit
+data ConversionError = ConversionError DerivedUnit DerivedUnit
 
-derive instance eqUnificationError ∷ Eq UnificationError
+derive instance eqConversionError ∷ Eq ConversionError
 
-instance showUnificationError ∷ Show UnificationError where
-  show (UnificationError u1 u2) = "UnificationError (" <> show u1 <> ")"
-                                               <> " (" <> show u2 <> ")"
+instance showConversionError ∷ Show ConversionError where
+  show (ConversionError u1 u2) = "ConversionError (" <> show u1 <> ")"
+                                             <> " (" <> show u2 <> ")"
 
 -- | Textual representation of a unit conversion error.
-errorMessage ∷ UnificationError → String
-errorMessage (UnificationError u1 u2) =
+errorMessage ∷ ConversionError → String
+errorMessage (ConversionError u1 u2) =
   if u1 == unity
     then "Cannot convert quantity of unit '" <> toString u2 <> "' to a scalar"
     else
       if u2 == unity
         then "Cannot convert quantity of unit '" <> toString u1 <> "' to a scalar"
         else
-          "Cannot unify unit '" <> toString u1 <> "'" <> baseRep u1 <> "\n" <>
-          "        with unit '" <> toString u2 <> "'" <> baseRep u2 <> ""
+          "Cannot convert unit '" <> toString u1 <> "'" <> baseRep u1 <> "\n" <>
+          "            to unit '" <> toString u2 <> "'" <> baseRep u2 <> ""
   where
     baseRep u =
       let u' = fst (U.toStandardUnit u)
@@ -207,8 +207,8 @@ scalar' ∷ Decimal → Quantity
 scalar' factor = factor ..* U.unity
 
 -- | Attempt to convert a physical quantity to a given target unit. Returns a
--- | `UnificationError` if the conversion fails.
-convert ∷ DerivedUnit → Quantity → Either UnificationError Quantity
+-- | `ConversionError` if the conversion fails.
+convert ∷ DerivedUnit → Quantity → Either ConversionError Quantity
 convert to q@(val .*. from)
   | to == from = Right q
   | otherwise =
@@ -220,28 +220,28 @@ convert to q@(val .*. from)
             if from' == to'
               then Right $ case q' of
                              (val' .*. _) → (val' / factor) .*. to
-              else Left $ UnificationError from to
+              else Left $ ConversionError from to
 
 -- | Flipped version of `convert`.
-convertTo ∷ Quantity → DerivedUnit → Either UnificationError Quantity
+convertTo ∷ Quantity → DerivedUnit → Either ConversionError Quantity
 convertTo = flip convert
 
 -- | Get the numerical value of a physical quantity in a given unit. Returns a
--- | `UnificationError` if the conversion fails.
-asValueIn' ∷ Quantity → DerivedUnit → Either UnificationError Decimal
+-- | `ConversionError` if the conversion fails.
+asValueIn' ∷ Quantity → DerivedUnit → Either ConversionError Decimal
 asValueIn' u = convertTo u >=> value >>> pure
 
 -- | Get the numerical value of a physical quantity in a given unit. Returns a
--- | `UnificationError` if the conversion fails.
-asValueIn ∷ Quantity → DerivedUnit → Either UnificationError Number
+-- | `ConversionError` if the conversion fails.
+asValueIn ∷ Quantity → DerivedUnit → Either ConversionError Number
 asValueIn q u = toNumber <$> (asValueIn' q u)
 
 -- | Try to convert a quantity to a scalar value
-toScalar' ∷ Quantity → Either UnificationError Decimal
+toScalar' ∷ Quantity → Either ConversionError Decimal
 toScalar' q = q `asValueIn'` unity
 
 -- | Try to convert a quantity to a scalar value
-toScalar ∷ Quantity → Either UnificationError Number
+toScalar ∷ Quantity → Either ConversionError Number
 toScalar q = q `asValueIn` unity
 
 -- | Check if the numerical value of a quantity is finite.
@@ -254,7 +254,7 @@ qNegate (v .*. u) = (-v) .*. u
 
 -- | Attempt to add two quantities. If the units can not be unified, an error
 -- | is returned.
-qAdd ∷ Quantity → Quantity → Either UnificationError Quantity
+qAdd ∷ Quantity → Quantity → Either ConversionError Quantity
 qAdd (v1 .*. u1) q2 = do
   q2' ← q2 `convertTo` u1
   case q2' of
@@ -264,7 +264,7 @@ infixl 3 qAdd as ⊕
 
 -- | Attempt to subtract two quantities. If the units can not be unified, an
 -- | error is returned.
-qSubtract ∷ Quantity → Quantity → Either UnificationError Quantity
+qSubtract ∷ Quantity → Quantity → Either ConversionError Quantity
 qSubtract q1 (v2 .*. u2) = q1 ⊕ ((-v2) .*. u2)
 
 infixl 3 qSubtract as ⊖

@@ -17,8 +17,8 @@ encode physical units at *compile time*.
 "36 km/h"
 
 > log $ showResult $ (10.0 .* joule) `convertTo` watt
-Cannot unify unit 'J' (SI: 'm²·g/s²')
-        with unit 'W' (SI: 'm²·g/s³')
+Cannot convert unit 'J' (SI: 'm²·g/s²')
+            to unit 'W' (SI: 'm²·g/s³')
 
 > showResult $ sin (90.0 .* degree)
 "1"

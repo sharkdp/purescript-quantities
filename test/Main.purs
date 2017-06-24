@@ -505,7 +505,7 @@ main = runTest do
     testExample 3 "37.9984 m/s" $
       (85.0 .* miles ./ hour) `convertTo` (meters ./ second)
 
-    testExample 4 "Cannot unify unit 'mi' (SI: 'm')\n        with unit 'g²' (SI: 'g²')" $
+    testExample 4 "Cannot convert unit 'mi' (SI: 'm')\n            to unit 'g²' (SI: 'g²')" $
       (10.0 .* miles) `convertTo` (grams .^ 2.0)
 
     testExample 5 "1" $
