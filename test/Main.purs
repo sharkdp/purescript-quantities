@@ -281,6 +281,36 @@ main = runTest do
       equal "12.7 cm²" $
         prettyPrint $ Q.fullSimplify (5.0 .* (centi meter <> inch))
 
+      equal "1 s⁻²" $
+        prettyPrint $ Q.fullSimplify (1.0 .* (hertz ./ second))
+
+      equal "1 s³·m" $
+        prettyPrint $ Q.fullSimplify (1.0 .* (second <> meter ./ hertz .^ 2.0))
+
+      equal "5 g" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (gram <> hertz <> second))
+
+      equal "5 g·s" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (gram <> hertz <> second .^ 2.0))
+
+      equal "0.005 m²" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (meter .^ (-1.0) <> liter))
+
+      equal "0.005 m²" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (liter ./ meter))
+
+      equal "0.464515 m" $
+        prettyPrint $ Q.fullSimplify (5.0 .* (foot .^ 2.0 ./ meter))
+
+      equal "231 in²" $
+        prettyPrint $ Q.fullSimplify (1.0 .* (gallon ./ inch))
+
+      equal "231 in" $
+        prettyPrint $ Q.fullSimplify (1.0 .* (gallon ./ inch .^ 2.0))
+
+      equal "0.3048 m²" $
+        prettyPrint $ Q.fullSimplify (1.0 .* (foot <> meter))
+
     test "approximatelyEqual" do
       let upToTenPercent = Q.approximatelyEqual 0.1
       assert "should tolerate small differences" $

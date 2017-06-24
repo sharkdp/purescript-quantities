@@ -44,7 +44,7 @@ import Data.Decimal (Decimal, pow, fromNumber, toNumber)
 import Data.Foldable (intercalate, sum, foldMap, product)
 import Data.Function (on)
 import Data.List (List(Nil), filter, findIndex, modifyAt,
-                  singleton, sortBy, span, (:), concat)
+                  singleton, sortBy, span, (:), concat, uncons)
 import Data.List.NonEmpty (NonEmptyList(..), head, toList)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid (class Monoid)
@@ -175,6 +175,15 @@ groupBy' _ Nil = Nil
 groupBy' eq (x : xs) = case split (eq x) xs of
   { yes, no } → NonEmptyList (x :| yes) : groupBy' eq no
 
+-- | A version of `sortBy` for `NonEmptyList`.
+sortBy' ∷ ∀ a. (a → a → Ordering) → NonEmptyList a → NonEmptyList a
+sortBy' f (NonEmptyList (x :| xs)) = NonEmptyList nel
+  where
+    sorted = sortBy f (x : xs)
+    nel = case uncons sorted of
+            Just { head, tail } → head :| tail
+            Nothing             → x    :| xs   -- This can never happen
+
 -- | Simplify the internal representation of a `DerivedUnit` by merging base
 -- | units of the same type. For example, *m·s·m* will by simplified to *m²·s*.
 simplify ∷ DerivedUnit → DerivedUnit
@@ -190,22 +199,53 @@ simplify (DerivedUnit list) = DerivedUnit (go list)
                   , baseUnit: (head units).baseUnit
                   , exponent: sum $ _.exponent <$> units }
 
--- | Split up a physical units into several parts that belong to the same
+-- | Split up a physical unit into several parts that belong to the same
 -- | physical dimension (length, time, ...). In the first component, the
 -- | returned tuples contain a 'target' unit, to which this group can be
 -- | converted. In the second component, the original group is returned.
 splitByDimension ∷ DerivedUnit → List (Tuple DerivedUnit DerivedUnit)
 splitByDimension (DerivedUnit list) = transform list
   where
-    transform = groupBy' (eq `on` standardUnit) >>> map reduce
+    transform = groupBy' (eq `on` standardUnitWithoutExponent) >>> map reduce
 
+    -- Remove the exponent of a derived unit if *and only if* it exists of
+    -- a single component.
+    removeExponent ∷ DerivedUnit → DerivedUnit
+    removeExponent (DerivedUnit (u : Nil)) = DerivedUnit $ singleton (u { exponent = 1.0 })
+    removeExponent us = us
+
+    -- Get the standard unit of a given base unit, e.g. Hz -> s^(-1)
+    standardUnit ∷ BaseUnitWithExponent → DerivedUnit
     standardUnit = _.baseUnit >>> baseToStandard
 
-    reduce ∷ NonEmptyList BaseUnitWithExponent → Tuple DerivedUnit DerivedUnit
-    reduce us = Tuple first (DerivedUnit $ toList us)
+    -- Get the standard unit without exponent, e.g. Hz -> s
+    standardUnitWithoutExponent = standardUnit >>> removeExponent
+
+    -- Get the unit exponent with respect to the given base.
+    exponentWRT ∷ BaseUnitWithExponent → BaseUnitWithExponent → Number
+    exponentWRT base u = u.exponent * removedExponent u / removedExponent base
       where
-        first = DerivedUnit $ singleton $ (head us) { exponent = exp }
-        exp = sum $ (_.exponent) <$> us
+        removedExponent u' =
+          case standardUnit u' of
+            (DerivedUnit (su : Nil)) → su.exponent
+            _ → 1.0
+
+    -- | Favor standard units over non-standard units, favor lower exponents
+    -- | over larger exponents.
+    -- | This way, `ft·m` will be converted to `m²` and `liter/m` will be
+    -- | converted to `m²`.
+    heuristic ∷ BaseUnitWithExponent → BaseUnitWithExponent → Ordering
+    heuristic b1 b2 =
+         compare (isStandardUnit b1.baseUnit) (isStandardUnit b2.baseUnit)
+      <> compare b2.exponent b1.exponent
+
+    reduce ∷ NonEmptyList BaseUnitWithExponent → Tuple DerivedUnit DerivedUnit
+    reduce us' = Tuple convertTo (DerivedUnit $ toList us)
+      where
+        us = sortBy' (flip heuristic) us'
+        first = head us
+        convertTo = DerivedUnit $ singleton $ first { exponent = exp }
+        exp = sum $ exponentWRT first <$> us
 
 -- | Return a representation of the `DerivedUnit` in terms of base units, split
 -- | by physical dimension.
