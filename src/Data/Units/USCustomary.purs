@@ -24,3 +24,7 @@ tablespoon = makeNonStandard "tablespoon" "tablespoon" 0.00001478676478125 (mete
 -- | Unit of volume, the US teaspoon, *1 teaspoon = 1/3·tablespoon*.
 teaspoon ∷ DerivedUnit
 teaspoon = makeNonStandard "teaspoon" "teaspoon" 0.00000492892159375 (meter .^ 3.0)
+
+-- | Unit of volume, the US fluid ounce, *1 floz = 2 tablespoon*.
+fluidounce ∷ DerivedUnit
+fluidounce = makeNonStandard "fluidounce" "floz" 0.0000295735295625 (meter .^ 3.0)
