@@ -18,12 +18,12 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
 import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
                                bel, astronomicalUnit, bar, angstrom, barn)
 import Data.Units.Time (hour, minute, day, week, month, year)
-import Data.Units.Imperial (inch, mile, foot, yard)
+import Data.Units.Imperial (inch, mile, foot, yard, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
-import Data.Units.Misc (calorie, rpm)
+import Data.Units.Misc (calorie, rpm, fortnight)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -495,6 +495,9 @@ main = runTest do
     test "Data.Units.CGS" do
       equal (100.0 .* micro tesla) (1.0 .* gauss)
 
+    test "Data.Units.Imperial" do
+      equal (220.0 .* yard) (1.0 .* furlong)
+
     test "Data.Units.Astronomical" do
       almostEqual (206264.806247096 .* astronomicalUnit) (1.0 .* parsec)
       almostEqual (63241.077 .* astronomicalUnit) (1.0 .* lightyear)
@@ -503,6 +506,7 @@ main = runTest do
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
       almostEqual (1.0 .* hertz) (60.0 .* rpm)
+      equal (2.0 .* week) (1.0 .* fortnight)
 
   suite "Integration" do
     let testExample nr output input =

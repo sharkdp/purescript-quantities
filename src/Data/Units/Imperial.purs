@@ -27,3 +27,7 @@ ounce = makeNonStandard "ounce" "oz" 28.35 gram
 -- | Unit of mass, *1 lb = 453.6 g*.
 pound ∷ DerivedUnit
 pound = makeNonStandard "pound" "lb" 453.6 gram
+
+-- | Unit of length, *1 furlong = 201.1680 m*.
+furlong ∷ DerivedUnit
+furlong = makeNonStandard "furlong" "furlong" 201.168 meter
