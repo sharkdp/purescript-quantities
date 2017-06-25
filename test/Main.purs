@@ -21,6 +21,7 @@ import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon)
 import Data.Units.CGS (gauss)
+import Data.Units.Astronomical (parsec, lightyear)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -490,6 +491,11 @@ main = runTest do
 
     test "Data.Units.CGS" do
       equal (100.0 .* micro tesla) (1.0 .* gauss)
+
+    test "Data.Units.Astronomical" do
+      almostEqual (206264.806247096 .* astronomicalUnit) (1.0 .* parsec)
+      almostEqual (63241.077 .* astronomicalUnit) (1.0 .* lightyear)
+      almostEqual (0.30660139 .* parsec) (1.0 .* lightyear)
 
   suite "Integration" do
     let testExample nr output input =
