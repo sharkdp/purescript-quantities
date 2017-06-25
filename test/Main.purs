@@ -23,7 +23,7 @@ import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
-import Data.Units.Misc (calorie)
+import Data.Units.Misc (calorie, rpm)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -502,6 +502,7 @@ main = runTest do
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
+      almostEqual (1.0 .* hertz) (60.0 .* rpm)
 
   suite "Integration" do
     let testExample nr output input =
