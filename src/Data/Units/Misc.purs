@@ -9,6 +9,10 @@ import Data.Units.SI
 calorie ∷ DerivedUnit
 calorie = makeNonStandard "calorie" "cal" 4184.0 (gram <> meter .^ 2.0 <> second .^ (-2.0))
 
+-- | Unit of energy, *1 BTU = 1055.05585262 J*.
+btu ∷ DerivedUnit
+btu = makeNonStandard "BTU" "BTU" 1055055.85262 (gram <> meter .^ 2.0 <> second .^ (-2.0))
+
 -- | Unit of frequency, *1 rpm = 1/min*.
 rpm ∷ DerivedUnit
 rpm = makeNonStandard "rpm" "rpm" (1.0 / 60.0) (second .^ (-1.0))

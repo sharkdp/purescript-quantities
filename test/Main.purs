@@ -23,7 +23,7 @@ import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
-import Data.Units.Misc (calorie, rpm, fortnight, mmHg, psi, atm)
+import Data.Units.Misc (calorie, btu, rpm, fortnight, mmHg, psi, atm)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
@@ -517,6 +517,7 @@ main = runTest do
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
+      equal (1055.05585262 .* joule) (1.0 .* btu)
       almostEqual (1.0 .* hertz) (60.0 .* rpm)
       equal (2.0 .* week) (1.0 .* fortnight)
       equal (133.322387415 .* pascal) (1.0 .* mmHg)
