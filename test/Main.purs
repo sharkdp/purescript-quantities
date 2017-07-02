@@ -8,7 +8,7 @@ import Data.Tuple (fst, snd)
 import Data.Number.Approximate ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa,
-                   removePrefix)
+                   removePrefix, kibi, mebi, gibi, exbi)
 import Data.Units as U
 import Data.Units.SI (meter, gram, second, ampere, kelvin, mole, candela)
 import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
@@ -156,6 +156,10 @@ main = runTest do
       equal "Es" $ U.toString (exa second)
       equal "as²" $ U.toString (atto second .^ 2.0)
       equal "Ts²" $ U.toString (tera second .^ 2.0)
+      equal "KiB" $ U.toString (kibi byte)
+      equal "MiB" $ U.toString (mebi byte)
+      equal "GiB" $ U.toString (gibi byte)
+      equal "GiB²" $ U.toString (gibi byte .^ 2.0)
 
     test "power" do
       equal (meter <> meter) (meter .^ 2.0)
@@ -239,6 +243,7 @@ main = runTest do
 
     test "removePrefix" do
       equal (meter <> second) (removePrefix (kilo meter <> nano second))
+      equal (byte <> second .^ 2.0) (removePrefix (mebi byte <> nano second .^ 2.0))
 
     test "simplify" do
       equal "m" $
@@ -429,6 +434,13 @@ main = runTest do
       equal (2.4 .* seconds) (Q.abs (2.4 .* seconds))
       equal (2.4 .* seconds) (Q.abs ((-2.4) .* seconds))
       equal (0.0 .* seconds) (Q.abs (0.0 .* seconds))
+
+    test "Prefixes" do
+      equal (1024.0 .* byte) (1.0 .* kibi byte)
+      equal ((1024.0 `Math.pow` 3.0) .* byte) (1.0 .* gibi byte)
+      equal (kibi byte <> mega meter) (mega byte <> kibi meter)
+      equal (giga byte <> kibi meter <> exbi second <> mega gram)
+            (mega byte <> exbi meter <> kibi second <> giga gram)
 
   suite "Data.Quantity.Math" do
     test "Functions" do

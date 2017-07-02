@@ -2,7 +2,8 @@
 module Data.Units
   ( Prefix
   , DerivedUnit()
-  , withPrefix
+  , decimalPrefix
+  , binaryPrefix
   , removePrefix
   , simplify
   , splitByDimension
@@ -36,19 +37,30 @@ module Data.Units
   , tera
   , peta
   , exa
+  , kibi
+  , mebi
+  , gibi
+  , tebi
+  , pebi
+  , exbi
+  , zebi
+  , yobi
   ) where
 
 import Prelude
 
 import Data.Decimal (Decimal, pow, fromNumber, toNumber)
-import Data.Foldable (intercalate, sum, foldMap, product)
+import Data.Foldable (intercalate, sum, foldMap, product, fold)
 import Data.Function (on)
 import Data.List (List(Nil), filter, findIndex, modifyAt,
                   singleton, sortBy, span, (:), concat, uncons)
 import Data.List.NonEmpty (NonEmptyList(..), head, toList)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid (class Monoid)
+import Data.Monoid.Additive (Additive(..))
+import Data.Newtype (un)
 import Data.NonEmpty ((:|))
+import Data.Pair (Pair(..))
 import Data.Tuple (Tuple(..), fst, snd)
 
 -- | A factor which is used to convert between two units. For the conversion
@@ -113,14 +125,28 @@ conversionFactor (BaseUnit u) =
     Standard → one
     NonStandard { standardUnit, factor } → factor
 
--- | A number that represents a power of ten as a prefix for a unit.
-type Prefix = Decimal
+-- | Units can have both decimal prefixes (micro, kilo, ..) or binary
+-- | prefixes (kibi, mebi, ..).
+data PrefixBase = Decimal | Binary
+
+derive instance eqPrefixBase ∷ Eq PrefixBase
+
+-- | A number that represents a power of ten/two as a prefix for a unit.
+data Prefix = Prefix PrefixBase Decimal
+
+instance eqPrefix ∷ Eq Prefix where
+  eq (Prefix b1 e1) (Prefix b2 e2) =
+    (e1 == zero && e2 == zero) || (b1 == b2 && e1 == e2)
+
+-- | Represents a non-existing prefix
+noPrefix ∷ Prefix
+noPrefix = Prefix Decimal zero
 
 -- | A number that represents the exponent of a unit, like *2* in *m²*.
 type Exponent = Number
 
--- | Type alias for something like *m³*, *s⁻¹*, *km²* or similar A prefix.
--- | value of `p` represents an additional factor of `10^p`. The mathematical
+-- | Type alias for something like *m³*, *s⁻¹*, *km²* or similar. A prefix
+-- | value represents an additional factor of `10^p` or `2^p`. The mathematical
 -- | representation of this record would be *(10^prefix * baseUnit)^exponent*.
 type BaseUnitWithExponent = { prefix   ∷ Prefix
                             , baseUnit ∷ BaseUnit
@@ -132,29 +158,43 @@ type BaseUnitWithExponent = { prefix   ∷ Prefix
 -- | Implementation detail:
 -- | A `DerivedUnit` is a product of `BaseUnits`, raised to arbitrary powers.
 -- | Each factor also has a `Prefix` value which represents a numerical
--- | prefix as a power of ten.
+-- | prefix as a power of ten or two.
 data DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
 
 -- | Expose the underlying list of base units.
 runDerivedUnit ∷ DerivedUnit → List BaseUnitWithExponent
 runDerivedUnit (DerivedUnit u) = u
 
--- | Add a given prefix value to a unit: `withPrefix 3.0 meter = kilo meter`.
-withPrefix ∷ Number → DerivedUnit → DerivedUnit
-withPrefix p (DerivedUnit Nil) =
-  DerivedUnit $ singleton { prefix: fromNumber p, baseUnit: unity', exponent: 1.0 }
-withPrefix p (DerivedUnit us) = DerivedUnit $
-  case findIndex (\u → u.exponent == 1.0) us of
+-- | Add a given prefix value to a unit: `withPrefix Decimal 3.0 meter = kilo meter`.
+withPrefix ∷ PrefixBase → Number → DerivedUnit → DerivedUnit
+withPrefix base p (DerivedUnit Nil) =
+  DerivedUnit $ singleton { prefix: Prefix base (fromNumber p), baseUnit: unity', exponent: 1.0 }
+withPrefix base p (DerivedUnit us) = DerivedUnit $
+  case findIndex isPlaceholder us of
     Just ind →
-      fromMaybe us (modifyAt ind (\u → u { prefix = u.prefix + fromNumber p }) us)
-    Nothing → { prefix: fromNumber p, baseUnit: unity', exponent: 1.0 } : us
+      fromMaybe us (modifyAt ind addPrefixExp us)
+    Nothing → { prefix: Prefix base (fromNumber p), baseUnit: unity', exponent: 1.0 } : us
+  where
+    isPlaceholder {prefix: Prefix b prf, baseUnit, exponent} =
+      exponent == 1.0 && (base == b || prf == zero)
+    addPrefixExp du =
+      case du.prefix of
+        Prefix _ dp → du { prefix = Prefix base (fromNumber p + dp) }
+
+-- | Add a given decimal prefix value to a unit: `withDecimal 3.0 meter = kilo meter`.
+decimalPrefix ∷ Number → DerivedUnit → DerivedUnit
+decimalPrefix = withPrefix Decimal
+
+-- | Add a given binary prefix value to a unit: `withDecimal 10.0 byte = kibi byte`.
+binaryPrefix ∷ Number → DerivedUnit → DerivedUnit
+binaryPrefix = withPrefix Binary
 
 -- | Remove all prefix values from the unit:
 -- | ```
 -- | removePrefix (kilo meter <> milli second) = meter <> second
 -- | ```
 removePrefix ∷ DerivedUnit → DerivedUnit
-removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = fromNumber 0.0 }) <$> list
+removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = noPrefix }) <$> list
 
 -- | Like filter, but also return the non-matching elements.
 split ∷ ∀ a . (a → Boolean) → List a → { yes ∷ List a, no ∷ List a }
@@ -288,8 +328,13 @@ instance eqDerivedUnit ∷ Eq DerivedUnit where
       list1' = removeUnity list1
       list2' = removeUnity list2
 
-      globalPrefix ∷ List BaseUnitWithExponent → Prefix
-      globalPrefix us = sum $ map (\{prefix, baseUnit, exponent} → prefix * fromNumber exponent) us
+      globalPrefix ∷ List BaseUnitWithExponent → Pair Decimal
+      globalPrefix us = map (un Additive) $ fold (map (map Additive <<< prefixPair) us)
+        where
+          prefixPair {prefix, baseUnit, exponent} = (_ * fromNumber exponent) <$> toPair prefix
+
+          toPair (Prefix Decimal p) = Pair p zero
+          toPair (Prefix Binary p)  = Pair zero p
 
 instance showDerivedUnit ∷ Show DerivedUnit where
   show (DerivedUnit us) = listString us
@@ -298,27 +343,33 @@ instance showDerivedUnit ∷ Show DerivedUnit where
       listString (u : Nil) = show' u
       listString us'       = "(" <> intercalate " <> " (show' <$> us') <> ")"
 
-      addPrf  (-18.0) str = "(atto "  <> str <> ")"
-      addPrf  (-15.0) str = "(femto " <> str <> ")"
-      addPrf  (-12.0) str = "(pico "  <> str <> ")"
-      addPrf  ( -9.0) str = "(nano "  <> str <> ")"
-      addPrf  ( -6.0) str = "(micro " <> str <> ")"
-      addPrf  ( -3.0) str = "(milli " <> str <> ")"
-      addPrf     0.0  str = str
-      addPrf     3.0  str = "(kilo "  <> str <> ")"
-      addPrf     6.0  str = "(mega "  <> str <> ")"
-      addPrf     9.0  str = "(giga "  <> str <> ")"
-      addPrf    12.0  str = "(tera "  <> str <> ")"
-      addPrf    15.0  str = "(peta "  <> str <> ")"
-      addPrf    18.0  str = "(exa "   <> str <> ")"
-      addPrf  prefix  str = "(withPrefix (" <> show prefix <> ") (" <> str <> "))"
+      addPrf Decimal = decPrf
+      addPrf Binary = binPrf
 
-      show' { prefix, baseUnit, exponent: 1.0 } = addPrf (toNumber prefix) (show baseUnit)
-      show' { prefix, baseUnit, exponent }
-        | prefix == zero =
+      decPrf  (-18.0) str = "(atto "  <> str <> ")"
+      decPrf  (-15.0) str = "(femto " <> str <> ")"
+      decPrf  (-12.0) str = "(pico "  <> str <> ")"
+      decPrf  ( -9.0) str = "(nano "  <> str <> ")"
+      decPrf  ( -6.0) str = "(micro " <> str <> ")"
+      decPrf  ( -3.0) str = "(milli " <> str <> ")"
+      decPrf     0.0  str = str
+      decPrf     3.0  str = "(kilo "  <> str <> ")"
+      decPrf     6.0  str = "(mega "  <> str <> ")"
+      decPrf     9.0  str = "(giga "  <> str <> ")"
+      decPrf    12.0  str = "(tera "  <> str <> ")"
+      decPrf    15.0  str = "(peta "  <> str <> ")"
+      decPrf    18.0  str = "(exa "   <> str <> ")"
+      decPrf  prefix  str = "(decimalPrefix (" <> show prefix <> ") (" <> str <> "))"
+
+      binPrf  prefix  str = "(binaryPrefix (" <> show prefix <> ") (" <> str <> "))"
+
+      show' { prefix: Prefix base p, baseUnit, exponent: 1.0 } =
+        addPrf base (toNumber p) (show baseUnit)
+      show' { prefix: Prefix base p, baseUnit, exponent }
+        | p == zero =
             show baseUnit <> " .^ (" <> show exponent <> ")"
-        | otherwise      =
-            addPrf (toNumber prefix) (show baseUnit) <> " .^ (" <> show exponent <> ")"
+        | otherwise =
+            addPrf base (toNumber p) (show baseUnit) <> " .^ (" <> show exponent <> ")"
 
 instance semigroupDerivedUnit ∷ Semigroup DerivedUnit where
   append (DerivedUnit u1) (DerivedUnit u2) =
@@ -351,17 +402,19 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
     converted = convert <$> units
 
     convert ∷ BaseUnitWithExponent → Tuple DerivedUnit Decimal
-    convert { prefix, baseUnit, exponent } =
+    convert { prefix: Prefix base p, baseUnit, exponent } =
       Tuple (standardUnit .^ exponent)
-            ((fromNumber 10.0 `pow` prefix * factor) `pow` exponent')
+            ((toNum base `pow` p * factor) `pow` exponent')
         where
+          toNum Decimal = fromNumber 10.0
+          toNum Binary = fromNumber 2.0
           standardUnit = baseToStandard baseUnit
           factor = conversionFactor baseUnit
           exponent' = fromNumber exponent
 
 -- | Get the name of a SI-prefix.
 prefixName ∷ Prefix → Maybe String
-prefixName = pn <<< toNumber
+prefixName (Prefix Decimal p) = pn (toNumber p)
   where
     pn (-18.0) = Just "a"
     pn (-12.0) = Just "p"
@@ -380,6 +433,18 @@ prefixName = pn <<< toNumber
     pn   15.0  = Just "P"
     pn   18.0  = Just "E"
     pn      _  = Nothing
+prefixName (Prefix Binary p) = pn (toNumber p)
+  where
+    pn  0.0 = Just ""
+    pn 10.0 = Just "Ki"
+    pn 20.0 = Just "Mi"
+    pn 30.0 = Just "Gi"
+    pn 40.0 = Just "Ti"
+    pn 50.0 = Just "Pi"
+    pn 60.0 = Just "Ei"
+    pn 70.0 = Just "Zi"
+    pn 80.0 = Just "Yi"
+    pn    _ = Nothing
 
 -- | Helper to show exponents in superscript notation.
 prettyExponent ∷ Number → String
@@ -399,7 +464,10 @@ prettyExponent exp = "^(" <> show exp <> ")"
 toString ∷ DerivedUnit → String
 toString (DerivedUnit us) = unitString
   where
-    prefixName' exp = fromMaybe ("10^" <> show exp <> "·") (prefixName exp)
+    toNum Decimal = 10
+    toNum Binary = 2
+    prefixName' prefix@(Prefix base exp) =
+      fromMaybe (show (toNum base) <> "^" <> show exp <> "·") (prefixName prefix)
 
     withExp { prefix, baseUnit, exponent } =
       prefixName' prefix <> shortName baseUnit <> prettyExponent exponent
@@ -448,51 +516,75 @@ unity = DerivedUnit Nil
 -- | Convert a `BaseUnit` to a `DerivedUnit`.
 fromBaseUnit ∷ BaseUnit → DerivedUnit
 fromBaseUnit = DerivedUnit <<< singleton
-                           <<< { prefix: fromNumber 0.0
+                           <<< { prefix: noPrefix
                                , baseUnit: _
                                , exponent: 1.0 }
 
 atto ∷ DerivedUnit → DerivedUnit
-atto = withPrefix (-18.0)
+atto = decimalPrefix (-18.0)
 
 femto ∷ DerivedUnit → DerivedUnit
-femto = withPrefix (-15.0)
+femto = decimalPrefix (-15.0)
 
 pico ∷ DerivedUnit → DerivedUnit
-pico = withPrefix (-12.0)
+pico = decimalPrefix (-12.0)
 
 nano ∷ DerivedUnit → DerivedUnit
-nano = withPrefix (-9.0)
+nano = decimalPrefix (-9.0)
 
 micro ∷ DerivedUnit → DerivedUnit
-micro = withPrefix (-6.0)
+micro = decimalPrefix (-6.0)
 
 milli ∷ DerivedUnit → DerivedUnit
-milli = withPrefix (-3.0)
+milli = decimalPrefix (-3.0)
 
 centi ∷ DerivedUnit → DerivedUnit
-centi = withPrefix (-2.0)
+centi = decimalPrefix (-2.0)
 
 deci ∷ DerivedUnit → DerivedUnit
-deci = withPrefix (-1.0)
+deci = decimalPrefix (-1.0)
 
 hecto ∷ DerivedUnit → DerivedUnit
-hecto = withPrefix 2.0
+hecto = decimalPrefix 2.0
 
 kilo ∷ DerivedUnit → DerivedUnit
-kilo = withPrefix 3.0
+kilo = decimalPrefix 3.0
 
 mega ∷ DerivedUnit → DerivedUnit
-mega = withPrefix 6.0
+mega = decimalPrefix 6.0
 
 giga ∷ DerivedUnit → DerivedUnit
-giga = withPrefix 9.0
+giga = decimalPrefix 9.0
 
 tera ∷ DerivedUnit → DerivedUnit
-tera = withPrefix 12.0
+tera = decimalPrefix 12.0
 
 peta ∷ DerivedUnit → DerivedUnit
-peta = withPrefix 15.0
+peta = decimalPrefix 15.0
 
 exa ∷ DerivedUnit → DerivedUnit
-exa = withPrefix 18.0
+exa = decimalPrefix 18.0
+
+kibi ∷ DerivedUnit → DerivedUnit
+kibi = binaryPrefix 10.0
+
+mebi ∷ DerivedUnit → DerivedUnit
+mebi = binaryPrefix 20.0
+
+gibi ∷ DerivedUnit → DerivedUnit
+gibi = binaryPrefix 30.0
+
+tebi ∷ DerivedUnit → DerivedUnit
+tebi = binaryPrefix 40.0
+
+pebi ∷ DerivedUnit → DerivedUnit
+pebi = binaryPrefix 50.0
+
+exbi ∷ DerivedUnit → DerivedUnit
+exbi = binaryPrefix 60.0
+
+zebi ∷ DerivedUnit → DerivedUnit
+zebi = binaryPrefix 70.0
+
+yobi ∷ DerivedUnit → DerivedUnit
+yobi = binaryPrefix 80.0
