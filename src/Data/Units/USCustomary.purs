@@ -28,3 +28,11 @@ teaspoon = makeNonStandard "teaspoon" "teaspoon" 0.00000492892159375 (meter .^ 3
 -- | Unit of volume, the US fluid ounce, *1 floz = 2 tablespoon*.
 fluidounce ∷ DerivedUnit
 fluidounce = makeNonStandard "fluidounce" "floz" 0.0000295735295625 (meter .^ 3.0)
+
+-- | Unit of volume, the US hogshead, *1 hogshead = 63 gal*.
+hogshead ∷ DerivedUnit
+hogshead = makeNonStandard "hogshead" "hogshead" 0.238480942392 (meter .^ 3.0)
+
+-- | Unit of length, the US rod, *1 rod = 16.5 ft*.
+rod ∷ DerivedUnit
+rod = makeNonStandard "rod" "rod" 5.0292 meter

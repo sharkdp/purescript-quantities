@@ -20,7 +20,7 @@ import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
 import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
-                               fluidounce)
+                               fluidounce, hogshead, rod)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
 import Data.Units.Misc (calorie, btu, rpm, fortnight, mmHg, psi, atm)
@@ -512,6 +512,8 @@ main = runTest do
       equal (1.0 .* cup)           (16.0 .* tablespoon)
       equal (1.0 .* tablespoon)    ( 3.0 .* teaspoon)
       equal (2.0 .* tablespoon)    ( 1.0 .* fluidounce)
+      equal (63.0 .* gallon)       ( 1.0 .* hogshead)
+      equal (16.5 .* foot)         ( 1.0 .* rod)
 
     test "Data.Units.CGS" do
       equal (100.0 .* micro tesla) (1.0 .* gauss)
