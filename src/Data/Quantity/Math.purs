@@ -23,6 +23,7 @@ module Data.Quantity.Math
   , log10
   , max
   , min
+  , modulo
   , round
   , gamma
   , factorial
@@ -32,11 +33,12 @@ module Data.Quantity.Math
   ) where
 
 import Prelude
-import Data.Either (Either)
-import Data.Quantity (Quantity, ConversionError, asValueIn', scalar')
-import Data.Units (unity)
-import Data.Decimal (Decimal)
 import Data.Decimal as Decimal
+import Data.Decimal (Decimal)
+import Data.Either (Either)
+import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
+                      scalar', (.*), quantity')
+import Data.Units (unity)
 
 type Result = Either ConversionError Quantity
 
@@ -106,6 +108,14 @@ max = lift2 Decimal.max
 
 min ∷ Quantity → Quantity → Result
 min = lift2 Decimal.min
+
+modulo ∷ Quantity → Quantity → Result
+modulo q1 q2 = do
+  let u = derivedUnit q1
+  v1 ← q1 `asValueIn'` u
+  v2 ← q2 `asValueIn'` u
+  let res = v1 `Decimal.modulo` v2
+  pure (quantity' res u)
 
 round ∷ Quantity → Result
 round = lift Decimal.round

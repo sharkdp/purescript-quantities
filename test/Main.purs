@@ -27,9 +27,10 @@ import Data.Units.Misc (calorie, btu, rpm, fortnight, mmHg, psi, atm)
 import Data.Units.Bit (bit, byte)
 import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       convertTo, asValueIn, pow, scalar, sqrt, derivedUnit,
-                      errorMessage, showResult, qNegate, isFinite)
+                      errorMessage, showResult, qNegate, isFinite,
+                      ConversionError(..))
 import Data.Quantity as Q
-import Data.Quantity.Math (sin, asin, pi)
+import Data.Quantity.Math (sin, asin, pi, modulo)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
@@ -448,6 +449,14 @@ main = runTest do
       almostEqual' (scalar 0.5) (sin (30.0 .* degree))
       almostEqual' (30.0 .* degree) (asin (scalar 0.5))
       almostEqual' (scalar 1.0) (sin ((0.5 * Math.pi) .* radian))
+
+    test "modulo" do
+      equal (Right $ scalar 2.0) ((scalar 5.0) `modulo` (scalar 3.0))
+      equal (Right $ scalar 3.0) ((scalar (-1.0)) `modulo` (scalar 4.0))
+      equal (Right $ 3.0 .* centi meter) ((8.0 .* centi meter) `modulo` (5.0 .* centi meter))
+      equal (Right $ 35.0 .* centi meter) ((235.0 .* centi meter) `modulo` (1.0 .* meter))
+      equal (Right $ 0.04 .* meter) ((2.0 .* meter) `modulo` (7.0 .* centi meter))
+      equal (Left (ConversionError second meter)) ((8.0 .* meter) `modulo` (5.0 .* seconds))
 
   suite "Consistency checks" do
     test "Data.Units.SI.Derived" do
