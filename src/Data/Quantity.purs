@@ -266,7 +266,7 @@ qAdd q1@(v1 .*. u1) q2@(v2 .*. _)
   | otherwise = do
     q2' ← q2 `convertTo` u1
     case q2' of
-      (v2 .*. _) → pure $ (v1 + v2) ..* u1
+      (v2' .*. _) → pure $ (v1 + v2') ..* u1
 
 infixl 3 qAdd as ⊕
 

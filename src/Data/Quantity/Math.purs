@@ -37,7 +37,7 @@ import Data.Decimal as Decimal
 import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
-                      scalar', (.*), quantity')
+                      scalar', quantity')
 import Data.Units (unity)
 
 type Result = Either ConversionError Quantity
