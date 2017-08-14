@@ -3,7 +3,7 @@ module Test.Main where
 import Prelude hiding (degree)
 
 import Data.Decimal (fromNumber)
-import Data.Either (Either(..), isLeft)
+import Data.Either (Either(..), isLeft, isRight)
 import Data.Tuple (fst, snd)
 import Data.Number.Approximate ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
@@ -408,6 +408,31 @@ main = runTest do
       equal (Right $ 55.0 .* minutes) (1.0 .* hour ⊖ 5.0 .* minutes)
       assert "should not subtract meters from seconds" $
              isLeft $ 3.0 .* second ⊖ 5.0 .* meter
+
+    test "Zero" do
+      -- 0 m == 0 s
+      equal (zero .* meter) (zero .* second)
+
+      assert "should be able to convert zero to anything" $
+        isRight $ (zero .* unity) `convertTo` meter
+
+      assert "should be able to convert zero to anything" $
+        isRight $ (zero .* second) `convertTo` meter
+
+      -- should be able to add 0 to anything
+      equal (Right $ 5.0 .* meter) (5.0 .* meter ⊕ 0.0 .* unity)
+      equal (Right $ 5.0 .* meter) (0.0 .* unity ⊕ 5.0 .* meter)
+      equal (Right $ 5.0 .* meter) (5.0 .* meter ⊕ 0.0 .* seconds)
+      equal (Right $ 5.0 .* meter) (0.0 .* seconds ⊕ 5.0 .* meter)
+
+      -- same for subtraction
+      equal (Right $ 5.0 .* meter) (5.0 .* meter ⊖ 0.0 .* unity)
+      equal (Right $ (-5.0) .* meter) (0.0 .* unity ⊖ 5.0 .* meter)
+      equal (Right $ 5.0 .* meter) (5.0 .* meter ⊖ 0.0 .* seconds)
+      equal (Right $ (-5.0) .* meter) (0.0 .* seconds ⊖ 5.0 .* meter)
+
+      -- sin(0 m) == 0
+      equal (Right $ 0.0 .* unity) (sin (0.0 .* meter))
 
     test "Multiplication" do
       equal (15.0 .* meter .^ 2.0) (3.0 .* meter ⊗ 5.0 .* meter)

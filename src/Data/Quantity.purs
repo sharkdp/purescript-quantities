@@ -82,10 +82,14 @@ quantity' n du = Quantity n du
 infix 5 quantity' as ..*
 
 instance eqQuantity ∷ Eq Quantity where
-  eq q1 q2 = value q1' == value q2' && derivedUnit q1' == derivedUnit q2'
+  eq q1 q2 = (v1 == v2 && u1 == u2) || (v1 == zero && v2 == zero)
     where
       q1' = toStandard q1
       q2' = toStandard q2
+      v1 = value q1'
+      v2 = value q2'
+      u1 = derivedUnit q1'
+      u2 = derivedUnit q2'
 
 instance showQuantity ∷ Show Quantity where
   show (Quantity num unit) = show num <> " .* " <> show unit
@@ -210,8 +214,9 @@ scalar' factor = factor ..* U.unity
 -- | `ConversionError` if the conversion fails.
 convert ∷ DerivedUnit → Quantity → Either ConversionError Quantity
 convert to q@(val .*. from)
-  | to == from = Right q
-  | otherwise =
+  | to == from  = Right q
+  | val == zero = Right (zero .*. to) -- zero can be converted to any unit
+  | otherwise   =
       case U.toStandardUnit to of
         Tuple to' factor →
           let q'    = toStandard q
@@ -255,10 +260,13 @@ qNegate (v .*. u) = (-v) .*. u
 -- | Attempt to add two quantities. If the units can not be unified, an error
 -- | is returned.
 qAdd ∷ Quantity → Quantity → Either ConversionError Quantity
-qAdd (v1 .*. u1) q2 = do
-  q2' ← q2 `convertTo` u1
-  case q2' of
-    (v2 .*. _) → pure $ (v1 + v2) ..* u1
+qAdd q1@(v1 .*. u1) q2@(v2 .*. _)
+  | v1 == zero = pure q2
+  | v2 == zero = pure q1
+  | otherwise = do
+    q2' ← q2 `convertTo` u1
+    case q2' of
+      (v2 .*. _) → pure $ (v1 + v2) ..* u1
 
 infixl 3 qAdd as ⊕
 
