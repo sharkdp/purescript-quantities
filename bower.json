@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "purescript-lists": "^4.0.1",
+    "purescript-foldable-traversable": "^3.6.0",
     "purescript-monoid": "^3.0.0",
     "purescript-numbers": "^5.0.0",
     "purescript-pairs": "^5.0.0",

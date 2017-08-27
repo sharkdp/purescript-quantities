@@ -21,8 +21,11 @@ module Data.Quantity.Math
   , ceil
   , floor
   , log10
+  , max2
   , max
+  , min2
   , min
+  , mean
   , modulo
   , round
   , gamma
@@ -34,20 +37,20 @@ module Data.Quantity.Math
 
 import Prelude
 import Data.Decimal as Decimal
+import Data.List.NonEmpty (NonEmptyList, head, tail, length)
+import Data.Foldable (foldM)
 import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
-                      scalar', quantity')
-import Data.Units (unity)
+                      scalar', quantity', toScalar', (⊘), (⊕))
 
 type Result = Either ConversionError Quantity
 
 lift ∷ (Decimal → Decimal) → Quantity → Result
-lift fn q = (scalar' <<< fn) <$> (q `asValueIn'` unity)
+lift fn q = (scalar' <<< fn) <$> toScalar' q
 
 lift2 ∷ (Decimal → Decimal → Decimal) → Quantity → Quantity → Result
-lift2 fn q1 q2 = scalar' <$> (fn <$> (q1 `asValueIn'` unity)
-                                 <*> (q2 `asValueIn'` unity))
+lift2 fn q1 q2 = scalar' <$> (fn <$> toScalar' q1 <*> toScalar' q2)
 
 acos ∷ Quantity → Result
 acos = lift Decimal.acos
@@ -103,11 +106,34 @@ floor = lift Decimal.floor
 log10 ∷ Quantity → Result
 log10 = lift Decimal.log10
 
-max ∷ Quantity → Quantity → Result
-max = lift2 Decimal.max
+max2 ∷ Quantity → Quantity → Result
+max2 q1 q2 = do
+  let u1 = derivedUnit q1
+  v1 ← q1 `asValueIn'` u1
+  v2 ← q2 `asValueIn'` u1
+  if v1 >= v2
+    then pure q1
+    else pure q2
 
-min ∷ Quantity → Quantity → Result
-min = lift2 Decimal.min
+max ∷ NonEmptyList Quantity → Result
+max xs = foldM max2 (head xs) (tail xs)
+
+min2 ∷ Quantity → Quantity → Result
+min2 q1 q2 = do
+  let u1 = derivedUnit q1
+  v1 ← q1 `asValueIn'` u1
+  v2 ← q2 `asValueIn'` u1
+  if v1 <= v2
+    then pure q1
+    else pure q2
+
+min ∷ NonEmptyList Quantity → Result
+min xs = foldM min2 (head xs) (tail xs)
+
+mean ∷ NonEmptyList Quantity → Result
+mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
+  where
+    n = scalar' (Decimal.fromInt (length xs))
 
 modulo ∷ Quantity → Quantity → Result
 modulo q1 q2 = do

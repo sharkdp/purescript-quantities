@@ -1,10 +1,13 @@
 module Test.Main where
 
-import Prelude hiding (degree)
+import Prelude hiding (degree, min, max)
 
 import Data.Decimal (fromNumber)
 import Data.Either (Either(..), isLeft, isRight)
 import Data.Tuple (fst, snd)
+import Data.List (List(..), (:))
+import Data.List.NonEmpty (NonEmptyList(..))
+import Data.NonEmpty ((:|))
 import Data.Number.Approximate ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa,
@@ -30,7 +33,7 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       errorMessage, showResult, qNegate, isFinite,
                       ConversionError(..))
 import Data.Quantity as Q
-import Data.Quantity.Math (sin, asin, pi, modulo)
+import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
@@ -482,6 +485,28 @@ main = runTest do
       equal (Right $ 35.0 .* centi meter) ((235.0 .* centi meter) `modulo` (1.0 .* meter))
       equal (Right $ 0.04 .* meter) ((2.0 .* meter) `modulo` (7.0 .* centi meter))
       equal (Left (ConversionError second meter)) ((8.0 .* meter) `modulo` (5.0 .* seconds))
+
+    let qs1 = NonEmptyList $ scalar (-3.0) :| scalar 4.0 : scalar 2.0 : Nil
+    let qs2 = NonEmptyList $  (300.0 .* centi meter)
+                           :| (0.0254 .* meter)
+                           :  ((-1.0) .* inch)
+                           :   Nil
+    let qs3 = NonEmptyList $ (4.2 .* second) :| Nil
+
+    test "max" do
+      equal (Right $ scalar 4.0) (max qs1)
+      equal (Right $ 300.0 .* centi meter) (max qs2)
+      equal (Right $ 4.2 .* second) (max qs3)
+
+    test "min" do
+      equal (Right $ scalar (-3.0)) (min qs1)
+      equal (Right $ (-1.0) .* inch) (min qs2)
+      equal (Right $ 4.2 .* second) (min qs3)
+
+    test "mean" do
+      equal (Right $ scalar 1.0) (mean qs1)
+      equal (Right $ 1.0 .* meter) (mean qs2)
+      equal (Right $ 4.2 .* second) (mean qs3)
 
   suite "Consistency checks" do
     test "Data.Units.SI.Derived" do
