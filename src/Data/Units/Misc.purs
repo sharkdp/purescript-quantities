@@ -2,7 +2,7 @@
 module Data.Units.Misc where
 
 import Prelude ((<>), negate, (/), (*))
-import Data.Units (DerivedUnit, makeNonStandard, (.^), (./))
+import Data.Units (DerivedUnit, makeStandard, makeNonStandard, (.^), (./))
 import Data.Units.SI
 
 -- | Unit of energy, *1 cal = 4.184 J*.
@@ -32,3 +32,19 @@ psi = makeNonStandard "psi" "psi" (6894757.0) (gram ./ (meter <> second .^ 2.0))
 -- | Unit of pressure, *1 atm = 101325 Pa*.
 atm ∷ DerivedUnit
 atm = makeNonStandard "atm" "atm" (101325000.0) (gram ./ (meter <> second .^ 2.0))
+
+-- | Smallest addressable element on a digital display.
+pixel ∷ DerivedUnit
+pixel = makeStandard "pixel" "px"
+
+-- | Smallest possible output resolution on a printing device.
+dot ∷ DerivedUnit
+dot = makeStandard "dot" "dot"
+
+-- | A separate or limited portion or quantity of something.
+piece ∷ DerivedUnit
+piece = makeStandard "piece" "piece"
+
+-- | A human being.
+person ∷ DerivedUnit
+person = makeStandard "person" "person"
