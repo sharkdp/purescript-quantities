@@ -13,6 +13,10 @@ calorie = makeNonStandard "calorie" "cal" 4184.0 (gram <> meter .^ 2.0 <> second
 btu ∷ DerivedUnit
 btu = makeNonStandard "BTU" "BTU" 1055055.85262 (gram <> meter .^ 2.0 <> second .^ (-2.0))
 
+-- | Unit of force, *1 lbf = 4.448222 N*.
+lbf ∷ DerivedUnit
+lbf = makeNonStandard "pound_force" "lbf" 4448.222 (gram <> meter <> second .^ (-2.0))
+
 -- | Unit of frequency, *1 rpm = 1/min*.
 rpm ∷ DerivedUnit
 rpm = makeNonStandard "rpm" "rpm" (1.0 / 60.0) (second .^ (-1.0))
