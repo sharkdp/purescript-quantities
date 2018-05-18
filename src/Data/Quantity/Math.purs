@@ -50,10 +50,7 @@ lift ∷ (Decimal → Decimal) → Quantity → Result
 lift fn q = (scalar' <<< fn) <$> toScalar' q
 
 lift2 ∷ (Decimal → Decimal → Decimal) → Quantity → Quantity → Result
-lift2 fn q1 q2 = scalar' <$> (fn <$> toScalar' q1 <*> toScalar' q2)
-
-lift2' ∷ (Decimal → Decimal → Decimal) → Quantity → Quantity → Result
-lift2' f q1 q2 = do
+lift2 f q1 q2 = do
   let u = derivedUnit q1
   v1 ← q1 `asValueIn'` u
   v2 ← q2 `asValueIn'` u
@@ -69,7 +66,7 @@ atan ∷ Quantity → Result
 atan = lift Decimal.atan
 
 atan2 ∷ Quantity → Quantity → Result
-atan2 = lift2' Decimal.atan2
+atan2 = lift2 Decimal.atan2
 
 cos ∷ Quantity → Result
 cos = lift Decimal.cos
@@ -114,13 +111,13 @@ log10 ∷ Quantity → Result
 log10 = lift Decimal.log10
 
 max2 ∷ Quantity → Quantity → Result
-max2 = lift2' Decimal.max
+max2 = lift2 Decimal.max
 
 max ∷ NonEmptyList Quantity → Result
 max xs = foldM max2 (head xs) (tail xs)
 
 min2 ∷ Quantity → Quantity → Result
-min2 = lift2' Decimal.min
+min2 = lift2 Decimal.min
 
 min ∷ NonEmptyList Quantity → Result
 min xs = foldM min2 (head xs) (tail xs)
@@ -131,7 +128,7 @@ mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
     n = scalar' (Decimal.fromInt (length xs))
 
 modulo ∷ Quantity → Quantity → Result
-modulo = lift2' Decimal.modulo
+modulo = lift2 Decimal.modulo
 
 round ∷ Quantity → Result
 round = lift Decimal.round
