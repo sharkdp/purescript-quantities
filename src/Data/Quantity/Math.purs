@@ -42,7 +42,7 @@ import Data.Foldable (foldM)
 import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
-                      scalar', quantity', toScalar', (⊘), (⊕))
+                      scalar', quantity', toScalar', (⊘), (⊕), (.*))
 
 type Result = Either ConversionError Quantity
 
@@ -66,7 +66,9 @@ atan ∷ Quantity → Result
 atan = lift Decimal.atan
 
 atan2 ∷ Quantity → Quantity → Result
-atan2 = lift2 Decimal.atan2
+atan2 x y = removeDims <$> lift2 Decimal.atan2 x y
+  where
+    removeDims q = q ⊘ 1.0 .* derivedUnit q
 
 cos ∷ Quantity → Result
 cos = lift Decimal.cos
