@@ -33,7 +33,7 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       errorMessage, showResult, qNegate, isFinite,
                       ConversionError(..))
 import Data.Quantity as Q
-import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean)
+import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean, atan2)
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
@@ -485,6 +485,11 @@ main = runTest do
       equal (Right $ 35.0 .* centi meter) ((235.0 .* centi meter) `modulo` (1.0 .* meter))
       equal (Right $ 0.04 .* meter) ((2.0 .* meter) `modulo` (7.0 .* centi meter))
       equal (Left (ConversionError second meter)) ((8.0 .* meter) `modulo` (5.0 .* seconds))
+
+    test "atan2" do
+      almostEqual' (scalar (Math.pi / 2.0)) ((scalar 10.0) `atan2` (scalar 0.0))
+      almostEqual' (scalar (Math.pi / 4.0)) ((100.0 .* centi meter) `atan2` (1.0 .* meter))
+      equal (Left (ConversionError meter second)) ((1.0 .* second) `atan2` (2.0 .* meter))
 
     let qs1 = NonEmptyList $ scalar (-3.0) :| scalar 4.0 : scalar 2.0 : Nil
     let qs2 = NonEmptyList $  (300.0 .* centi meter)
