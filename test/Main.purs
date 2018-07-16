@@ -35,18 +35,15 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
 import Data.Quantity as Q
 import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean, atan2)
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
-import Control.Monad.Aff.AVar (AVAR)
+import Effect (Effect)
 
 import Math as Math
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
-import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.Assert (assert, assertFalse, equal)
 
-almostEqualNumbers ∷ ∀ e. Number → Number → Test e
+almostEqualNumbers ∷ Number → Number → Test
 almostEqualNumbers x y = do
   if x ≅ y
     then success
@@ -54,7 +51,7 @@ almostEqualNumbers x y = do
 
 -- | Test if two quantities are almost equal, i.e. if the units match and the
 -- | numerical value is approximately the same.
-almostEqual ∷ ∀ e. Quantity → Quantity → Test e
+almostEqual ∷ Quantity → Quantity → Test
 almostEqual expected actual = do
   if expected `approximatelyEqual` actual
     then success
@@ -64,13 +61,13 @@ almostEqual expected actual = do
     approximatelyEqual = Q.approximatelyEqual tolerance
     tolerance = 1.0e-6
 
-almostEqual' ∷ ∀ e err. Quantity → Either err Quantity → Test e
+almostEqual' ∷ ∀ err. Quantity → Either err Quantity → Test
 almostEqual' expected actual =
   case actual of
     Left _ → failure "Conversion error"
     Right actual' → almostEqual expected actual'
 
-main ∷ Eff (console ∷ CONSOLE, testOutput ∷ TESTOUTPUT, avar ∷ AVAR) Unit
+main ∷ Effect Unit
 main = runTest do
   let
     meters = meter

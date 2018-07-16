@@ -56,7 +56,6 @@ import Data.List (List(Nil), filter, findIndex, modifyAt,
                   singleton, sortBy, span, (:), concat, uncons)
 import Data.List.NonEmpty (NonEmptyList(..), head, toList)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Monoid (class Monoid)
 import Data.Monoid.Additive (Additive(..))
 import Data.Newtype (un)
 import Data.NonEmpty ((:|))
@@ -312,8 +311,8 @@ baseRepresentation du
         _ → u
 
 instance eqDerivedUnit ∷ Eq DerivedUnit where
-  eq u1 u2 = (_.baseUnit <$> list1' == _.baseUnit <$> list2')
-          && (_.exponent <$> list1' == _.exponent <$> list2')
+  eq u1 u2 = ((_.baseUnit <$> list1') == (_.baseUnit <$> list2'))
+          && ((_.exponent <$> list1') == (_.exponent <$> list2'))
           && globalPrefix list1 == globalPrefix list2
     where
       prepare = simplify
