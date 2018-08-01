@@ -45,6 +45,10 @@ pixel = makeStandard "pixel" "px"
 dot ∷ DerivedUnit
 dot = makeStandard "dot" "dot"
 
+-- | A single image in a (video) sequence.
+frame ∷ DerivedUnit
+frame = makeStandard "frame" "frame"
+
 -- | A separate or limited portion or quantity of something.
 piece ∷ DerivedUnit
 piece = makeStandard "piece" "piece"
