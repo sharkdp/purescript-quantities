@@ -44,13 +44,14 @@ module Data.Quantity
 
 import Prelude
 
+import Data.Array (notElem)
 import Data.Either (Either(..))
 import Data.Foldable (product, foldMap)
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Number.Approximate (Fraction(..), eqRelative)
 
 import Data.Units (DerivedUnit, toString, (.^), (./), unity, removePrefix)
-import Data.Units.SI.Derived (radian) as SI
+import Data.Units.SI.Derived (radian, steradian) as SI
 import Data.Units.SI.Accepted (degree) as SI
 import Data.Units as U
 import Data.Decimal (Decimal, fromNumber, toNumber)
@@ -136,12 +137,16 @@ toStandard (num .*. du) =
   case U.toStandardUnit du of
     Tuple du' conversion → (conversion * num) ..* du'
 
--- | Attempt to simplify the unit of a quantity.
+-- | Attempt to simplify the unit of a quantity, except angles.
 fullSimplify ∷ Quantity → Quantity
-fullSimplify q@(num .*. du) =
+fullSimplify = fullSimplify' [SI.degree, SI.radian, SI.steradian]
+
+-- | Attempt to simplify the unit of a quantity, except the given units.
+fullSimplify' ∷ Array DerivedUnit → Quantity → Quantity
+fullSimplify' blacklist q@(num .*. du) =
   case toScalar' q of
     Right n →
-     if removePrefix du /= SI.degree && removePrefix du /= SI.radian
+     if removePrefix du `notElem` blacklist
        then n .*. unity
        else num ..* du
     Left _ →
