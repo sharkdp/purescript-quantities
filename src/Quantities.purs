@@ -27,7 +27,7 @@ import Data.Quantity.Math (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, c
                            min2, modulo, pi, round, sin, sinh, tan, tanh, tau) as DQM
 import Data.Quantity.Physics (avogadroConstant, electronCharge, electronMass, g0,
                               gravitationalConstant, kB, planckConstant, protonMass,
-                              speedOfLight, µ0, µB, α, ε0, ℏ) as DQP
+                              idealGasConstant, speedOfLight, µ0, µB, α, ε0, ℏ) as DQP
 import Data.Units (DerivedUnit, Prefix, atto, baseRepresentation, binaryPrefix, centi, deci,
                    decimalPrefix, divideUnits, exa, exbi, femto, gibi, giga, hecto, kibi,
                    kilo, makeNonStandard, makeStandard, mebi, mega, micro, milli, nano, pebi,

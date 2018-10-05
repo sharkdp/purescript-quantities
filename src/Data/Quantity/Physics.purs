@@ -14,17 +14,17 @@ module Data.Quantity.Physics
   , avogadroConstant
   , kB
   , g0
+  , idealGasConstant
   ) where
 
 import Prelude
 
 import Data.Decimal (fromNumber)
 import Data.Either (Either(..))
-import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar, pow, fullSimplify,
-                      convertTo)
+import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar, pow, fullSimplify, convertTo)
 import Data.Quantity.Math (pi)
 import Data.Units ((.^), (./), kilo)
-import Data.Units.SI (meter, second, gram, ampere, kilogram, mole, kelvin)
+import Data.Units.SI (ampere, gram, kelvin, kilogram, meter, mole, second)
 import Data.Units.SI.Derived (joule, coulomb, newton, tesla, farad)
 
 -- | The speed of light in vacuum.
@@ -87,3 +87,7 @@ kB = 1.38064852e-23 .* (joule ./ kelvin)
 -- | Standard gravitational acceleration on earth.
 g0 ∷ Quantity
 g0 = 9.80665 .* meter ./ second .^ (2.0)
+
+-- Ideal gas constant.
+idealGasConstant :: Quantity
+idealGasConstant = 8.3145 .* joule ./ (mole <> kelvin)
