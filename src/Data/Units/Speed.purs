@@ -1,6 +1,7 @@
 module Data.Units.Speed where
 
 import Data.Units(DerivedUnit, makeNonStandard)
+import Data.Units.SI
 
 knot :: DerivedUnit
 knot = makeNonStandard "knot" "kn" (1852/3600) (meter ./ second)
