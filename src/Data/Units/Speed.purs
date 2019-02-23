@@ -1,7 +1,6 @@
 module Data.Units.Speed where
 
-import Prelude ((/))
-import Data.Units(DerivedUnit, makeNonStandard)
+import Data.Units(DerivedUnit, makeNonStandard, (./))
 import Data.Units.SI
 
 knot :: DerivedUnit
