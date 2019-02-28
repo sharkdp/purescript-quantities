@@ -1,4 +1,4 @@
-module Data.Units.Speed where
+module Data.Units.Nautical where
 
 import Prelude ((/))
 import Data.Units(DerivedUnit, makeNonStandard, (./))

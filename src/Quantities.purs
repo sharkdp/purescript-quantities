@@ -7,7 +7,7 @@ module Quantities
   , module DUS
   , module DUSD
   , module DUSA
-  , module DUSP
+  , module DNAU
   , module DUT
   , module DUI
   , module DUUSC
@@ -40,7 +40,7 @@ import Data.Units.SI.Derived (becquerel, coulomb, farad, gray, henry, hertz, jou
                               steradian, tesla, volt, watt, weber) as DUSD
 import Data.Units.SI.Accepted (angstrom, astronomicalUnit, bar, barn, bel, degree,
                                electronvolt, hectare, liter, tonne) as DUSA
-import Data.Units.Speed (knot, nauticalMile) as DUSP
+import Data.Units.Nautical (knot, nauticalMile) as DNAU
 import Data.Units.Time (day, hour, minute, month, week, year) as DUT
 import Data.Units.Imperial (foot, furlong, inch, mile, ounce, pound, yard) as DUI
 import Data.Units.USCustomary (cup, fluidounce, gallon, hogshead,
