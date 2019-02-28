@@ -24,6 +24,7 @@ import Data.Units.Time (hour, minute, day, week, month, year)
 import Data.Units.Imperial (inch, mile, foot, yard, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce, hogshead, rod)
+import Data.Units.Nautical(knot, nauticalMile)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
 import Data.Units.Misc (calorie, btu, lbf, rpm, fortnight, mmHg, psi, atm)
@@ -577,6 +578,9 @@ main = runTest do
       almostEqual (206264.806247096 .* astronomicalUnit) (1.0 .* parsec)
       almostEqual (63241.077 .* astronomicalUnit) (1.0 .* lightyear)
       almostEqual (0.30660139 .* parsec) (1.0 .* lightyear)
+
+    test "Data.Units.Nautical" do
+      equal(1.0 .* nauticalMile ./ hour) (1.0 .* knot)
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
