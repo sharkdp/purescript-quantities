@@ -580,7 +580,7 @@ main = runTest do
       almostEqual (0.30660139 .* parsec) (1.0 .* lightyear)
 
     test "Data.Units.Nautical" do
-      equal(1.0 .* nauticalMile ./ hour) (1.0 .* knot)
+      almostEqual (1.0 .* (nauticalMile ./ hour)) (1.0 .* knot)
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
