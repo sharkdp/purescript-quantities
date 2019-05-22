@@ -21,7 +21,7 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
 import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
                                bel, astronomicalUnit, bar, angstrom, barn)
 import Data.Units.Time (hour, minute, day, week, month, year)
-import Data.Units.Imperial (inch, mile, foot, yard, furlong)
+import Data.Units.Imperial (inch, mile, foot, yard, thou, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce, hogshead, rod)
 import Data.Units.Nautical(knot, nauticalMile)
@@ -362,6 +362,7 @@ main = runTest do
       checkConversion (3.0 .* foot) 1.0 yard
       checkConversion (36.0 .* inch) 1.0 yard
       checkConversion (2.0 .* foot .^ 2.0) 288.0 (inch .^ 2.0)
+      checkConversion (0.001 .* inch) 1.0 thou
       checkConversion (1.0 .* (kilo gram <> meter <> second .^ (-2.0))) 1.0 newton
       checkConversion (1.0 .* newton) 1.0 (kilo gram <> meter <> second .^ (-2.0))
       checkConversion (1.0 .* joule) 1.0 (watt <> second)
