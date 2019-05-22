@@ -25,6 +25,7 @@ import Data.Units.Imperial (inch, mile, foot, yard, thou, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce, hogshead, rod)
 import Data.Units.Nautical(knot, nauticalMile)
+import Data.Units.PartsPerX(percent, partsPerMillion, partsPerBillion, partsPerTrillion, partsPerQuadrillion)
 import Data.Units.CGS (gauss)
 import Data.Units.Astronomical (parsec, lightyear)
 import Data.Units.Misc (calorie, btu, lbf, rpm, fortnight, mmHg, psi, atm)
@@ -582,6 +583,14 @@ main = runTest do
 
     test "Data.Units.Nautical" do
       almostEqual (1.0 .* (nauticalMile ./ hour)) (1.0 .* knot)
+
+    test "Data.Units.PartsPerX" do
+      equal (3.0 .* percent) (3e-2 .* unity)
+      equal (400.0 .* partsPerMillion) (400e-6 .* unity)
+      equal (8.7 .* partsPerBillion) (8.7e-9 .* unity)
+      equal (22.9 .* partsPerTrillion) (22.9e-12 .* unity)
+      equal (10.24 .* partsPerQuadrillion) (10.24e-15 .* unity)
+      equal (400.0 .* (partsPerMillion <> (meter .^ (3.0)))) (0.4 .* liter)
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
