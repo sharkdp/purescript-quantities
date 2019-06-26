@@ -214,7 +214,7 @@ scalar' factor = factor ..* U.unity
 -- | `ConversionError` if the conversion fails.
 convert ∷ DerivedUnit → Quantity → Either ConversionError Quantity
 convert to q@(val .*. from)
-  | to == from  = Right q
+  | to == from  = Right (val .*. to)
   | val == zero = Right (zero .*. to) -- zero can be converted to any unit
   | otherwise   =
       case U.toStandardUnit to of
