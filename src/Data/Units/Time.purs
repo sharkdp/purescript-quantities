@@ -22,10 +22,10 @@ day = makeNonStandard "day" "d" (24.0 * 3600.0) second
 week ∷ DerivedUnit
 week = makeNonStandard "week" "week" (7.0 * 24.0 * 3600.0) second
 
--- | Unit of time, *1 month = 30 days + 10 hours*.
+-- | Unit of time, *1 month = 30 days + 10 hours + 30 minutes*.
 month ∷ DerivedUnit
-month = makeNonStandard "month" "month" ((30.0 * 24.0 + 10.0) * 3600.0) second
+month = makeNonStandard "month" "month" ((30.0 * 24.0 + 10.5) * 3600.0) second
 
--- | Unit of time, *1 year = 365 days*.
+-- | Unit of time, *1 year = 365.25 days* (Julian year).
 year ∷ DerivedUnit
-year = makeNonStandard "year" "year" (365.0 * 24.0 * 3600.0) second
+year = makeNonStandard "year" "year" (365.25 * 24.0 * 3600.0) second

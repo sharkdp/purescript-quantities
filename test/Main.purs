@@ -556,8 +556,8 @@ main = runTest do
       equal (60.0 .* minute)  (1.0 .* hour)
       equal (7.0 .* day)      (1.0 .* week)
       equal (24.0 .* hour)    (1.0 .* day)
-      equal (730.0 .* hour)   (1.0 .* month)
-      equal (365.0 .* day)    (1.0 .* year)
+      equal (730.5 .* hour)   (1.0 .* month)
+      equal (365.25 .* day)   (1.0 .* year)
       equal (12.0 .* month)   (1.0 .* year)
 
     test "Data.Units.USCustomary" do
