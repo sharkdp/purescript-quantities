@@ -21,7 +21,8 @@
     "purescript-foldable-traversable": "^4.1.0",
     "purescript-numbers": "^7.0.0",
     "purescript-pairs": "^7.0.0",
-    "purescript-decimals": "^5.0.0"
+    "purescript-decimals": "^5.0.0",
+    "purescript-math": "git://github.com/brianrodri/purescript-math#add-phi"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0",
