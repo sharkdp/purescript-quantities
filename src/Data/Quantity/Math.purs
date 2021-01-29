@@ -152,4 +152,4 @@ tau ∷ Quantity
 tau = scalar' $ Decimal.fromNumber 2.0 * Decimal.pi
 
 phi ∷ Quantity
-phi = scalar' Decimal.phi
+phi = (1.0 + (5.0 .^ 0.5)) ./ (2.0)
