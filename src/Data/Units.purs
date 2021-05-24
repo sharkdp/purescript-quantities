@@ -447,11 +447,11 @@ prefixName (Prefix Binary p) = pn (toNumber p)
 
 -- | Helper to show exponents in superscript notation.
 prettyExponent ∷ Number → String
-prettyExponent -5.0 = "⁻⁵"
-prettyExponent -4.0 = "⁻⁴"
-prettyExponent -3.0 = "⁻³"
-prettyExponent -2.0 = "⁻²"
-prettyExponent -1.0 = "⁻¹"
+prettyExponent (-5.0) = "⁻⁵"
+prettyExponent (-4.0) = "⁻⁴"
+prettyExponent (-3.0) = "⁻³"
+prettyExponent (-2.0) = "⁻²"
+prettyExponent (-1.0) = "⁻¹"
 prettyExponent  1.0 = ""
 prettyExponent  2.0 = "²"
 prettyExponent  3.0 = "³"
