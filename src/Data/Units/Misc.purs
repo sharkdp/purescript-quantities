@@ -17,6 +17,10 @@ btu = makeNonStandard "BTU" "BTU" 1055055.85262 (gram <> meter .^ 2.0 <> second 
 lbf ∷ DerivedUnit
 lbf = makeNonStandard "pound_force" "lbf" 4448.222 (gram <> meter <> second .^ (-2.0))
 
+-- | Unit of force, *1 kgf = 9.806650 N*.
+kgf ∷ DerivedUnit
+kgf = makeNonStandard "pound_force" "kgf" 9806.650 (gram <> meter <> second .^ (-2.0))
+
 -- | Unit of frequency, *1 rpm = 1/min*.
 rpm ∷ DerivedUnit
 rpm = makeNonStandard "rpm" "rpm" (1.0 / 60.0) (second .^ (-1.0))
