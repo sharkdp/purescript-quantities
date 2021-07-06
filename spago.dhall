@@ -4,8 +4,7 @@ You can edit this file as you like.
 -}
 { name = "quantities"
 , dependencies =
-  [ "console"
-  , "decimals"
+  [ "decimals"
   , "effect"
   , "either"
   , "foldable-traversable"
