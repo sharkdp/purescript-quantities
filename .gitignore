@@ -1,7 +1,7 @@
 /bower_components/
 /node_modules/
-/.pulp-cache/
+/.spago
 /output/
 /.psci*
 /src/.webpack.js
-/.psc-ide-port
+/.purs-repl
