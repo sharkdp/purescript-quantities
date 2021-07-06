@@ -86,6 +86,7 @@ main = runTest do
       equal (meter .^ 2.0) (meter <> meter)
       equal (second <> meter) (second <> meter)
       equal (kilo meter) (kilo meter)
+      equal (kilo (mega gram)) (giga gram)
       assertFalse "should check the prefix" $ kilo meter == meter
       assertFalse "should compare prefixes" $ kilo meter == nano meter
 
