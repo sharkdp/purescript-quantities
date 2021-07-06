@@ -70,14 +70,14 @@ infix 3 Quantity as .*.
 -- | Construct a physical quantity from a numerical value and the physical
 -- | unit.
 quantity ∷ Number → DerivedUnit → Quantity
-quantity n du = Quantity (fromNumber n) du
+quantity n = Quantity (fromNumber n)
 
 infix 5 quantity as .*
 
 -- | Construct a physical quantity from a numerical value and the physical
 -- | unit.
 quantity' ∷ Decimal → DerivedUnit → Quantity
-quantity' n du = Quantity n du
+quantity' = Quantity
 
 infix 5 quantity' as ..*
 
