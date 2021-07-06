@@ -352,7 +352,7 @@ main = runTest do
                   then failure "Conversion failed: unit /= targetUnit"
                   else
                     case q' `asValueIn` targetUnit of
-                      Left err → failure "Conversion failed in this stage?"
+                      Left _ → failure "Conversion failed in this stage?"
                       Right val → almostEqualNumbers targetValue val
 
       checkConversion (1.0 .* minute)  60.0 seconds
