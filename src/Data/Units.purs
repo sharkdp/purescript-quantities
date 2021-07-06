@@ -116,13 +116,13 @@ baseToStandard ∷ BaseUnit → DerivedUnit
 baseToStandard bu@(BaseUnit u) =
   case u.unitType of
     Standard → fromBaseUnit bu
-    NonStandard { standardUnit, factor } → standardUnit
+    NonStandard { standardUnit } → standardUnit
 
 conversionFactor ∷ BaseUnit → ConversionFactor
 conversionFactor (BaseUnit u) =
   case u.unitType of
     Standard → one
-    NonStandard { standardUnit, factor } → factor
+    NonStandard { factor } → factor
 
 -- | Units can have both decimal prefixes (micro, kilo, ..) or binary
 -- | prefixes (kibi, mebi, ..).
@@ -174,7 +174,7 @@ withPrefix base p (DerivedUnit us) = DerivedUnit $
       fromMaybe us (modifyAt ind addPrefixExp us)
     Nothing → { prefix: Prefix base (fromNumber p), baseUnit: unity', exponent: 1.0 } : us
   where
-    isPlaceholder {prefix: Prefix b prf, baseUnit, exponent} =
+    isPlaceholder {prefix: Prefix b prf, exponent} =
       exponent == 1.0 && (base == b || prf == zero)
     addPrefixExp du =
       case du.prefix of
@@ -330,7 +330,7 @@ instance eqDerivedUnit ∷ Eq DerivedUnit where
       globalPrefix ∷ List BaseUnitWithExponent → Pair Decimal
       globalPrefix us = map (un Additive) $ fold (map (map Additive <<< prefixPair) us)
         where
-          prefixPair {prefix, baseUnit, exponent} = (_ * fromNumber exponent) <$> toPair prefix
+          prefixPair {prefix, exponent} = (_ * fromNumber exponent) <$> toPair prefix
 
           toPair (Prefix Decimal p) = Pair p zero
           toPair (Prefix Binary p)  = Pair zero p
@@ -486,8 +486,8 @@ toString (DerivedUnit us) = unitString
         Nil → negativeUsStr
         _   → case negativeUs of
                 Nil → positiveUsStr
-                n : Nil → positiveUsStr <> "/" <> negativeUsStr'
-                ns → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
+                _ : Nil → positiveUsStr <> "/" <> negativeUsStr'
+                _ → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
 
 -- | Raise a unit to the given power.
 power ∷ DerivedUnit → Number → DerivedUnit
