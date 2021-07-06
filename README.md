@@ -45,7 +45,6 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 ## Development
 ```
 npm install
-spago build
 spago test
 ```
 
