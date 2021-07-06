@@ -33,7 +33,6 @@ module Data.Quantity.Math
   , pi
   , e
   , tau
-  , phi
   ) where
 
 import Prelude
@@ -150,6 +149,3 @@ e = scalar' Decimal.e
 
 tau ∷ Quantity
 tau = scalar' $ Decimal.fromNumber 2.0 * Decimal.pi
-
-phi ∷ Quantity
-phi = (1.0 + (5.0 .^ 0.5)) ./ (2.0)
