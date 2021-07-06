@@ -17,14 +17,14 @@
     "output"
   ],
   "dependencies": {
-    "purescript-lists": "^5.4.0",
-    "purescript-foldable-traversable": "^4.1.0",
-    "purescript-numbers": "^7.0.0",
-    "purescript-pairs": "^7.0.0",
-    "purescript-decimals": "^5.0.0"
+    "purescript-lists": "^6.0.0",
+    "purescript-foldable-traversable": "^5.0.0",
+    "purescript-numbers": "^8.0.0",
+    "purescript-pairs": "^8.0.0",
+    "purescript-decimals": "^6.0.0"
   },
   "devDependencies": {
-    "purescript-psci-support": "^4.0.0",
-    "purescript-test-unit": "^15.0.0"
+    "purescript-psci-support": "^5.0.0",
+    "purescript-test-unit": "^16.0.0"
   }
 }
