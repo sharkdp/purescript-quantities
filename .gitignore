@@ -1,7 +1,4 @@
-/bower_components/
-/node_modules/
+/node_modules
 /.spago
-/output/
-/.psci*
-/src/.webpack.js
+/output
 /.purs-repl
