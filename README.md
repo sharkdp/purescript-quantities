@@ -42,10 +42,11 @@ Calculate the oscillation period *T = 2π sqrt(L/g)* of a pendulum with length *
 "0.89714 s"
 ```
 
-## Installation
+## Development
 ```
-bower install purescript-quantities
 npm install decimal.js
+spago build
+spago test
 ```
 
 ## Documentation
