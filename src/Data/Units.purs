@@ -75,11 +75,7 @@ data UnitType
       , factor       ∷ ConversionFactor
       }
 
-instance eqUnitType ∷ Eq UnitType where
-  eq Standard Standard = true
-  eq (NonStandard rec1) (NonStandard rec2) = rec1.standardUnit == rec2.standardUnit
-                                          &&       rec1.factor == rec2.factor
-  eq _ _ = false
+derive instance eqUnitType ∷ Eq UnitType
 
 -- | A (single) physical unit, for example *meter* or *second*.
 newtype BaseUnit = BaseUnit
@@ -96,10 +92,7 @@ shortName (BaseUnit u) = u.short
 longName ∷ BaseUnit → String
 longName (BaseUnit u) = u.long
 
-instance eqBaseUnit ∷ Eq BaseUnit where
-  eq (BaseUnit u1) (BaseUnit u2) =     u1.long == u2.long
-                                &&    u1.short == u2.short
-                                && u1.unitType == u2.unitType
+derive newtype instance eqBaseUnit ∷ Eq BaseUnit
 
 instance showBaseUnit ∷ Show BaseUnit where
   show = longName
@@ -233,7 +226,7 @@ simplify (DerivedUnit list) = DerivedUnit (go list)
            >>> groupBy' (\u1 u2 → u1.baseUnit == u2.baseUnit
                                  && u1.prefix == u2.prefix)
            >>> map merge
-           >>> filter (\x → not (x.exponent == 0.0))
+           >>> filter (\x → x.exponent /= 0.0)
     merge units = { prefix: (head units).prefix
                   , baseUnit: (head units).baseUnit
                   , exponent: sum $ _.exponent <$> units }
