@@ -19,5 +19,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and run tests
-        run: spago test
+      - name: Build (using normal Spago config)
+        run: spago build
+
+      - name: Run tests
+        run: spago -x test.dhall test
