@@ -5,7 +5,6 @@ You can edit this file as you like.
 { name = "quantities"
 , dependencies =
   [ "decimals"
-  , "effect"
   , "either"
   , "foldable-traversable"
   , "lists"
@@ -17,11 +16,10 @@ You can edit this file as you like.
   , "pairs"
   , "prelude"
   , "psci-support"
-  , "test-unit"
   , "tuples"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, sources = [ "src/**/*.purs" ]
 , license = "MIT"
 , repository = "https://github.com/sharkdp/purescript-quantities"
 }
