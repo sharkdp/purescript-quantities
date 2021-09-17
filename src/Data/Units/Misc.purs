@@ -17,6 +17,10 @@ btu = makeNonStandard "BTU" "BTU" 1055055.85262 (gram <> meter .^ 2.0 <> second 
 lbf ∷ DerivedUnit
 lbf = makeNonStandard "pound_force" "lbf" 4448.222 (gram <> meter <> second .^ (-2.0))
 
+-- | Unit of force, *1 ozf = 16 lbf*.
+ozf ∷ DerivedUnit
+ozf = makeNonStandard "ounce_force" "ozf" (4448.222 / 16.0) (gram <> meter <> second .^ (-2.0))
+
 -- | Unit of force, *1 kgf = 9.806650 N*.
 kgf ∷ DerivedUnit
 kgf = makeNonStandard "pound_force" "kgf" 9806.650 (gram <> meter <> second .^ (-2.0))
