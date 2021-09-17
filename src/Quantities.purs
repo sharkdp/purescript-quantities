@@ -49,7 +49,7 @@ import Data.Units.USCustomary (cup, fluidounce, gallon, hogshead,
                                pint, rod, tablespoon, teaspoon) as DUUSC
 import Data.Units.Astronomical (lightyear, parsec) as DUA
 import Data.Units.Currency (dollar, euro) as DUC
-import Data.Units.Misc (atm, btu, calorie, dot, fortnight, frame, lbf,
+import Data.Units.Misc (atm, btu, calorie, dot, fortnight, frame, lbf, ozf,
                         mmHg, person, piece, pixel, psi, rpm) as DUM
 import Data.Units.CGS (gauss) as DUCGS
 import Data.Units.Bit (bit, byte) as DUB
