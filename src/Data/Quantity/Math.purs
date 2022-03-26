@@ -4,20 +4,32 @@
 -- | to a scalar fails, they will return a `ConversionError`.
 module Data.Quantity.Math
   ( acos
+  , asec
   , asin
+  , acsc
   , atan
+  , acot
   , atan2
   , cos
+  , sec
   , exp
   , ln
   , sin
+  , csc
   , tan
+  , cot
   , sinh
+  , csch
   , cosh
+  , sech
   , tanh
+  , coth
   , asinh
+  , acsch
   , acosh
+  , asech
   , atanh
+  , acoth
   , ceil
   , floor
   , log10
@@ -60,11 +72,20 @@ lift2 f q1 q2 = do
 acos ∷ Quantity → Result
 acos = lift Decimal.acos
 
+asec ∷ Quantity → Result
+asec = lift Decimal.asec
+
 asin ∷ Quantity → Result
 asin = lift Decimal.asin
 
+acsc ∷ Quantity → Result
+acsc = lift Decimal.acsc
+
 atan ∷ Quantity → Result
 atan = lift Decimal.atan
+
+acot ∷ Quantity → Result
+acot = lift Decimal.acot
 
 atan2 ∷ Quantity → Quantity → Result
 atan2 x y = removeDims <$> lift2 Decimal.atan2 x y
@@ -73,6 +94,9 @@ atan2 x y = removeDims <$> lift2 Decimal.atan2 x y
 
 cos ∷ Quantity → Result
 cos = lift Decimal.cos
+
+sec ∷ Quantity → Result
+sec = lift Decimal.sec
 
 exp ∷ Quantity → Result
 exp = lift Decimal.exp
@@ -83,26 +107,50 @@ ln = lift Decimal.ln
 sin ∷ Quantity → Result
 sin = lift Decimal.sin
 
+csc ∷ Quantity → Result
+csc = lift Decimal.csc
+
 tan ∷ Quantity → Result
 tan = lift Decimal.tan
+
+cot ∷ Quantity → Result
+cot = lift Decimal.cot
 
 sinh ∷ Quantity → Result
 sinh = lift Decimal.sinh
 
+csch ∷ Quantity → Result
+csch = lift Decimal.csch
+
 cosh ∷ Quantity → Result
 cosh = lift Decimal.cosh
+
+sech ∷ Quantity → Result
+sech = lift Decimal.sech
 
 tanh ∷ Quantity → Result
 tanh = lift Decimal.tanh
 
+coth ∷ Quantity → Result
+coth = lift Decimal.coth
+
 asinh ∷ Quantity → Result
 asinh = lift Decimal.asinh
+
+acsch ∷ Quantity → Result
+acsch = lift Decimal.acsch
 
 acosh ∷ Quantity → Result
 acosh = lift Decimal.acosh
 
+asech ∷ Quantity → Result
+asech = lift Decimal.asech
+
 atanh ∷ Quantity → Result
 atanh = lift Decimal.atanh
+
+acoth ∷ Quantity → Result
+acoth = lift Decimal.acoth
 
 ceil ∷ Quantity → Result
 ceil = lift Decimal.ceil

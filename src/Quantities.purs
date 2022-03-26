@@ -24,9 +24,10 @@ import Data.Quantity (ConversionError(..), Quantity, abs, approximatelyEqual, as
                       isFinite, pow, prettyPrint, prettyPrint', qAdd, qDivide, qMultiply,
                       qNegate, qSubtract, quantity, quantity', scalar, scalar', showResult,
                       sqrt, toScalar, toScalar', toStandard, (.*), (⊕), (⊖), (⊗), (⊘)) as DQ
-import Data.Quantity.Math (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, cos, cosh, e,
-                           exp, factorial, floor, gamma, ln, log10, max, max2, mean, min,
-                           min2, modulo, pi, round, sin, sinh, tan, tanh, tau, phi) as DQM
+import Data.Quantity.Math (acos, acosh, acot, acoth, acsc, acsch, asec, asech, asin, asinh, atan,
+                           atan2, atanh, ceil, cos, cosh, cot, coth, csc, csch, e, exp, factorial,
+                           floor, gamma, ln, log10, max, max2, mean, min, min2, modulo, pi, round,
+                           sec, sech, sin, sinh, tan, tanh, tau, phi) as DQM
 import Data.Quantity.Physics (avogadroConstant, electronCharge, electronMass, g0,
                               gravitationalConstant, kB, planckConstant, protonMass,
                               idealGasConstant, speedOfLight, µ0, µB, α, ε0, ℏ) as DQP
