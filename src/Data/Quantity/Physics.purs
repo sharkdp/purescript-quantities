@@ -78,7 +78,7 @@ protonMass = 1.672621898e-27 .* kilogram
 
 -- | Avogadro's number.
 avogadroConstant ∷ Quantity
-avogadroConstant = 6.022140857e23 .* mole .^ (-1.0)
+avogadroConstant = 6.022140857e23 .* mole .^ -1.0
 
 -- | Boltzmann constant.
 kB ∷ Quantity

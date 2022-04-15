@@ -81,7 +81,7 @@ quantity' = Quantity
 
 infix 5 quantity' as ..*
 
-instance eqQuantity ∷ Eq Quantity where
+instance Eq Quantity where
   eq q1 q2 = (v1 == v2 && u1 == u2) || (v1 == zero && v2 == zero)
     where
       q1' = toStandard q1
@@ -91,30 +91,31 @@ instance eqQuantity ∷ Eq Quantity where
       u1 = derivedUnit q1'
       u2 = derivedUnit q2'
 
-instance showQuantity ∷ Show Quantity where
+instance Show Quantity where
   show (Quantity num unit) = show num <> " .* " <> show unit
 
 prettyDecimal ∷ Decimal → String
 prettyDecimal d =
-  if D.isInteger d && d < (D.fromNumber 1.0e18)
-    then D.toString d
-    else D.toString (D.toSignificantDigits 6 d)
+  D.toString
+    if D.isInteger d && d < D.fromNumber 1.0e18
+      then d
+      else D.toSignificantDigits 6 d
 
 -- | Show a physical quantity in a human-readable form, value and unit
 -- | separately.
 prettyPrint' ∷ Quantity → { number ∷ String, space ∷ Boolean, unit ∷ String }
 prettyPrint' (val .*. du)
   | du == unity = { number: prettyDecimal val, space: false, unit: "" }
-  | otherwise   = { number: prettyDecimal val, space: space, unit: toString du }
-    where space = du /= SI.degree
+  | otherwise   = { number: prettyDecimal val, space: du /= SI.degree, unit: toString du }
 
 -- | Show a physical quantity in a human-readable form.
 prettyPrint ∷ Quantity → String
 prettyPrint q =
-  case prettyPrint' q of
-    rec →
-      let space = if rec.space then " " else ""
-      in rec.number <> space <> rec.unit
+  if rec.space
+    then rec.number <> " " <> rec.unit
+    else rec.number <> rec.unit
+  where
+    rec = prettyPrint' q
 
 -- | Show the (possibly failed) result of a computation in human-readable form.
 showResult ∷ Either ConversionError Quantity → String
@@ -176,9 +177,9 @@ approximatelyEqual tol q1' q2' =
 -- | converted into each other.
 data ConversionError = ConversionError DerivedUnit DerivedUnit
 
-derive instance eqConversionError ∷ Eq ConversionError
+derive instance Eq ConversionError
 
-instance showConversionError ∷ Show ConversionError where
+instance Show ConversionError where
   show (ConversionError u1 u2) = "ConversionError (" <> show u1 <> ")"
                                              <> " (" <> show u2 <> ")"
 
@@ -224,7 +225,7 @@ convert to q@(val .*. from)
           in
             if from' == to'
               then Right $ case q' of
-                             (val' .*. _) → (val' / factor) .*. to
+                             val' .*. _ → (val' / factor) .*. to
               else Left $ ConversionError from to
 
 -- | Flipped version of `convert`.
@@ -239,7 +240,7 @@ asValueIn' u = convertTo u >=> value >>> pure
 -- | Get the numerical value of a physical quantity in a given unit. Returns a
 -- | `ConversionError` if the conversion fails.
 asValueIn ∷ Quantity → DerivedUnit → Either ConversionError Number
-asValueIn q u = toNumber <$> (asValueIn' q u)
+asValueIn q u = toNumber <$> q `asValueIn'` u
 
 -- | Try to convert a quantity to a scalar value
 toScalar' ∷ Quantity → Either ConversionError Decimal
@@ -255,7 +256,7 @@ isFinite (n .*. _) = D.isFinite n
 
 -- | Negate the numerical value of a quantity.
 qNegate ∷ Quantity → Quantity
-qNegate (v .*. u) = (-v) .*. u
+qNegate (v .*. u) = -v .*. u
 
 -- | Attempt to add two quantities. If the units can not be unified, an error
 -- | is returned.
@@ -273,7 +274,7 @@ infixl 3 qAdd as ⊕
 -- | Attempt to subtract two quantities. If the units can not be unified, an
 -- | error is returned.
 qSubtract ∷ Quantity → Quantity → Either ConversionError Quantity
-qSubtract q1 (v2 .*. u2) = q1 ⊕ ((-v2) .*. u2)
+qSubtract q1 (v2 .*. u2) = q1 ⊕ (-v2 .*. u2)
 
 infixl 3 qSubtract as ⊖
 

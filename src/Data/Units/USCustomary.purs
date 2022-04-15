@@ -2,7 +2,7 @@
 module Data.Units.USCustomary where
 
 import Data.Units (DerivedUnit, makeNonStandard, (.^))
-import Data.Units.SI
+import Data.Units.SI (meter)
 
 -- | Unit of volume, the US liquid gallon,
 -- | *1 gal = 0.003785411784 m^3 = 231 in^3*

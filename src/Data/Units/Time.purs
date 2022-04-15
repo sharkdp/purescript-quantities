@@ -1,10 +1,10 @@
 -- | A collection of units for durations of time.
 module Data.Units.Time where
 
-import Data.Units (DerivedUnit, makeNonStandard)
-import Data.Units.SI
+import Prelude
 
-import Prelude ((*), (+))
+import Data.Units (DerivedUnit, makeNonStandard)
+import Data.Units.SI (second)
 
 -- | Unit of time, *1 min = 60 sec*.
 minute ∷ DerivedUnit
