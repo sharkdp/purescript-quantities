@@ -77,7 +77,7 @@ lux = makeNonStandard "lux" "lx" 1.0 (candela ./ meter .^ 2.0)
 
 -- | Unit of radioactivity (decays per time), *1 Bq = 1/s*.
 becquerel ∷ DerivedUnit
-becquerel = makeNonStandard "becquerel" "Bq" 1.0 (second .^ (-1.0))
+becquerel = makeNonStandard "becquerel" "Bq" 1.0 (second .^ -1.0)
 
 -- | Unit of absorbed dose, *1 Gy = 1 J/kg*.
 gray ∷ DerivedUnit

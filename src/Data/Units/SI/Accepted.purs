@@ -39,7 +39,7 @@ astronomicalUnit = makeNonStandard "astronomical unit" "AU" 1.495978707e11 meter
 
 -- | Unit of pressure, *1 bar = 10^5 Pa*.
 bar ∷ DerivedUnit
-bar = makeNonStandard "bar" "bar" 1.0e8 (gram ./ (meter <> second .^ (2.0)))
+bar = makeNonStandard "bar" "bar" 1.0e8 (gram ./ (meter <> second .^ 2.0))
 
 -- | Unit of length, *1 Å = 10^(-10) m*.
 angstrom ∷ DerivedUnit

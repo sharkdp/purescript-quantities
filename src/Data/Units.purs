@@ -75,7 +75,7 @@ data UnitType
       , factor       ∷ ConversionFactor
       }
 
-derive instance eqUnitType ∷ Eq UnitType
+derive instance Eq UnitType
 
 -- | A (single) physical unit, for example *meter* or *second*.
 newtype BaseUnit = BaseUnit
@@ -92,17 +92,14 @@ shortName (BaseUnit u) = u.short
 longName ∷ BaseUnit → String
 longName (BaseUnit u) = u.long
 
-derive newtype instance eqBaseUnit ∷ Eq BaseUnit
+derive newtype instance Eq BaseUnit
 
-instance showBaseUnit ∷ Show BaseUnit where
+instance Show BaseUnit where
   show = longName
 
 -- | Test whether or not a given `BaseUnit` is a standard unit.
 isStandardUnit ∷ BaseUnit → Boolean
-isStandardUnit (BaseUnit u) =
-  case u.unitType of
-    Standard → true
-    _        → false
+isStandardUnit (BaseUnit u) = u.unitType == Standard
 
 -- | Convert a base unit to a standard unit.
 baseToStandard ∷ BaseUnit → DerivedUnit
@@ -121,12 +118,12 @@ conversionFactor (BaseUnit u) =
 -- | prefixes (kibi, mebi, ..).
 data PrefixBase = Decimal | Binary
 
-derive instance eqPrefixBase ∷ Eq PrefixBase
+derive instance Eq PrefixBase
 
 -- | A number that represents a power of ten/two as a prefix for a unit.
 data Prefix = Prefix PrefixBase Decimal
 
-instance eqPrefix ∷ Eq Prefix where
+instance Eq Prefix where
   eq (Prefix b1 e1) (Prefix b2 e2) =
     (e1 == zero && e2 == zero) || (b1 == b2 && e1 == e2)
 
@@ -161,17 +158,16 @@ runDerivedUnit (DerivedUnit u) = u
 withPrefix ∷ PrefixBase → Number → DerivedUnit → DerivedUnit
 withPrefix base p (DerivedUnit Nil) =
   DerivedUnit $ singleton { prefix: Prefix base (fromNumber p), baseUnit: unity', exponent: 1.0 }
-withPrefix base p (DerivedUnit us) = DerivedUnit $
+withPrefix base p (DerivedUnit us) = DerivedUnit
   case findIndex isPlaceholder us of
     Just ind →
       fromMaybe us (modifyAt ind addPrefixExp us)
     Nothing → { prefix: Prefix base (fromNumber p), baseUnit: unity', exponent: 1.0 } : us
   where
-    isPlaceholder {prefix: Prefix b prf, exponent} =
+    isPlaceholder { prefix: Prefix b prf, exponent } =
       exponent == 1.0 && (base == b || prf == zero)
-    addPrefixExp du =
-      case du.prefix of
-        Prefix _ dp → du { prefix = Prefix base (fromNumber p + dp) }
+    addPrefixExp du@{ prefix: Prefix _ dp } =
+      du { prefix = Prefix base (fromNumber p + dp) }
 
 -- | Add a given decimal prefix value to a unit: `withDecimal 3.0 meter = kilo meter`.
 decimalPrefix ∷ Number → DerivedUnit → DerivedUnit
@@ -189,7 +185,7 @@ removePrefix ∷ DerivedUnit → DerivedUnit
 removePrefix (DerivedUnit list) = DerivedUnit $ (_ { prefix = noPrefix }) <$> list
 
 -- | Like filter, but also return the non-matching elements.
-split ∷ ∀ a . (a → Boolean) → List a → { yes ∷ List a, no ∷ List a }
+split ∷ ∀ a. (a → Boolean) → List a → { yes ∷ List a, no ∷ List a }
 split _ Nil = { yes: Nil, no: Nil }
 split f (x : xs) =
   if f x
@@ -227,9 +223,7 @@ simplify (DerivedUnit list) = DerivedUnit (go list)
                                  && u1.prefix == u2.prefix)
            >>> map merge
            >>> filter (\x → x.exponent /= 0.0)
-    merge units = { prefix: (head units).prefix
-                  , baseUnit: (head units).baseUnit
-                  , exponent: sum $ _.exponent <$> units }
+    merge units = (head units) { exponent = sum $ _.exponent <$> units }
 
 -- | Split up a physical unit into several parts that belong to the same
 -- | physical dimension (length, time, ...). In the first component, the
@@ -303,16 +297,16 @@ baseRepresentation du
           in DerivedUnit (singleton b')
         _ → u
 
-instance eqDerivedUnit ∷ Eq DerivedUnit where
-  eq u1 u2 = ((_.baseUnit <$> list1') == (_.baseUnit <$> list2'))
-          && ((_.exponent <$> list1') == (_.exponent <$> list2'))
+instance Eq DerivedUnit where
+  eq u1 u2 = (_.baseUnit <$> list1') == (_.baseUnit <$> list2')
+          && (_.exponent <$> list1') == (_.exponent <$> list2')
           && globalPrefix list1 == globalPrefix list2
     where
       prepare = simplify
                 >>> runDerivedUnit
                 >>> sortBy (comparing (_.baseUnit >>> shortName))
 
-      removeUnity = filter (\u → longName u.baseUnit /= "unity")
+      removeUnity = filter \u → longName u.baseUnit /= "unity"
 
       list1 = prepare u1
       list2 = prepare u2
@@ -328,7 +322,7 @@ instance eqDerivedUnit ∷ Eq DerivedUnit where
           toPair (Prefix Decimal p) = Pair p zero
           toPair (Prefix Binary p)  = Pair zero p
 
-instance showDerivedUnit ∷ Show DerivedUnit where
+instance Show DerivedUnit where
   show (DerivedUnit us) = listString us
     where
       listString Nil       = "unity"
@@ -363,11 +357,11 @@ instance showDerivedUnit ∷ Show DerivedUnit where
         | otherwise =
             addPrf base (toNumber p) (show baseUnit) <> " .^ (" <> show exponent <> ")"
 
-instance semigroupDerivedUnit ∷ Semigroup DerivedUnit where
+instance Semigroup DerivedUnit where
   append (DerivedUnit u1) (DerivedUnit u2) =
     simplify $ DerivedUnit (u1 <> u2)
 
-instance monoidDerivedUnit ∷ Monoid DerivedUnit where
+instance Monoid DerivedUnit where
   mempty = unity
 
 -- | Helper function to create a standard unit.
@@ -379,7 +373,7 @@ makeStandard long short = fromBaseUnit $
 makeNonStandard ∷ String → String → Number → DerivedUnit
                    → DerivedUnit
 makeNonStandard long short factor standardUnit = fromBaseUnit $
-  BaseUnit { short, long, unitType: NonStandard { standardUnit: standardUnit
+  BaseUnit { short, long, unitType: NonStandard { standardUnit
                                                 , factor: fromNumber factor
                                                 } }
 
@@ -464,7 +458,7 @@ toString (DerivedUnit us) = unitString
     withExp { prefix, baseUnit, exponent } =
       prefixName' prefix <> shortName baseUnit <> prettyExponent exponent
 
-    usSorted = sortBy (comparing (\rec → -rec.exponent)) us
+    usSorted = sortBy (comparing \rec → -rec.exponent) us
     splitted = span (\rec → rec.exponent >= 0.0) usSorted
     positiveUs = splitted.init
     negativeUs = sortBy (comparing _.exponent) splitted.rest

@@ -1,4 +1,4 @@
-module Test.Main where
+module Test.Main (main) where
 
 import Prelude hiding (degree, min, max)
 
@@ -46,7 +46,7 @@ import Test.Unit.Main (runTest)
 import Test.Unit.Assert (assert, assertFalse, equal)
 
 almostEqualNumbers ∷ Number → Number → Test
-almostEqualNumbers x y = do
+almostEqualNumbers x y =
   if x ≅ y
     then success
     else failure $ "expected " <> show x <> ", got " <> show y
@@ -54,7 +54,7 @@ almostEqualNumbers x y = do
 -- | Test if two quantities are almost equal, i.e. if the units match and the
 -- | numerical value is approximately the same.
 almostEqual ∷ Quantity → Quantity → Test
-almostEqual expected actual = do
+almostEqual expected actual =
   if expected `approximatelyEqual` actual
     then success
     else failure $ "expected " <> show expected <>
@@ -130,8 +130,8 @@ main = runTest do
       equal "m⁴" $ U.toString (meter .^ 4.0)
       equal "m^(8.0)" $ U.toString (meter .^ 8.0)
       equal "m^(-8.0)" $ U.toString (meter .^ -8.0)
-      equal "m⁻¹" $ U.toString (meter .^ (-1.0))
-      equal "m⁻⁴" $ U.toString (meter .^ (-4.0))
+      equal "m⁻¹" $ U.toString (meter .^ -1.0)
+      equal "m⁻⁴" $ U.toString (meter .^ -4.0)
       equal "m²·s" $ U.toString (meter <> meter <> second)
       equal "s²·m" $ U.toString (meter <> second <> second)
       equal "m/s" $ U.toString (meter ./ second)
@@ -167,9 +167,9 @@ main = runTest do
 
     test "power" do
       equal (meter <> meter) (meter .^ 2.0)
-      equal unity (meter .^ (-1.0) <> meter)
-      equal unity (meter <> meter .^ (-1.0))
-      equal (meter ./ second) (meter <> second .^ (-1.0))
+      equal unity (meter .^ -1.0 <> meter)
+      equal unity (meter <> meter .^ -1.0)
+      equal (meter ./ second) (meter <> second .^ -1.0)
       equal (micro (meter .^ 2.0)) (milli meter .^ 2.0)
 
     test "divideUnits" do
@@ -184,7 +184,7 @@ main = runTest do
 
   suite "Data.Quantity" do
     test "Eq instance" do
-      equal (3.0 .* meter) ((1.0 + 2.0) .* (meter .^ 1.0))
+      equal (3.0 .* meter) (3.0 .* (meter .^ 1.0))
       assert "should compare units" $ 3.0 .* meter /= 3.0 .* second
       assert "should compare exponents" $ 3.0 .* meter /= 3.0 .* meter .^ 1.1
       assert "should compare values" $ 3.0 .* meter /= 3.01 .* meter
@@ -201,7 +201,7 @@ main = runTest do
       equal "3.2 m" $ prettyPrint (3.2 .* meter)
       equal "3.71 m²·s" $ prettyPrint (3.71 .* (meter <> second <> meter))
       equal "3 m/s" $ prettyPrint (3.0 .* meter ./ second)
-      equal "-3.12332 Ps²" $ prettyPrint ((-3.123321) .* peta second .^ 2.0)
+      equal "-3.12332 Ps²" $ prettyPrint (-3.123321 .* peta second .^ 2.0)
       equal "3 km²" $ prettyPrint (3.0 .* kilo meter .^ 2.0)
       equal "3 K" $ prettyPrint (3.0 .* kelvin)
 
@@ -260,7 +260,7 @@ main = runTest do
         U.toString $ U.simplify (micro second <> meter <> second <> centi meter)
 
       equal "s/m" $
-        U.toString $ U.simplify (meter <> second <> meter .^ (-2.0))
+        U.toString $ U.simplify (meter <> second <> meter .^ -2.0)
 
     test "fullSimplify" do
       equal "200" $
@@ -306,7 +306,7 @@ main = runTest do
         prettyPrint $ Q.fullSimplify (5.0 .* (gram <> hertz <> second .^ 2.0))
 
       equal "0.005 m²" $
-        prettyPrint $ Q.fullSimplify (5.0 .* (meter .^ (-1.0) <> liter))
+        prettyPrint $ Q.fullSimplify (5.0 .* (meter .^ -1.0 <> liter))
 
       equal "0.005 m²" $
         prettyPrint $ Q.fullSimplify (5.0 .* (liter ./ meter))
@@ -365,8 +365,8 @@ main = runTest do
       checkConversion (36.0 .* inch) 1.0 yard
       checkConversion (2.0 .* foot .^ 2.0) 288.0 (inch .^ 2.0)
       checkConversion (0.001 .* inch) 1.0 thou
-      checkConversion (1.0 .* (kilo gram <> meter <> second .^ (-2.0))) 1.0 newton
-      checkConversion (1.0 .* newton) 1.0 (kilo gram <> meter <> second .^ (-2.0))
+      checkConversion (1.0 .* (kilo gram <> meter <> second .^ -2.0)) 1.0 newton
+      checkConversion (1.0 .* newton) 1.0 (kilo gram <> meter <> second .^ -2.0)
       checkConversion (1.0 .* joule) 1.0 (watt <> second)
       checkConversion (1.0 .* joule) 1.0 (newton <> meter)
 
@@ -376,12 +376,12 @@ main = runTest do
       almostEqual (50.0 .* meters ./ second) (180000.0 .* meters ./ hour)
 
     test "asValueIn" do
-      equal (Right $ 2.54) ((100.0 .* inches) `asValueIn` meters)
-      equal (Right $ 100.0) ((2.54 .* meters) `asValueIn` inches)
-      equal (Right $ 120.0) ((2.0 .* hours) `asValueIn` minutes)
-      equal (Right $ 2.0) ((120.0 .* minutes) `asValueIn` hours)
-      equal (Right $ 2000.0) ((2.0 .* kilo meters) `asValueIn` meters)
-      equal (Right $ 2.0) ((2000.0 .* meters) `asValueIn` kilo meters)
+      equal (Right 2.54) ((100.0 .* inches) `asValueIn` meters)
+      equal (Right 100.0) ((2.54 .* meters) `asValueIn` inches)
+      equal (Right 120.0) ((2.0 .* hours) `asValueIn` minutes)
+      equal (Right 2.0) ((120.0 .* minutes) `asValueIn` hours)
+      equal (Right 2000.0) ((2.0 .* kilo meters) `asValueIn` meters)
+      equal (Right 2.0) ((2000.0 .* meters) `asValueIn` kilo meters)
       assert "should not convert m to m^2" $
              isLeft ((2.0 .* meters) `asValueIn` (meter .^ 2.0))
       assert "should not convert meters to seconds" $
@@ -397,7 +397,7 @@ main = runTest do
       equal (Right false) (isFinite <$> (asin (scalar 2.0)))
 
     test "Negation" do
-      equal ((-8.0) .* meter) (qNegate $ 8.0 .* meter)
+      equal (-8.0 .* meter) (qNegate $ 8.0 .* meter)
       equal (0.0 .* meter) (qNegate $ 0.0 .* meter)
 
     test "Addition" do
@@ -431,9 +431,9 @@ main = runTest do
 
       -- same for subtraction
       equal (Right $ 5.0 .* meter) (5.0 .* meter ⊖ 0.0 .* unity)
-      equal (Right $ (-5.0) .* meter) (0.0 .* unity ⊖ 5.0 .* meter)
+      equal (Right $ -5.0 .* meter) (0.0 .* unity ⊖ 5.0 .* meter)
       equal (Right $ 5.0 .* meter) (5.0 .* meter ⊖ 0.0 .* seconds)
-      equal (Right $ (-5.0) .* meter) (0.0 .* seconds ⊖ 5.0 .* meter)
+      equal (Right $ -5.0 .* meter) (0.0 .* seconds ⊖ 5.0 .* meter)
 
       -- sin(0 m) == 0
       equal (Right $ 0.0 .* unity) (sin (0.0 .* meter))
@@ -462,7 +462,7 @@ main = runTest do
 
     test "abs" do
       equal (2.4 .* seconds) (Q.abs (2.4 .* seconds))
-      equal (2.4 .* seconds) (Q.abs ((-2.4) .* seconds))
+      equal (2.4 .* seconds) (Q.abs (-2.4 .* seconds))
       equal (0.0 .* seconds) (Q.abs (0.0 .* seconds))
 
     test "Prefixes" do
@@ -495,7 +495,7 @@ main = runTest do
     let qs1 = NonEmptyList $ scalar (-3.0) :| scalar 4.0 : scalar 2.0 : Nil
     let qs2 = NonEmptyList $  (300.0 .* centi meter)
                            :| (0.0254 .* meter)
-                           :  ((-1.0) .* inch)
+                           :  (-1.0 .* inch)
                            :   Nil
     let qs3 = NonEmptyList $ (4.2 .* second) :| Nil
 
@@ -506,7 +506,7 @@ main = runTest do
 
     test "min" do
       equal (Right $ scalar (-3.0)) (min qs1)
-      equal (Right $ (-1.0) .* inch) (min qs2)
+      equal (Right $ -1.0 .* inch) (min qs2)
       equal (Right $ 4.2 .* second) (min qs3)
 
     test "mean" do
@@ -519,7 +519,7 @@ main = runTest do
       -- See: https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units
       equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* radian)
       equal (1.0 .* (meter .^ 2.0 ./ meter .^ 2.0)) (1.0 .* steradian)
-      equal (1.0 .* second .^ (-1.0)) (1.0 .* hertz)
+      equal (1.0 .* second .^ -1.0) (1.0 .* hertz)
       equal (1.0 .* (kilo gram <> meter ./ second .^ 2.0)) (1.0 .* newton)
       equal (1.0 .* (newton ./ meter .^ 2.0)) (1.0 .* pascal)
       equal (1.0 .* (newton <> meter)) (1.0 .* joule)
@@ -534,7 +534,7 @@ main = runTest do
       equal (1.0 .* (weber ./ ampere)) (1.0 .* henry)
       equal (1.0 .* (candela <> steradian)) (1.0 .* lumen)
       equal (1.0 .* (lumen ./ meter .^ 2.0)) (1.0 .* lux)
-      equal (1.0 .* (second .^ (-1.0))) (1.0 .* becquerel)
+      equal (1.0 .* (second .^ -1.0)) (1.0 .* becquerel)
       equal (1.0 .* (joule ./ kilo gram)) (1.0 .* gray)
       equal (1.0 .* (joule ./ kilo gram)) (1.0 .* sievert)
       equal (1.0 .* (mole ./ second)) (1.0 .* katal)
@@ -542,15 +542,15 @@ main = runTest do
     test "Data.Units.SI.Accepted" do
       -- See: https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI
       equal ((Math.pi / 180.0) .* radian) (1.0 .* degree)
-      equal (1.0 .* (hecto meter) .^ 2.0) (1.0 .* hectare)
-      almostEqual (1.0 .* (deci meter) .^ 3.0) (1.0 .* liter)
+      equal (1.0 .* hecto meter .^ 2.0) (1.0 .* hectare)
+      almostEqual (1.0 .* deci meter .^ 3.0) (1.0 .* liter)
       equal (1000.0 .* kilo gram) (1.0 .* tonne)
       almostEqual (1.602176e-19 .* joule) (1.0 .* electronvolt)
       equal (0.1 .* bel) (1.0 .* deci bel)
       equal (149597870700.0 .* meter) (1.0 .* astronomicalUnit)
       equal (1.0e5 .* pascal) (1.0 .* bar)
       equal (100.0 .* pico meter) (1.0 .* angstrom)
-      equal (100.0 .* (femto meter) .^ 2.0) (1.0 .* barn)
+      equal (100.0 .* femto meter .^ 2.0) (1.0 .* barn)
 
     test "Data.Units.Time" do
       equal (60.0 .* second)  (1.0 .* minute)
@@ -591,7 +591,7 @@ main = runTest do
       equal (8.7 .* partsPerBillion) (8.7e-9 .* unity)
       equal (22.9 .* partsPerTrillion) (22.9e-12 .* unity)
       equal (10.24 .* partsPerQuadrillion) (10.24e-15 .* unity)
-      equal (400.0 .* (partsPerMillion <> (meter .^ (3.0)))) (0.4 .* liter)
+      equal (400.0 .* (partsPerMillion <> (meter .^ 3.0))) (0.4 .* liter)
 
     test "Data.Units.Misc" do
       equal (4.184 .* joule) (1.0 .* calorie)
