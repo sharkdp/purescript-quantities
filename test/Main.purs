@@ -20,7 +20,7 @@ import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
                               sievert, katal)
 import Data.Units.SI.Accepted (degree, hectare, liter, tonne, electronvolt,
                                bel, astronomicalUnit, bar, angstrom, barn)
-import Data.Units.Time (hour, minute, day, week, month, year)
+import Data.Units.Time (hour, minute, day, week, month, year, julianYear)
 import Data.Units.Imperial (inch, mile, foot, yard, thou, furlong)
 import Data.Units.USCustomary (gallon, pint, cup, tablespoon, teaspoon,
                                fluidounce, hogshead, rod)
@@ -557,9 +557,10 @@ main = runTest do
       equal (60.0 .* minute)  (1.0 .* hour)
       equal (7.0 .* day)      (1.0 .* week)
       equal (24.0 .* hour)    (1.0 .* day)
-      equal (730.5 .* hour)   (1.0 .* month)
-      equal (365.25 .* day)   (1.0 .* year)
+      equal (730.485 .* hour) (1.0 .* month)
+      equal (365.2425 .* day) (1.0 .* year)
       equal (12.0 .* month)   (1.0 .* year)
+      equal (365.25 .* day)   (1.0 .* julianYear)
 
     test "Data.Units.USCustomary" do
       equal (231.0 .* inch .^ 3.0) ( 1.0 .* gallon)

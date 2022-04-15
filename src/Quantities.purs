@@ -43,7 +43,7 @@ import Data.Units.SI.Accepted (angstrom, astronomicalUnit, bar, barn, bel, degre
                                electronvolt, hectare, liter, tonne) as DUSA
 import Data.Units.Nautical (knot, nauticalMile) as DNAU
 import Data.Units.PartsPerX (percent, partsPerMillion, partsPerBillion, partsPerTrillion, partsPerQuadrillion) as DPPX
-import Data.Units.Time (day, hour, minute, month, week, year) as DUT
+import Data.Units.Time (day, hour, minute, month, week, year, julianYear) as DUT
 import Data.Units.Imperial (foot, furlong, inch, mile, ounce, pound, thou, yard) as DUI
 import Data.Units.USCustomary (cup, fluidounce, gallon, hogshead,
                                pint, rod, tablespoon, teaspoon) as DUUSC
