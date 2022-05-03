@@ -10,7 +10,7 @@ jobs:
 
       - uses: purescript-contrib/setup-purescript@main
         with:
-          purescript: "0.14.2"
+          purescript: "0.15.0"
 
       - uses: actions/setup-node@v3
         with:

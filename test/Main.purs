@@ -39,7 +39,7 @@ import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean, atan2)
 
 import Effect (Effect)
 
-import Math as Math
+import Data.Number as Number
 
 import Test.Unit (Test, suite, test, success, failure)
 import Test.Unit.Main (runTest)
@@ -467,7 +467,7 @@ main = runTest do
 
     test "Prefixes" do
       equal (1024.0 .* byte) (1.0 .* kibi byte)
-      equal ((1024.0 `Math.pow` 3.0) .* byte) (1.0 .* gibi byte)
+      equal ((1024.0 `Number.pow` 3.0) .* byte) (1.0 .* gibi byte)
       equal (kibi byte <> mega meter) (mega byte <> kibi meter)
       equal (giga byte <> kibi meter <> exbi second <> mega gram)
             (mega byte <> exbi meter <> kibi second <> giga gram)
@@ -477,7 +477,7 @@ main = runTest do
       almostEqual' (scalar 1.0) (sin (90.0 .* degree))
       almostEqual' (scalar 0.5) (sin (30.0 .* degree))
       almostEqual' (30.0 .* degree) (asin (scalar 0.5))
-      almostEqual' (scalar 1.0) (sin ((0.5 * Math.pi) .* radian))
+      almostEqual' (scalar 1.0) (sin ((0.5 * Number.pi) .* radian))
 
     test "modulo" do
       equal (Right $ scalar 2.0) ((scalar 5.0) `modulo` (scalar 3.0))
@@ -488,8 +488,8 @@ main = runTest do
       equal (Left (ConversionError second meter)) ((8.0 .* meter) `modulo` (5.0 .* seconds))
 
     test "atan2" do
-      almostEqual' (scalar (Math.pi / 2.0)) ((scalar 10.0) `atan2` (scalar 0.0))
-      almostEqual' (scalar (Math.pi / 4.0)) ((100.0 .* centi meter) `atan2` (1.0 .* meter))
+      almostEqual' (scalar (Number.pi / 2.0)) ((scalar 10.0) `atan2` (scalar 0.0))
+      almostEqual' (scalar (Number.pi / 4.0)) ((100.0 .* centi meter) `atan2` (1.0 .* meter))
       equal (Left (ConversionError meter second)) ((1.0 .* second) `atan2` (2.0 .* meter))
 
     let qs1 = NonEmptyList $ scalar (-3.0) :| scalar 4.0 : scalar 2.0 : Nil
@@ -541,7 +541,7 @@ main = runTest do
 
     test "Data.Units.SI.Accepted" do
       -- See: https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI
-      equal ((Math.pi / 180.0) .* radian) (1.0 .* degree)
+      equal ((Number.pi / 180.0) .* radian) (1.0 .* degree)
       equal (1.0 .* hecto meter .^ 2.0) (1.0 .* hectare)
       almostEqual (1.0 .* deci meter .^ 3.0) (1.0 .* liter)
       equal (1000.0 .* kilo gram) (1.0 .* tonne)

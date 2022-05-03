@@ -3,7 +3,7 @@ module Data.Units.SI.Accepted where
 
 import Prelude
 
-import Math (pi)
+import Data.Number (pi)
 
 import Data.Units (DerivedUnit, makeStandard, makeNonStandard, (.^), (./),
                    unity)
