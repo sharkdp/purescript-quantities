@@ -2,3 +2,4 @@
 /.spago
 /output
 /.purs-repl
+/bower_components

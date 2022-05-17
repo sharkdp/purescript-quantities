@@ -22,7 +22,7 @@
         "purescript-newtype": "^v5.0.0",
         "purescript-nonempty": "^v7.0.0",
         "purescript-numbers": "^v9.0.0",
-        "purescript-pairs": "^v8.0.0",
+        "purescript-pairs": "^v9.0.0",
         "purescript-prelude": "^v6.0.0",
         "purescript-tuples": "^v7.0.0"
     }
