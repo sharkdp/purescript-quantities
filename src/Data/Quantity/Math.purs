@@ -149,7 +149,7 @@ e ∷ Quantity
 e = scalar' Decimal.e
 
 tau ∷ Quantity
-tau = scalar' $ Decimal.fromNumber 2.0 * Decimal.pi
+tau = scalar' $ Decimal.fromInt 2 * Decimal.pi
 
 phi ∷ Quantity
-phi = scalar' $ (one + Decimal.sqrt (Decimal.fromNumber 5.0)) / Decimal.fromNumber 2.0
+phi = scalar' $ (one + Decimal.sqrt (Decimal.fromInt 5)) / Decimal.fromInt 2

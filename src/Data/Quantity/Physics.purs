@@ -19,12 +19,12 @@ module Data.Quantity.Physics
 
 import Prelude
 
-import Data.Decimal (fromNumber)
+import Data.Decimal (fromInt)
 import Data.Either (Either(..))
 import Data.Quantity ((⊗), (⊘), (.*), Quantity, scalar, pow, fullSimplify, convertTo)
 import Data.Quantity.Math (pi)
-import Data.Units ((.^), (./), kilo)
-import Data.Units.SI (ampere, gram, kelvin, kilogram, meter, mole, second)
+import Data.Units ((.^), (./))
+import Data.Units.SI (ampere, kelvin, kilogram, meter, mole, second)
 import Data.Units.SI.Derived (joule, coulomb, newton, tesla, farad)
 
 -- | The speed of light in vacuum.
@@ -33,7 +33,7 @@ speedOfLight = 299792458.0 .* meter ./ second
 
 -- | The Newtonian constant of gravitation.
 gravitationalConstant ∷ Quantity
-gravitationalConstant = 6.67408e-11 .* meter .^ 3.0 ./ (kilo gram <> second .^ 2.0)
+gravitationalConstant = 6.67408e-11 .* meter .^ 3.0 ./ (kilogram <> second .^ 2.0)
 
 -- | The Planck constant.
 planckConstant ∷ Quantity
@@ -45,7 +45,7 @@ planckConstant = 6.626070040e-34 .* (joule <> second)
 
 -- | The mass of the electron.
 electronMass ∷ Quantity
-electronMass = 9.1093826e-31 .* kilo gram
+electronMass = 9.1093826e-31 .* kilogram
 
 -- | Elementary charge (charge of the electron).
 electronCharge ∷ Quantity
@@ -61,7 +61,7 @@ electronCharge = 1.60217653e-19 .* coulomb
        Right q → q
        Left _ → ε0'
   where
-    ε0' = scalar 1.0 ⊘ (µ0 ⊗ (speedOfLight `pow` (fromNumber 2.0)))
+    ε0' = scalar 1.0 ⊘ (µ0 ⊗ (speedOfLight `pow` (fromInt 2)))
 
 -- | Bohr magneton.
 µB ∷ Quantity
@@ -69,7 +69,7 @@ electronCharge = 1.60217653e-19 .* coulomb
 
 -- | Fine structure constant.
 α ∷ Quantity
-α = fullSimplify $ electronCharge `pow` (fromNumber 2.0) ⊘
+α = fullSimplify $ electronCharge `pow` (fromInt 2) ⊘
       (scalar 4.0 ⊗ pi ⊗ ε0 ⊗ ℏ ⊗ speedOfLight)
 
 -- | Mass of the proton.
@@ -89,5 +89,5 @@ g0 ∷ Quantity
 g0 = 9.80665 .* meter ./ second .^ (2.0)
 
 -- Ideal gas constant.
-idealGasConstant :: Quantity
+idealGasConstant ∷ Quantity
 idealGasConstant = 8.3145 .* joule ./ (mole <> kelvin)
