@@ -224,8 +224,7 @@ convert to q@(val .*. from)
               from' = derivedUnit q'
           in
             if from' == to'
-              then Right $ case q' of
-                             val' .*. _ → (val' / factor) .*. to
+              then Right $ (value q' / factor) .*. to
               else Left $ ConversionError from to
 
 -- | Flipped version of `convert`.
@@ -266,8 +265,7 @@ qAdd q1@(v1 .*. u1) q2@(v2 .*. _)
   | v2 == zero = pure q1
   | otherwise = do
     q2' ← q2 `convertTo` u1
-    case q2' of
-      (v2' .*. _) → pure $ (v1 + v2') ..* u1
+    pure $ (v1 + value q2') ..* u1
 
 infixl 3 qAdd as ⊕
 

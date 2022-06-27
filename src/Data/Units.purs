@@ -148,7 +148,7 @@ type BaseUnitWithExponent = { prefix   ∷ Prefix
 -- | A `DerivedUnit` is a product of `BaseUnits`, raised to arbitrary powers.
 -- | Each factor also has a `Prefix` value which represents a numerical
 -- | prefix as a power of ten or two.
-data DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
+newtype DerivedUnit = DerivedUnit (List BaseUnitWithExponent)
 
 -- | Expose the underlying list of base units.
 runDerivedUnit ∷ DerivedUnit → List BaseUnitWithExponent
@@ -253,7 +253,7 @@ splitByDimension (DerivedUnit list) = transform list
       where
         removedExponent u' =
           case standardUnit u' of
-            (DerivedUnit (su : Nil)) → su.exponent
+            DerivedUnit (su : Nil) → su.exponent
             _ → 1.0
 
     -- | Favor standard units over non-standard units, favor lower exponents
@@ -285,16 +285,9 @@ baseRepresentation du
 
     -- Replace "gram" by "kilo gram"
     replace u =
-      case runDerivedUnit u of
-        (b : Nil) →
-          let b' =
-                case b.baseUnit of
-                  BaseUnit rec →
-                    if rec.long == "gram"
-                      then b { baseUnit = BaseUnit (rec { long = "kilogram"
-                                                        , short = "kg" }) }
-                      else b
-          in DerivedUnit (singleton b')
+      case u of
+        DerivedUnit (b@{ baseUnit: BaseUnit rec@{ long: "gram" } } : Nil) →
+          DerivedUnit (b { baseUnit = BaseUnit (rec { long = "kilogram", short = "kg" }) } : Nil)
         _ → u
 
 instance Eq DerivedUnit where
@@ -349,9 +342,8 @@ instance Show DerivedUnit where
 
       binPrf  prefix  str = "(binaryPrefix (" <> show prefix <> ") (" <> str <> "))"
 
-      show' { prefix: Prefix base p, baseUnit, exponent: 1.0 } =
-        addPrf base (toNumber p) (show baseUnit)
       show' { prefix: Prefix base p, baseUnit, exponent }
+        | exponent == 1.0 = addPrf base (toNumber p) (show baseUnit)
         | p == zero =
             show baseUnit <> " .^ (" <> show exponent <> ")"
         | otherwise =
@@ -469,12 +461,11 @@ toString (DerivedUnit us) = unitString
     negativeUsStr' = intercalate "·" ((withExp <<< reverseExp) <$> negativeUs)
 
     unitString =
-      case positiveUs of
-        Nil → negativeUsStr
-        _   → case negativeUs of
-                Nil → positiveUsStr
-                _ : Nil → positiveUsStr <> "/" <> negativeUsStr'
-                _ → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
+      case positiveUs, negativeUs of
+        Nil, _     → negativeUsStr
+        _, Nil     → positiveUsStr
+        _, _ : Nil → positiveUsStr <> "/" <> negativeUsStr'
+        _, _       → positiveUsStr <> "/(" <> negativeUsStr' <> ")"
 
 -- | Raise a unit to the given power.
 power ∷ DerivedUnit → Number → DerivedUnit
