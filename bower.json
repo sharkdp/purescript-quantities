@@ -14,8 +14,8 @@
         "output"
     ],
     "dependencies": {
-        "purescript-decimals": "^v7.0.0",
-        "purescript-either": "^v6.0.0",
+        "purescript-decimals": "^v7.1.0",
+        "purescript-either": "^v6.1.0",
         "purescript-foldable-traversable": "^v6.0.0",
         "purescript-lists": "^v7.0.0",
         "purescript-maybe": "^v6.0.0",
