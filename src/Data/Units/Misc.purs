@@ -45,6 +45,14 @@ psi = makeNonStandard "psi" "psi" 6894757.0 (gram ./ (meter <> second .^ 2.0))
 atm ∷ DerivedUnit
 atm = makeNonStandard "atm" "atm" 101325000.0 (gram ./ (meter <> second .^ 2.0))
 
+-- | Unit of molar concentration, *1 molar = 1 mol/L*.
+molar ∷ DerivedUnit
+molar = makeNonStandard "molar" "molar" 1000.0 (mole ./ meter .^ 3.0)
+
+-- | Unit of molal concentration, *1 molal = 1 mol/kg*.
+molal ∷ DerivedUnit
+molal = makeNonStandard "molal" "molal" 0.001 (mole ./ gram)
+
 -- | Smallest addressable element on a digital display.
 pixel ∷ DerivedUnit
 pixel = makeStandard "pixel" "px"

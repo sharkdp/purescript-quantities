@@ -15,6 +15,7 @@ module Data.Quantity.Physics
   , kB
   , g0
   , idealGasConstant
+  , faradayConstant
   ) where
 
 import Prelude
@@ -88,6 +89,10 @@ kB = 1.38064852e-23 .* (joule ./ kelvin)
 g0 ∷ Quantity
 g0 = 9.80665 .* meter ./ second .^ (2.0)
 
--- Ideal gas constant.
+-- | Ideal gas constant.
 idealGasConstant ∷ Quantity
 idealGasConstant = 8.3145 .* joule ./ (mole <> kelvin)
+
+-- | Faraday constant.
+faradayConstant ∷ Quantity
+faradayConstant = electronCharge ⊗ avogadroConstant
