@@ -30,7 +30,7 @@ import Data.Quantity.Math (acos, acosh, acot, acoth, acsc, acsch, asec, asech, a
                            sec, sech, sin, sinh, tan, tanh, tau, phi) as DQM
 import Data.Quantity.Physics (avogadroConstant, electronCharge, electronMass, g0,
                               gravitationalConstant, kB, planckConstant, protonMass,
-                              idealGasConstant, speedOfLight, µ0, µB, α, ε0, ℏ) as DQP
+                              idealGasConstant, speedOfLight, µ0, µB, α, ε0, ℏ, faradayConstant) as DQP
 import Data.Units (DerivedUnit, Prefix, atto, baseRepresentation, binaryPrefix, centi, deci,
                    decimalPrefix, divideUnits, exa, exbi, femto, gibi, giga, hecto, kibi,
                    kilo, makeNonStandard, makeStandard, mebi, mega, micro, milli, nano, pebi,
@@ -51,6 +51,6 @@ import Data.Units.USCustomary (cup, fluidounce, gallon, hogshead,
 import Data.Units.Astronomical (lightyear, parsec) as DUA
 import Data.Units.Currency (dollar, euro) as DUC
 import Data.Units.Misc (atm, btu, calorie, dot, fortnight, frame, lbf, ozf,
-                        mmHg, person, piece, pixel, psi, rpm) as DUM
+                        mmHg, molal, molar, person, piece, pixel, psi, rpm) as DUM
 import Data.Units.CGS (gauss) as DUCGS
 import Data.Units.Bit (bit, byte) as DUB
