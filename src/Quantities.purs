@@ -32,10 +32,11 @@ import Data.Quantity.Physics (avogadroConstant, electronCharge, electronMass, g0
                               gravitationalConstant, kB, planckConstant, protonMass,
                               idealGasConstant, speedOfLight, µ0, µB, α, ε0, ℏ, faradayConstant) as DQP
 import Data.Units (DerivedUnit, Prefix, atto, baseRepresentation, binaryPrefix, centi, deci,
-                   decimalPrefix, divideUnits, exa, exbi, femto, gibi, giga, hecto, kibi,
-                   kilo, makeNonStandard, makeStandard, mebi, mega, micro, milli, nano, pebi,
-                   peta, pico, power, prefixName, removePrefix, simplify, splitByDimension,
-                   tebi, tera, toStandardUnit, toString, unity, yobi, zebi, (./), (.^)) as DU
+                   decimalPrefix, divideUnits, exa, exbi, femto, gibi, giga, hecto, kibi, kilo,
+                   zetta, yotta, ronna, quetta, makeNonStandard, makeStandard, mebi, mega, micro,
+                   milli, nano, pebi, zepto, yocto, ronto, quecto, peta, pico, power, prefixName,
+                   removePrefix, simplify, splitByDimension, tebi, tera, toStandardUnit, toString,
+                   unity, yobi, zebi, (./), (.^)) as DU
 import Data.Units.SI (ampere, candela, gram, kelvin, kilogram, meter, mole, second) as DUS
 import Data.Units.SI.Derived (becquerel, coulomb, farad, gray, henry, hertz, joule, katal,
                               lumen, lux, newton, ohm, pascal, radian, siemens, sievert,

@@ -22,6 +22,10 @@ module Data.Units
   -- One
   , unity
   -- Prefixes
+  , quecto
+  , ronto
+  , yocto
+  , zepto
   , atto
   , femto
   , pico
@@ -45,6 +49,10 @@ module Data.Units
   , exbi
   , zebi
   , yobi
+  , zetta
+  , yotta
+  , ronna
+  , quetta
   ) where
 
 import Prelude
@@ -325,6 +333,10 @@ instance Show DerivedUnit where
       addPrf Decimal = decPrf
       addPrf Binary = binPrf
 
+      decPrf  (-30.0) str = "(quecto "  <> str <> ")"
+      decPrf  (-27.0) str = "(ronto "  <> str <> ")"
+      decPrf  (-24.0) str = "(yocto "  <> str <> ")"
+      decPrf  (-21.0) str = "(zepto "  <> str <> ")"
       decPrf  (-18.0) str = "(atto "  <> str <> ")"
       decPrf  (-15.0) str = "(femto " <> str <> ")"
       decPrf  (-12.0) str = "(pico "  <> str <> ")"
@@ -338,6 +350,10 @@ instance Show DerivedUnit where
       decPrf    12.0  str = "(tera "  <> str <> ")"
       decPrf    15.0  str = "(peta "  <> str <> ")"
       decPrf    18.0  str = "(exa "   <> str <> ")"
+      decPrf    21.0  str = "(zetta "   <> str <> ")"
+      decPrf    24.0  str = "(yotta "   <> str <> ")"
+      decPrf    27.0  str = "(ronna "   <> str <> ")"
+      decPrf    30.0  str = "(quetta "   <> str <> ")"
       decPrf  prefix  str = "(decimalPrefix (" <> show prefix <> ") (" <> str <> "))"
 
       binPrf  prefix  str = "(binaryPrefix (" <> show prefix <> ") (" <> str <> "))"
@@ -394,6 +410,10 @@ toStandardUnit (DerivedUnit units) = Tuple units' conv
 prefixName ∷ Prefix → Maybe String
 prefixName (Prefix Decimal p) = pn (toNumber p)
   where
+    pn (-30.0) = Just "q"
+    pn (-27.0) = Just "r"
+    pn (-24.0) = Just "y"
+    pn (-21.0) = Just "z"
     pn (-18.0) = Just "a"
     pn (-12.0) = Just "p"
     pn (-15.0) = Just "f"
@@ -410,6 +430,10 @@ prefixName (Prefix Decimal p) = pn (toNumber p)
     pn   12.0  = Just "T"
     pn   15.0  = Just "P"
     pn   18.0  = Just "E"
+    pn   21.0  = Just "Z"
+    pn   24.0  = Just "Y"
+    pn   27.0  = Just "R"
+    pn   30.0  = Just "Q"
     pn      _  = Nothing
 prefixName (Prefix Binary p) = pn (toNumber p)
   where
@@ -497,6 +521,18 @@ fromBaseUnit = DerivedUnit <<< singleton
                                , baseUnit: _
                                , exponent: 1.0 }
 
+quecto ∷ DerivedUnit → DerivedUnit
+quecto = decimalPrefix (-30.0)
+
+ronto ∷ DerivedUnit → DerivedUnit
+ronto = decimalPrefix (-27.0)
+
+yocto ∷ DerivedUnit → DerivedUnit
+yocto = decimalPrefix (-24.0)
+
+zepto ∷ DerivedUnit → DerivedUnit
+zepto = decimalPrefix (-21.0)
+
 atto ∷ DerivedUnit → DerivedUnit
 atto = decimalPrefix (-18.0)
 
@@ -541,6 +577,18 @@ peta = decimalPrefix 15.0
 
 exa ∷ DerivedUnit → DerivedUnit
 exa = decimalPrefix 18.0
+
+zetta ∷ DerivedUnit → DerivedUnit
+zetta = decimalPrefix 21.0
+
+yotta ∷ DerivedUnit → DerivedUnit
+yotta = decimalPrefix 24.0
+
+ronna ∷ DerivedUnit → DerivedUnit
+ronna = decimalPrefix 27.0
+
+quetta ∷ DerivedUnit → DerivedUnit
+quetta = decimalPrefix 30.0
 
 kibi ∷ DerivedUnit → DerivedUnit
 kibi = binaryPrefix 10.0
