@@ -11,7 +11,8 @@ import Data.NonEmpty ((:|))
 import Data.Number.Approximate ((≅))
 import Data.Units (unity, (.^), (./), atto, femto, pico, nano, micro, centi,
                    deci, hecto, milli, kilo, mega, giga, tera, peta, exa,
-                   removePrefix, kibi, mebi, gibi, exbi)
+                   removePrefix, kibi, mebi, gibi, exbi, zepto, yocto, ronto,
+                   quecto, quetta, ronna, yotta, zetta)
 import Data.Units as U
 import Data.Units.SI (meter, gram, second, ampere, kelvin, mole, candela)
 import Data.Units.SI.Derived (radian, steradian, hertz, newton, pascal, joule,
@@ -143,6 +144,10 @@ main = runTest do
       equal "m·ks·s" $ U.toString (meter <> kilo second <> second)
 
     test "toString (prefixes)" do
+      equal "qm" $ U.toString (quecto meter)
+      equal "rm" $ U.toString (ronto meter)
+      equal "ym" $ U.toString (yocto meter)
+      equal "zm" $ U.toString (zepto meter)
       equal "am" $ U.toString (atto meter)
       equal "fm" $ U.toString (femto meter)
       equal "pm" $ U.toString (pico meter)
@@ -158,6 +163,10 @@ main = runTest do
       equal "Ts" $ U.toString (tera second)
       equal "Ps" $ U.toString (peta second)
       equal "Es" $ U.toString (exa second)
+      equal "Zs" $ U.toString (zetta second)
+      equal "Ys" $ U.toString (yotta second)
+      equal "Rs" $ U.toString (ronna second)
+      equal "Qs" $ U.toString (quetta second)
       equal "as²" $ U.toString (atto second .^ 2.0)
       equal "Ts²" $ U.toString (tera second .^ 2.0)
       equal "KiB" $ U.toString (kibi byte)
@@ -452,6 +461,10 @@ main = runTest do
       equal (0.5 .* tera hertz) (scalar 1.0 ⊘ 2.0 .* pico second)
       equal (0.5 .* peta hertz) (scalar 1.0 ⊘ 2.0 .* femto second)
       equal (0.5 .* exa  hertz) (scalar 1.0 ⊘ 2.0 .* atto second)
+      equal (0.5 .* zetta hertz) (scalar 1.0 ⊘ 2.0 .* zepto second)
+      equal (0.5 .* yotta hertz) (scalar 1.0 ⊘ 2.0 .* yocto second)
+      equal (0.5 .* ronna hertz) (scalar 1.0 ⊘ 2.0 .* ronto second)
+      equal (0.5 .* quetta hertz) (scalar 1.0 ⊘ 2.0 .* quecto second)
 
     test "pow" do
       let two = fromNumber 2.0
