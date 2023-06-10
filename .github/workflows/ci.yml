@@ -13,11 +13,11 @@ jobs:
 
       - uses: purescript-contrib/setup-purescript@main
         with:
-          purescript: "0.15.4"
+          purescript: "0.15.8"
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "lts/*"
 
       - name: Install dependencies
         run: npm install
