@@ -56,7 +56,7 @@ import Data.Foldable (foldM)
 import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
-                      scalar', quantity', toScalar', (⊘), (⊕), (.*))
+                      scalar', quantity', toScalar', (⊗), (⊘), (⊕), (.*), pow)
 
 type Result = Either ConversionError Quantity
 
@@ -179,7 +179,7 @@ mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
 geomean ∷ NonEmptyList Quantity → Result
-geomean xs = (pow (_ (1 ⊘ n))) <$> foldM (⊗) (head xs) (tail xs)
+geomean xs = (_ `pow` (1.0 ⊘ n)) <$> foldM (⊗) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
 
