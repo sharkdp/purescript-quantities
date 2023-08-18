@@ -57,7 +57,7 @@ import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
                       scalar', quantity', toScalar', (⊗), (⊘), (⊕), (.*), pow)
-
+import Data.Int (toNumber)
 type Result = Either ConversionError Quantity
 
 lift ∷ (Decimal → Decimal) → Quantity → Result
@@ -178,10 +178,11 @@ mean ∷ NonEmptyList Quantity → Result
 mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
+
 geomean ∷ NonEmptyList Quantity → Result
-geomean xs = (_ `pow` ((scalar' one) ⊘ n)) <$> foldM (⊗) (head xs) (tail xs)
+geomean xs = (_ `pow` ( one / n)) <$> foldM (⊗) (head xs) (tail xs)
   where
-    n = scalar' (Decimal.fromInt (length xs))
+    n = Decimal.fromInt (length xs)
 
 modulo ∷ Quantity → Quantity → Result
 modulo = lift2 Decimal.modulo
