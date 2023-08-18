@@ -179,7 +179,7 @@ mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
 geomean ∷ NonEmptyList Quantity → Result
-geomean xs = (_ `pow` (1.0 ⊘ n)) <$> foldM (⊗) (head xs) (tail xs)
+geomean xs = (_ `pow` ((scalar' one) ⊘ n)) <$> foldM (⊗) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
 
