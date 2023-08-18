@@ -36,7 +36,7 @@ import Data.Quantity (Quantity, (.*), prettyPrint, (⊕), (⊖), (⊗), (⊘),
                       errorMessage, showResult, qNegate, isFinite,
                       ConversionError(..))
 import Data.Quantity as Q
-import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean, atan2)
+import Data.Quantity.Math (sin, asin, pi, modulo, max, min, mean, geomean, atan2)
 
 import Effect (Effect)
 
@@ -511,6 +511,7 @@ main = runTest do
                            :  (-1.0 .* inch)
                            :   Nil
     let qs3 = NonEmptyList $ (4.2 .* second) :| Nil
+    let qs4 = NonEmptyList $ scalar (3.0) :| scalar 4.0 : scalar 2.0 : Nil
 
     test "max" do
       equal (Right $ scalar 4.0) (max qs1)
@@ -526,7 +527,11 @@ main = runTest do
       equal (Right $ scalar 1.0) (mean qs1)
       equal (Right $ 1.0 .* meter) (mean qs2)
       equal (Right $ 4.2 .* second) (mean qs3)
+    test "geomean" do
 
+
+      equal (Right $ 4.2 .* second) (geomean qs3)
+      equal (Right $ scalar 2.9) (geomean qs4)
   suite "Consistency checks" do
     test "Data.Units.SI.Derived" do
       -- See: https://en.wikipedia.org/wiki/International_System_of_Units#Derived_units

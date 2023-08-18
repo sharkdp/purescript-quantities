@@ -38,6 +38,7 @@ module Data.Quantity.Math
   , min2
   , min
   , mean
+  , geomean
   , modulo
   , round
   , gamma
@@ -175,6 +176,10 @@ min xs = foldM min2 (head xs) (tail xs)
 
 mean ∷ NonEmptyList Quantity → Result
 mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
+  where
+    n = scalar' (Decimal.fromInt (length xs))
+geomean ∷ NonEmptyList Quantity → Result
+geomean xs = (pow (_ (1 ⊘ n))) <$> foldM (⊗) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
 
