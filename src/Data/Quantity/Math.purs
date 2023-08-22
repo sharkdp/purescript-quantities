@@ -38,6 +38,7 @@ module Data.Quantity.Math
   , min2
   , min
   , mean
+  , geomean
   , modulo
   , round
   , gamma
@@ -55,8 +56,8 @@ import Data.Foldable (foldM)
 import Data.Decimal (Decimal)
 import Data.Either (Either)
 import Data.Quantity (Quantity, ConversionError, derivedUnit, asValueIn',
-                      scalar', quantity', toScalar', (⊘), (⊕), (.*))
-
+                      scalar', quantity', toScalar', (⊗), (⊘), (⊕), (.*), pow)
+import Data.Int (toNumber)
 type Result = Either ConversionError Quantity
 
 lift ∷ (Decimal → Decimal) → Quantity → Result
@@ -177,6 +178,11 @@ mean ∷ NonEmptyList Quantity → Result
 mean xs = (_ ⊘ n) <$> foldM (⊕) (head xs) (tail xs)
   where
     n = scalar' (Decimal.fromInt (length xs))
+
+geomean ∷ NonEmptyList Quantity → Result
+geomean xs = (_ `pow` (Decimal.fromInt 1 / n)) <$> foldM (⊗) (head xs) (tail xs)
+  where
+    n = Decimal.fromInt (length xs)
 
 modulo ∷ Quantity → Quantity → Result
 modulo = lift2 Decimal.modulo
