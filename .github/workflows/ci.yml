@@ -11,13 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: purescript-contrib/setup-purescript@main
-        with:
-          purescript: "0.15.8"
-
       - uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
+
+      - uses: purescript-contrib/setup-purescript@main
+        with:
+          purescript: "0.15.8"
+          spago: "1.0.5"
 
       - name: Install dependencies
         run: npm install
@@ -26,4 +27,4 @@ jobs:
         run: spago build
 
       - name: Run tests
-        run: spago -x test.dhall test
+        run: spago test

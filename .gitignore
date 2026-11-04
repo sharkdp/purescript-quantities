@@ -3,3 +3,4 @@
 /output
 /.purs-repl
 /bower_components
+/spago.lock
