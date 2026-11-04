@@ -1,0 +1,26 @@
+package:
+  name: quantities
+  publish:
+    version: 12.2.1
+    license: MIT
+    location:
+      githubOwner: sharkdp
+      githubRepo: purescript-quantities
+  dependencies:
+    - decimals: ">=7.1.0 <8.0.0"
+    - either: ">=6.1.0 <7.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - lists: ">=7.0.0 <8.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - newtype: ">=5.0.0 <6.0.0"
+    - nonempty: ">=7.0.0 <8.0.0"
+    - numbers: ">=9.0.1 <10.0.0"
+    - pairs: ">=9.0.1 <10.0.0"
+    - prelude: ">=6.0.1 <7.0.0"
+    - tuples: ">=7.0.0 <8.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - effect: ">=4.0.0 <5.0.0"
+      - test-unit: ">=17.0.0 <18.0.0"
+workspace: {}
